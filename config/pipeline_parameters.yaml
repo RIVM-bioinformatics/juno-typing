@@ -1,0 +1,5 @@
+# General pipeline
+sample_sheet: "sample_sheet.yaml" 
+out: "out"
+
+# Pipeline parameters

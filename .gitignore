@@ -1,0 +1,16 @@
+## Files to ignore
+sample_sheet.yaml
+config/variables.yaml
+bin/rules/download_scheme.smk
+bin/rules/srst2.smk
+bin/rules/stringmlst.smk
+bin/rules/stringmlst_builddb.smk
+tests/test_sample_sheet.yaml
+
+## Folders to ignore
+raw_data/
+out/
+db/
+.snakemake/
+bin/kma/
+bin/cge-mlst

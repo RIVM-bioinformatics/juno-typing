@@ -1,0 +1,9 @@
+local-cores: 8
+cores: 300
+latency-wait: 60
+use-conda: true
+jobname: Juno-typing_{name}.jobid{jobid}
+keep-going: true
+printshellcmds: true
+conda-frontend: mamba
+

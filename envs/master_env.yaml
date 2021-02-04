@@ -1,0 +1,17 @@
+name: juno_mmaster
+channels:
+  - bioconda
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - mamba
+  - snakemake==5.20.1
+  - drmaa==0.7.9
+  - xlrd==1.2.0
+  - git==2.21.0
+  - pip==19.2.3
+  - pandas=1.1.0
+  - pip:
+    - PyYAML==5.3.1
+
