@@ -18,6 +18,7 @@
 ###                         cgemlst_fastq are run, according to the user's input.                                                           ###                                                     ###
 ###############################################################################################################################################
 
+set -eu
 
 ### conda environment
 PATH_MASTER_YAML="envs/master_env.yaml"
@@ -38,6 +39,7 @@ SNAKEMAKE_HELP="FALSE"
 HELP="FALSE"
 MAKE_SAMPLE_SHEET="FALSE"
 SHEET_SUCCESS="FALSE"
+SKIP_CONFIRMATION="FALSE"
 
 ### Parse the commandline arguments, if they are not part of the pipeline, they get send to Snakemake
 POSITIONAL=()
@@ -69,6 +71,10 @@ do
         -h|--help)
         HELP="TRUE"
         shift # Next
+        ;;
+        -y|--skip-confirmation)
+        SKIP_CONFIRMATION="TRUE"
+        shift
         ;;
         -sh|--snakemake-help)
         SNAKEMAKE_HELP="TRUE"
@@ -106,14 +112,15 @@ if [ ! -e "${PATH_MASTER_YAML}" ]; then # If this yaml file does not exist, give
     exit 1
 fi
 
+
 if [[ $PATH != *${MASTER_NAME}* ]]; then # If the master environment is not in your path (i.e. it is not currently active), do...
     line
     spacer
+    set +eu
     conda env update -f envs/mamba.yaml -q -v
     source activate mamba
     source activate ${MASTER_NAME}
     if [ ! $? -eq 0 ]; then
-    	set +ue # Turn bash strict mode off because that breaks conda
     	if [ "${SKIP_CONFIRMATION}" = "TRUE" ]; then
        		echo -e "\tInstalling master environment..." 
        		mamba env update -f ${PATH_MASTER_YAML} 
@@ -137,8 +144,8 @@ if [[ $PATH != *${MASTER_NAME}* ]]; then # If the master environment is not in y
     	fi
     fi
     source activate "${MASTER_NAME}"
-    set -ue # Turn bash strict mode on again
-fi
+    set -eu 
+fi 
 
 
 ### Print Snakemake help
@@ -211,13 +218,13 @@ fi
 ### Actual snakemake command with checkers for required files. N.B. here the UNIQUE_ID and SET_HOSTNAME variables are set!
 if [ -e sample_sheet.yaml ]; then
     echo -e "Starting snakemake"
-    set +ue #turn off bash strict mode because snakemake and conda can't work with it properly
     echo -e "pipeline_run:\n    identifier: ${UNIQUE_ID}" > config/variables.yaml
     echo -e "Server_host:\n    hostname: http://${SET_HOSTNAME}" >> config/variables.yaml
     eval $(parse_yaml config/variables.yaml "config_")
     echo -e "Juno-typing call to snakemake (the call parameters will overwrite the default):\n" > config/juno-typing_call.txt
     echo -e "snakemake --config out=$OUTPUT_DIR species=${SPECIES_ALL} \
         --profile config --drmaa \" -q bio -n {threads} -R \"span[hosts=1]\"\" --drmaa-log-dir ${OUTPUT_DIR}/log/drmaa ${@}" >> config/juno-typing_call.txt
+    set +ue #turn off bash strict mode 
     snakemake --config out="$OUTPUT_DIR" species="${SPECIES_ALL}" \
         --profile config --drmaa " -q bio -n {threads} -R \"span[hosts=1]\"" --drmaa-log-dir ${OUTPUT_DIR}/log/drmaa ${@}
     set -ue #turn bash strict mode back on

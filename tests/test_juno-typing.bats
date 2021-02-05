@@ -39,16 +39,17 @@
 }
 
 @test "Test full pipeline (dry run)" {
-  bash juno-typing.sh -i tests/example_fastq_input/ --species Salmonella enterica -n
+  bash juno-typing.sh -i tests/example_fastq_input/ --species Salmonella enterica -y -n
   [[ "$status" -eq 0 ]]
 }
 
 @test "Test error occurs when neither species nor metadata file are provided" {
-  bash juno-typing.sh -i tests/example_fastq_input/ -n
+  skip
+  bash juno-typing.sh -i tests/example_fastq_input/ -y -n
   [[ ! "$status" -eq 0 ]]
 }
 
 @test "Check full pipeline " {
-  bash juno-typing.sh -i tests/example_fastq_input/ --metadata tests/files/example_metadata.csv
+  bash juno-typing.sh -i tests/example_fastq_input/ --metadata tests/files/example_metadata.csv -y 
   [[ "$status" -eq 0 ]]
 }
