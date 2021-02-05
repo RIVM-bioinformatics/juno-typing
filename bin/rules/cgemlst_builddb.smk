@@ -12,7 +12,8 @@ rule cgemlst_builddb:
         "../../envs/cgemlst.yaml"
     benchmark:
         OUT + "/log/benchmark/cgemlst_builddb.txt"
-    threads: 1
+    threads: config["threads"]["cgemlst"]
+    resources: mem_mb=config["mem_mb"]["cgemlst"]
     log:
         OUT + "/log/cgemlst_builddb.log"
     shell:

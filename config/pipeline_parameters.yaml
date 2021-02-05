@@ -3,3 +3,7 @@ sample_sheet: "sample_sheet.yaml"
 out: "out"
 
 # Pipeline parameters
+threads:
+  cgemlst: 1
+mem_mb:
+  cgemlst: 4000

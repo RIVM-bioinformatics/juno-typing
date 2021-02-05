@@ -11,7 +11,8 @@ rule cgemlst_setup:
         "../../envs/cgemlst.yaml"
     benchmark:
         OUT + "/log/benchmark/cgemlst_setup.txt"
-    threads: 1
+    threads: config["threads"]["cgemlst"]
+    resources: mem_mb=config["mem_mb"]["cgemlst"]
     log:
         OUT + "/log/cgemlst_setup.log"
     shell:

@@ -6,4 +6,4 @@ jobname: Juno-typing_{name}.jobid{jobid}
 keep-going: true
 printshellcmds: true
 conda-frontend: mamba
-
+restart-times: 2

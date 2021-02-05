@@ -7,8 +7,6 @@ Date: 12-01-2021
 Documentation: 
 Snakemake rules (in order of execution):
     1. CGE-MLST
-    2. SRST2
-    3. stringMLST
 """
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####
@@ -123,8 +121,8 @@ onsuccess:
 
 localrules:
     all,
+    cgemlst_setup,
     cgemlst_builddb
-
 
 rule all:
     input:

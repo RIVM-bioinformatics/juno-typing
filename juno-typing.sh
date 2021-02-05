@@ -215,6 +215,9 @@ if [ -e sample_sheet.yaml ]; then
     echo -e "pipeline_run:\n    identifier: ${UNIQUE_ID}" > config/variables.yaml
     echo -e "Server_host:\n    hostname: http://${SET_HOSTNAME}" >> config/variables.yaml
     eval $(parse_yaml config/variables.yaml "config_")
+    echo -e "Juno-typing call to snakemake (the call parameters will overwrite the default):\n" > config/juno-typing_call.txt
+    echo -e "snakemake --config out=$OUTPUT_DIR species=${SPECIES_ALL} \
+        --profile config --drmaa \" -q bio -n {threads} -R \"span[hosts=1]\"\" --drmaa-log-dir ${OUTPUT_DIR}/log/drmaa ${@}" >> config/juno-typing_call.txt
     snakemake --config out="$OUTPUT_DIR" species="${SPECIES_ALL}" \
         --profile config --drmaa " -q bio -n {threads} -R \"span[hosts=1]\"" --drmaa-log-dir ${OUTPUT_DIR}/log/drmaa ${@}
     set -ue #turn bash strict mode back on
@@ -224,5 +227,9 @@ else
     echo -e "Please inspect the input directory (${INPUT_DIR}) and make sure the right files are present"
     exit 1
 fi
+
+# Clean up for future runs
+rm -f config/juno-typing_call.txt
+rm -f config/variables.yaml
 
 exit 0 

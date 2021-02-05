@@ -15,7 +15,8 @@ rule cgemlst:
         OUT + "/log/cgemlst/{sample}.log"
     benchmark:
         OUT + "/log/benchmark/cgemlst_{sample}.txt"
-    threads: 1
+    threads: config["threads"]["cgemlst"]
+    resources: mem_mb=config["mem_mb"]["cgemlst"]
     params:
         species = lambda wildcards: SAMPLES[wildcards.sample]["species"]
     shell:
