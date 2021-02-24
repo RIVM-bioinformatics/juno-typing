@@ -22,8 +22,29 @@ import re
 import yaml
 import pandas as pd
 
-fq_pattern = re.compile("(.*?)(?:_S\d+_|_S\d+.|_|\.)R?(1|2)(?:_.*\.|\..*\.|\.)f(ast)?q(\.gz)?")
-fasta_pattern = re.compile("(.*?)(?:_.*\.|\..*\.|\.).fasta?")
+
+fq_pattern = re.compile("(.*?)(?:_S\d+_|_S\d+.|_|\.)(?:p)?R?(1|2)(?:_.*\.|\..*\.|\.)f(ast)?q(\.gz)?")
+fasta_pattern = re.compile("(.*?).fasta?")
+
+def add_species_to_sample(sample, samples_dic, species_file):
+    try: 
+        samples_dic[sample].update(species_file[sample])
+    except:
+        pass
+
+def add_metadata(metadata_file, samples_dic):
+    assert metadata_file.is_file(), "Provided metadata file does not exist"
+    # Load species file
+    species_file = pd.read_csv(metadata_file, index_col = 0, dtype={'Sample':str})
+    species_file.index = species_file.index.map(str)
+    species_file['genus-abbr'] = species_file['Genus'].apply(lambda x: x[0])
+    species_file['species-mlst7'] = species_file['genus-abbr'] + species_file["Species"]
+    species_file['species-mlst7'] = species_file['species-mlst7'].apply(lambda x: x.lower())
+    species_file = species_file.transpose().to_dict()
+    # Update dictionary with species
+    for sample_name in samples_dic :
+        add_species_to_sample(sample_name, samples_dic, species_file)
+
 
 def main(args):
     assert args.dir.is_dir(), "Argument must be a directory."
@@ -36,6 +57,7 @@ def main(args):
         if match:
             sample = samples.setdefault(match.group(1), {})
             sample["R{}".format(match.group(2))] = str(file_)
+            sample['species-mlst7'] = "NotProvided"
     if len(samples) == 0 :
         for file_ in args.dir.iterdir():
             if file_.is_dir():
@@ -44,19 +66,11 @@ def main(args):
             if match:
                 sample = samples.setdefault(match.group(1), {})
                 sample["assembly"] = str(file_)
+                sample['species-mlst7'] = "NotProvided"
 
     if args.metadata is not None :
-        assert args.metadata.is_file(), "Provided metadata file does not exist"
-        # Load species file
-        species_file = pd.read_csv(args.metadata, index_col = 0, dtype={'Sample':str})
-        species_file.index = species_file.index.map(str)
-        species_file = species_file.transpose().to_dict()
-        for sample_name in samples :
-            try :
-                samples[sample_name]["species"] = species_file[sample_name]["Genus"].strip().lower()[0] + species_file[sample_name]["Species"].strip()
-            except:
-                pass
-                    
+        add_metadata(args.metadata, samples)
+        
     print(yaml.dump(samples, default_flow_style=False))
 
 
@@ -67,3 +81,4 @@ if __name__ == "__main__":
     parser.add_argument("--metadata", type=pathlib.Path, 
                        help=".csv file containing at least 3 columns: 'Sample', 'Genus' and 'Species'")
     main(parser.parse_args())
+

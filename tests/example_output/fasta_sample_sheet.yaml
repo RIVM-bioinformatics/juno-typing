@@ -1,2 +1,4 @@
-{}
+sample1:
+  assembly: tests/example_fasta_input/sample1.fasta
+  species-mlst7: NotProvided
 

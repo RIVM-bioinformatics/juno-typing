@@ -1,8 +1,9 @@
 name: testing_env
 channels:
-  - bioconda
-  - conda-forge
   - anaconda
+  - bioconda
+  - biocore
+  - conda-forge
   - defaults
 dependencies:
   - mamba
@@ -13,6 +14,8 @@ dependencies:
   - git==2.21.0
   - pip==19.2.3
   - pandas=1.1.0
+  - kma=1.3.12
   - pip:
     - PyYAML==5.3.1
+
 

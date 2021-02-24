@@ -12,4 +12,4 @@ install:
   - travis_wait 30 conda env create -q -f tests/files/testing_env.yaml
   - conda activate testing_env
 script: 
-  - travis_wait 30 bats tests/test_juno-typing.bats
+  - travis_wait 45 bats tests/test_juno-typing.bats

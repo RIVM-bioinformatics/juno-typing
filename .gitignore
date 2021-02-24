@@ -1,17 +1,24 @@
 ## Files to ignore
+# From previous tests
 sample_sheet.yaml
 config/variables.yaml
-bin/rules/download_scheme.smk
-bin/rules/srst2.smk
-bin/rules/stringmlst.smk
-bin/rules/stringmlst_builddb.smk
 tests/test_sample_sheet.yaml
+# Jupyter notebook tests
+*.ipynb
+
+
 
 ## Folders to ignore
+# From previous tests
 raw_data/
 out/
 db/
-.snakemake/
+db_test/
+# Software downloaded
 bin/kma/
 bin/cge-mlst
+bin/kmerfinder/
+bin/kmerfinder_db/
+# Snakemake
 .snakemake/
+.vscode/
