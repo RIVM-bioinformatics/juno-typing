@@ -1,9 +1,10 @@
 # General pipeline
 sample_sheet: "sample_sheet.yaml" 
-out: "out"
 
 # Pipeline parameters
 threads:
   cgemlst: 1
+  kmerfinder: 1
 mem_mb:
   cgemlst: 4000
+  kmerfinder: 4000
