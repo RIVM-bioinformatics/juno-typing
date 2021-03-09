@@ -17,6 +17,7 @@ Input:
                                     fastq or fasta files. Only one type (either
                                     fastq or fasta) should be present. Default 
                                     is raw_data/
+
   -o, --output [DIR]                This is the folder containing your output 
                                     fastq files. Default is out/ 
 
@@ -27,10 +28,9 @@ Input:
 
   --update-db                       If this flag is present, the databases will 
                                     be updated, even if they are present. Note
-                                    that due to a bug in the FTP server from the 
-                                    CGE, the KmerFinder database cannot be 
-                                    updated. Instead, the same version is always 
-                                    used (version '20201202'). 
+                                    that the KmerFinder database uses the version
+                                    '20210228' and it is not automatically 
+                                    updated. 
 
   --metadata [PATH_TO_FILE]         Excel file (.xlsx) containing the information
                                     of the samples and their corresponding genus. 
@@ -61,13 +61,13 @@ Output (automatically generated):
   <output_dir>                      Contains dir contains the results of every 
                                     step of the pipeline.
 
-  <output_dir> /log/                Contains the log files for every step of 
+  <output_dir>/log/                Contains the log files for every step of 
                                     the pipeline
 
-  <output_dir> /log/drmaa           Contains the .out and .err files of every 
+  <output_dir>/log/drmaa           Contains the .out and .err files of every 
                                     job sent to the grid/cluster.
 
-  <output_dir> /log/results         Contains the log files and parameters that 
+  <output_dir>/audit_trail          Contains the log files and parameters that 
                                     the pipeline used for the current run
 
 

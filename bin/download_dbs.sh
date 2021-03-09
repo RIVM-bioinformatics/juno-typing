@@ -19,6 +19,7 @@ KMERFINDER_DB_DOWNLOAD="${CURRENT_DIR%/}/bin/kmerfinder_db"
 KMERFINDER="${CURRENT_DIR%/}/bin/kmerfinder"
 CGEMLST="${CURRENT_DIR%/}/bin/cge-mlst"
 MLST7_DB="${DB_DIR%/}/mlst7_db"
+KMERFINDER_DB_V="20210228" 
 
 #################### KmerFinder and the database download #####################
 # Check available versions here: http://www.cbs.dtu.dk/public/CGE/databases/KmerFinder/version/
@@ -28,7 +29,7 @@ if [ ! -f "${KMERFINDER_DB%/}/config" ] || [ "$UPDATE_DBS" == "TRUE" ]; then
     rm -rf "${KMERFINDER_DB_DOWNLOAD}"
     git clone -b 'master' --single-branch --depth=1 https://bitbucket.org/genomicepidemiology/kmerfinder_db.git "$KMERFINDER_DB_DOWNLOAD"
     mkdir -p "$KMERFINDER_DB"
-    bash "${KMERFINDER_DB_DOWNLOAD%/}/INSTALL.sh" "$KMERFINDER_DB/" bacteria 20201202 ### "Latest" version not working
+    bash "${KMERFINDER_DB_DOWNLOAD%/}/INSTALL.sh" "$KMERFINDER_DB/" bacteria $KMERFINDER_DB_V 
 fi
 
 if [ ! -f "${KMERFINDER%}/kmerfinder.py" ] ; then
@@ -60,8 +61,6 @@ fi
 ################# Log versions for each software/db downloaded ################
 cd $KMERFINDER
 KMERFINDER_V="$(git log -n 1 --pretty=format:"%H")"
-cd $KMERFINDER_DB
-KMERFINDER_DB_V="$(git log -n 1 --pretty=format:"%H")"
 cd $CGEMLST
 CGEMLST_V="$(git log -n 1 --pretty=format:"%H")"
 cd $MLST7_DB

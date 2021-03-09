@@ -3,7 +3,7 @@
 """Get species name (formated for CGE-MLST).
 
 Usage:
-  get_species.py </path/to/kmerfinder/results/data.json>
+    get_species.py </path/to/kmerfinder/results/data.json>
 """
 
 import argparse
@@ -31,7 +31,7 @@ def parse_kmerfinder(json_file):
         score = species_df.iloc[2,:].apply(lambda x: float(x))
 
         species = score.idxmax().split()[0][0] + score.idxmax().split()[1]
-        
+
         return species.lower()
 
 def choose_right_db(species, translation_tbl):

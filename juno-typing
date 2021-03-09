@@ -58,6 +58,7 @@ LOCAL="FALSE"
 CORES="NotProvided"
 QUEUE="bio"
 UPDATE_DBS="FALSE"
+CLEAN="FALSE"
 SNAKEMAKE_HELP="FALSE"
 HELP="FALSE"
 MAKE_SAMPLE_SHEET="FALSE"
@@ -98,6 +99,10 @@ do
         ;;
         --local)
         LOCAL="TRUE"
+        shift
+        ;;
+        --clean)
+        CLEAN="TRUE"
         shift
         ;;
         --db)
@@ -145,6 +150,18 @@ if [ "${HELP:-}" == "TRUE" ]; then
     bash bin/include/help.sh "$PIPELINE_NAME" "$VERSION"
     exit 0
 fi
+
+
+###############################################################################
+#####                     Clean old output if necessary                   #####
+###############################################################################
+
+### Remove all output
+if [ "${CLEAN:-}" == "TRUE" ]; then
+    bash bin/include/Clean $OUTPUT_DIR
+    exit 0
+fi
+
 
 ###############################################################################
 #####               Installation conda environments                       #####
@@ -270,7 +287,7 @@ else
     minispacer
     echo -e "The input directory you specified (${INPUT_DIR}) exists but is empty or does not contain the expected input files..."
     echo -e "Please specify a directory with input-data."
-    exit 0
+    exit 1
 fi
 
 ### Checker for succesfull creation of sample_sheet
@@ -278,12 +295,8 @@ if [ "${SHEET_SUCCESS}" == "TRUE" ]; then
     echo -e "Succesfully generated the sample sheet"
     echo -e "Ready to start!"
 else
-    echo -e "Couldn't find files in the input directory that ended up being in a .FASTQ, .FQ or .GZ format"
-    echo -e "Please inspect the input directory (${INPUT_DIR}) and make sure the files are in one of the formats listed below"
-    echo -e ".fastq.gz (Zipped Fastq)"
-    echo -e ".fq.gz (Zipped Fq)"
-    echo -e ".fastq (Unzipped Fastq)"
-    echo -e ".fq (unzipped Fq)"
+    echo -e "Couldn't find files in the input directory with extension .fastq, .fq, .fastq.gz or .fq.gz"
+    echo -e "Please inspect the input directory (${INPUT_DIR}) and make sure the files are in one of the formats accepted"
     exit 1
 fi
 
@@ -318,19 +331,6 @@ if [ -e sample_sheet.yaml ]; then
     echo -e "pipeline_run:\n   identifier: ${UNIQUE_ID}" > "$LOG_ID_HOST"
     echo -e "Server_host:\n    hostname: http://${SET_HOSTNAME}" >> "$LOG_ID_HOST"
     eval $(parse_yaml ${LOG_ID_HOST} "config_")
-    set +ue #turn off bash strict mode 
-    if [[ $LOCAL == "TRUE" ]]; then
-        if [[ $CORES == "NotProvided" ]]; then
-            CORES="4"
-        fi
-        snakemake --profile config --cores $CORES ${@}
-    else
-        if [[ $CORES == "NotProvided" ]]; then
-            CORES="300"
-        fi
-        snakemake --profile config --cores $CORES --cluster "bsub -q ${QUEUE} -n {threads} -o ${OUTPUT_DIR}/log/cluster/{name}_{wildcards.sample}.out -e ${OUTPUT_DIR}/log/cluster/{name}_{wildcards.sample}.err" ${@}
-    fi
-    set -ue #turn bash strict mode back on
 else
     echo -e "Sample_sheet.yaml could not be found"
     echo -e "This also means that the ${PIPELINE_NAME} pipeline was unable to generate a new sample sheet for you"
@@ -338,9 +338,35 @@ else
     exit 1
 fi
 
+set +ue # Turn off bash strict mode to be able to use Snakemake + conda
+
+if [[ $LOCAL == "TRUE" ]]; then
+    if [[ $CORES == "NotProvided" ]]; then
+        CORES="4"
+    fi
+    echo "cores: ${CORES}" >> $PARAMETERS
+    snakemake --profile config --cores $CORES ${@}
+else
+    if [[ $CORES == "NotProvided" ]]; then
+        CORES="300"
+    fi
+    echo "cores: ${CORES}" >> $PARAMETERS
+    echo "queue: ${QUEUE}" >> $PARAMETERS
+    snakemake --profile config --cores $CORES \
+    --drmaa " -q ${QUEUE} -n {threads} \
+    -o ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.out \
+    -e ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.err \
+    -R \"span[hosts=1] rusage[mem={resources.mem_mb}]\" "  \
+    --drmaa-log-dir ${OUTPUT_DIR}/log/drmaa ${@}
+fi
+
+set -ue
+
 # Clean up for future runs
 rm -f "$PARAMETERS"
 rm -f "$LOG_ID_HOST"
 rm -f "$LOG_SOFTWARE_VERSIONS"
+
+echo "Finished successfully ${PIPELINE_NAME}"
 
 exit 0 

@@ -9,7 +9,9 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - travis_wait 30 conda env create -q -f tests/files/testing_env.yaml
+  - conda env update -q -f envs/mamba.yaml
+  - conda activate mamba
+  - travis_wait 30 mamba env create -q -f tests/files/testing_env.yaml
   - conda activate testing_env
 script: 
-  - travis_wait 45 bats tests/test_juno-typing.bats
+  - travis_wait 60 bats tests/test_juno-typing.bats

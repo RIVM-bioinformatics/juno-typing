@@ -13,6 +13,7 @@ Snakemake rules (in order of execution):
 #################################################################################
 
 configfile: "config/pipeline_parameters.yaml"
+configfile: "config/user_parameters.yaml"
 
 from pandas import *
 import pathlib
@@ -25,8 +26,6 @@ import json
 #################################################################################
 #####     Load samplesheet, load genus dict and define output directory     #####
 #################################################################################
-
-configfile: "config/user_parameters.yaml"
 
 # Loading sample sheet as dictionary 
 # ("R1" and "R2" keys for fastq, and "assembly" for fasta)
@@ -67,7 +66,7 @@ onstart:
     shell("""
         mkdir -p {OUT}
         mkdir -p {OUT}/audit_trail
-        mkdir -p {OUT}/log/cluster
+        mkdir -p {OUT}/log/drmaa
         LOG_CONDA="{OUT}/audit_trail/log_conda.txt"
         LOG_CONFIG="{OUT}/audit_trail/log_config.txt"
         LOG_GIT="{OUT}/audit_trail/log_git.txt"
@@ -79,6 +78,7 @@ onstart:
         conda list >> "${{LOG_CONDA}}"
         echo -e "\tGenerating config file log..."
         rm -f "${{LOG_CONFIG}}"
+        echo -e "Date run: $(date)" > "${{LOG_CONFIG}}"
         touch "${{LOG_CONFIG}}"
         for file in config/*.yaml
         do
@@ -86,6 +86,8 @@ onstart:
             cat ${{file}} >> "${{LOG_CONFIG}}"
             echo -e "\n\n" >> "${{LOG_CONFIG}}"
         done
+        echo -e "\n\nSample sheet:\n" >> "${{LOG_CONFIG}}"
+        cat sample_sheet.yaml >> "${{LOG_CONFIG}}"
     """)
 
 #@################################################################################

@@ -26,15 +26,7 @@ python bin/kmerfinder/kmerfinder.py -i "{input.r1}" "{input.r2}" \
 -x
 
 if `cat {output} | grep -q "species_hits': {{}}"`; then
-
     rm -f {output}
-
-    python bin/kmerfinder/kmerfinder.py -i "{input.r1}" "{input.r2}" \
--o "$(dirname {output})" \
--db "${{DB_DIR}}/bacteria.ATG" \
--tax "${{DB_DIR}}/bacteria.tax" \
--x
-
 fi
         """
 

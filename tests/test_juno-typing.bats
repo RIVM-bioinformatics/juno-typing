@@ -62,7 +62,8 @@
 }
 
 @test "Test full pipeline (dry run)" {
-  bash juno-typing -i tests/example_fastq_input/ --species Salmonella enterica --db "db_test" -y -n
+  bash juno-typing -i tests/example_fastq_input/ -o out-test --species Salmonella enterica --db "db_test" -y -n
   [[ "$status" -eq 0 ]]
   rm -rf db_test
+  rm -rf out-test
 }
