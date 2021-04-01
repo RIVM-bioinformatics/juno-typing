@@ -22,9 +22,7 @@ jobs:
     steps:
 
       - name: Setup BATS
-        uses: mig4/setup-bats@v1
-        with:
-          bats-version: 1.2.1
+        uses: actions/checkout@v2
 
       - name: Get conda
         run: |
@@ -35,8 +33,13 @@ jobs:
           conda config --set always_yes yes --set changeps1 no
           conda update -q conda
           conda info -a
-      - name: Tests
+      - name: Get mamba 
         run: |
-          pwd
-          ls
-          #bats ./tests/test_juno-typing.bats
+          conda env update -q -f envs/mamba.yaml
+          conda activate mamba
+      - name: Get testing_env
+        run: |
+          mamba env create -q -f tests/files/testing_env.yaml -n testing_env
+          conda activate testing_env
+      - name: Tests
+        run: bats ./tests/test_juno-typing.bats
