@@ -36,4 +36,7 @@ jobs:
           conda update -q conda
           conda info -a
       - name: Tests
-        run: bats ./tests/test_juno-typing.bats
+        run: |
+          pwd
+          ls
+          #bats ./tests/test_juno-typing.bats
