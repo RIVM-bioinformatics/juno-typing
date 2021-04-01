@@ -11,7 +11,7 @@ install:
   - conda info -a
   - conda env update -q -f envs/mamba.yaml
   - conda activate mamba
-  - travis_wait 30 mamba env create -q -f tests/files/testing_env.yaml
+  - travis_wait 30 mamba env create -q -f tests/files/testing_env.yaml -n testing_env
   - conda activate testing_env
 script: 
   - travis_wait 60 bats tests/test_juno-typing.bats

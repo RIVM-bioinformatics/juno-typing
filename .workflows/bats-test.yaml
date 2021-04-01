@@ -1,0 +1,43 @@
+# BATS testing for bash wrapper
+on: [push, pull_request]
+
+name: Test-bash-wrapper
+
+jobs:
+  Test-bash-wrapper:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macOS-latest}
+          - {os: windows-latest}
+          - {os: ubuntu-latest}
+
+    env:
+      RSPM: ${{ matrix.config.rspm }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.2.1
+
+      - run: wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+      - run: bash miniconda.sh -b -p $HOME/miniconda
+      - run: source "$HOME/miniconda/etc/profile.d/conda.sh"
+      - run: hash -r
+      - run: conda config --set always_yes yes --set changeps1 no
+      - run: conda update -q conda
+      - run: conda info -a
+      - run: conda env update -q -f envs/mamba.yaml
+      - run: conda activate mamba
+      - run: mamba env create -q -f tests/files/testing_env.yaml -n testing_env
+      - run: conda activate testing_env
+      - run: cd tests
+      - run: bats tests/test_juno-typing.bats

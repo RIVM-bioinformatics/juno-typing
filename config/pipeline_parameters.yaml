@@ -5,6 +5,8 @@ sample_sheet: "sample_sheet.yaml"
 threads:
   cgemlst: 1
   kmerfinder: 1
+  seqsero2: 6
 mem_mb:
   cgemlst: 4000
   kmerfinder: 4000
+  seqsero2: 5000

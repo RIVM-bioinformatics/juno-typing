@@ -139,8 +139,6 @@ done
 set -- "${POSITIONAL[@]:-}" 
 
 
-
-
 ###############################################################################
 #####                        Juno-typing help                             #####
 ###############################################################################
@@ -346,6 +344,7 @@ if [[ $LOCAL == "TRUE" ]]; then
     fi
     echo "cores: ${CORES}" >> $PARAMETERS
     snakemake --profile config --cores $CORES ${@}
+    RESULT=$?
 else
     if [[ $CORES == "NotProvided" ]]; then
         CORES="300"
@@ -358,6 +357,7 @@ else
     -e ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.err \
     -R \"span[hosts=1] rusage[mem={resources.mem_mb}]\" "  \
     --drmaa-log-dir ${OUTPUT_DIR}/log/drmaa ${@}
+    RESULT=$?
 fi
 
 set -ue
@@ -367,6 +367,8 @@ rm -f "$PARAMETERS"
 rm -f "$LOG_ID_HOST"
 rm -f "$LOG_SOFTWARE_VERSIONS"
 
-echo "Finished successfully ${PIPELINE_NAME}"
+if [ $RESULT == 0 ] ; then
+    echo "Finished successfully ${PIPELINE_NAME}"
+fi
 
-exit 0 
+exit ${RESULT} 

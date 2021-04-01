@@ -7,7 +7,7 @@ rule mlst7:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
         db = MLST7_DB + "/senterica/senterica.length.b",
-        species = OUT + "/identify_species/{sample}/data.json"
+        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output:
         OUT + "/mlst7/{sample}/results_tab.tsv"
     conda:
