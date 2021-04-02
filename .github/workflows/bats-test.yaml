@@ -21,20 +21,24 @@ jobs:
       - name: Get conda
         uses: actions/checkout@v2
 
-      - name: Get necessary environments
+      - name: Get conda
         uses: s-weigand/setup-conda@v1
         with: 
           update-conda: true
           python-version: ${{ matrix.python-version }}
           conda-channels: anaconda, conda-forge, bioconda, biocore
+        
+      - name: Make and activate necessary environments (mamba and testing_env)
         run: |
           conda env update -q -f envs/mamba.yaml
           conda activate mamba
           mamba env create -q -f tests/files/testing_env.yaml -n testing_env
           conda activate testing_env
+
       - name: check conda
         run: |
           conda --version
           conda list
+          
       - name: Tests
         run: bats ./tests/test_juno-typing.bats
