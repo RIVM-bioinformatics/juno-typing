@@ -4,41 +4,31 @@ on: [push, pull_request]
 name: Test-bash-wrapper
 
 jobs:
-  Test-bash-wrapper:
-    runs-on: ${{ matrix.config.os }}
-
-    name: Test ${{ matrix.config.os }} using python ${{ matrix.python-version }}
-
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - os: [ubuntu-latest]
-          - python-version: [3.6, 3.7, 3.8]
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+    name: Test ${{ matrix.config.os }} using python ${{ matrix.python-version }}
 
     steps:
-
-      - name: Get conda
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v2
       - name: Get conda
         uses: s-weigand/setup-conda@v1
         with: 
           update-conda: true
           python-version: ${{ matrix.python-version }}
-          conda-channels: anaconda, conda-forge, bioconda, biocore
-        
+          conda-channels: anaconda, conda-forge, bioconda, biocore  
+      - name: check conda
+        run: conda --version
       - name: Make and activate necessary environments (mamba and testing_env)
         run: |
           conda env update -q -f envs/mamba.yaml
           conda activate mamba
           mamba env create -q -f tests/files/testing_env.yaml -n testing_env
           conda activate testing_env
-
-      - name: check conda
-        run: |
-          conda --version
           conda list
-          
-      - name: Tests
+      - name: Test wrapper
         run: bats ./tests/test_juno-typing.bats
