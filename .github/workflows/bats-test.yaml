@@ -25,10 +25,10 @@ jobs:
         run: conda --version
       - name: Make and activate necessary environments (mamba and testing_env)
         run: |
-          conda env update -q -f envs/mamba.yaml
-          conda activate mamba
+          conda env create -f envs/mamba.yaml
+          source activate mamba
           mamba env create -q -f tests/files/testing_env.yaml -n testing_env
-          conda activate testing_env
+          source activate testing_env
           conda list
       - name: Test wrapper
         run: bats ./tests/test_juno-typing.bats
