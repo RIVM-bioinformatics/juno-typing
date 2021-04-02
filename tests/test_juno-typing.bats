@@ -54,6 +54,7 @@
 }
 
 @test "Downloading databases" {
+  skip
   bash bin/download_dbs.sh "./db_test" "TRUE" "./db_test/versions.yaml"
   [[ -f "db_test/mlst7_db/senterica/senterica.length.b" ]]
   [[ -f "db_test/kmerfinder_db/bacteria/bacteria.ATG.length.b" ]]
@@ -62,7 +63,7 @@
 }
 
 @test "Test full pipeline (dry run)" {
-  bash juno-typing -i tests/example_fastq_input/ -o out-test --species Salmonella enterica --db "db_test" -y -n
+  bash juno-typing -i tests/example_fastq_input/ -o out-test -y -n --db "db_test" 
   [[ "$status" -eq 0 ]]
   rm -rf db_test
   rm -rf out-test

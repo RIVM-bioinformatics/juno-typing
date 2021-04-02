@@ -28,8 +28,6 @@
 
 # Strict mode
 set -eu
-# Export all variables
-#set -a
 
 #################### Get name of necessary environments #######################
 PATH_MAMBA_YAML="envs/mamba.yaml"
@@ -182,6 +180,7 @@ if [[ $PATH != *${MASTER_NAME}* ]]; then
     if [[ $PATH != *${MAMBA_NAME}* ]]; then
         source activate ${MAMBA_NAME}
         if [ ! $? -eq 0 ]; then
+            echo "Activate mamba failed"
             if [ "${SKIP_CONFIRMATION}" == "FALSE" ]; then
                 spacer
                 while read -r -p "The ${PIPELINE_NAME} master environment is not active yet, do you want to install/update it and activate it now? [y/n] " envanswer
@@ -201,26 +200,31 @@ if [[ $PATH != *${MASTER_NAME}* ]]; then
             conda env update -f "${PATH_MAMBA_YAML}"
             source activate "${MAMBA_NAME}"
             mamba env update -f "${PATH_MASTER_YAML}"
-        fi
-        source activate "${MASTER_NAME}"
-        if [ ! $? -eq 0 ]; then
-            if [ "${SKIP_CONFIRMATION}" == "FALSE" ]; then
-                spacer
-                while read -r -p "The ${PIPELINE_NAME} master environment is not active yet, do you want to install/update it and activate it now? [y/n] " envanswer
-       	        do
-                    envanswer=${envanswer,,}
-                    if [[ "${envanswer}" =~ ^(yes|y)$ ]]; then
-                        break
-                    elif [[ "${envanswer}" =~ ^(no|n)$ ]]; then
-                        echo -e "The ${PIPELINE_NAME} master environment is a requirement. Exiting because cannot continue without this environment"
-                        exit 1
-                    else
-                        echo -e "Please answer with 'yes' or 'no'"
-                    fi
-                done
+        else
+            # Update environment
+            if [ $(conda env list | grep "${MASTER_NAME}" | wc -l) -gt 0 ]; then
+                echo "Updating master"
+                mamba env update -f "${PATH_MASTER_YAML}"
+            else
+                echo "Activate master failed"
+                if [ "${SKIP_CONFIRMATION}" == "FALSE" ]; then
+                    spacer
+                    while read -r -p "The ${PIPELINE_NAME} master environment is not active yet, do you want to install/update it and activate it now? [y/n] " envanswer
+       	            do
+                        envanswer=${envanswer,,}
+                        if [[ "${envanswer}" =~ ^(yes|y)$ ]]; then
+                            break
+                        elif [[ "${envanswer}" =~ ^(no|n)$ ]]; then
+                            echo -e "The ${PIPELINE_NAME} master environment is a requirement. Exiting because cannot continue without this environment"
+                            exit 1
+                        else
+                            echo -e "Please answer with 'yes' or 'no'"
+                        fi
+                    done
+                fi
+                echo -e "\nInstalling master environment...\n"
+                mamba env update -f "${PATH_MASTER_YAML}"
             fi
-            echo -e "\nInstalling master environment...\n"
-            mamba env update -f "${PATH_MASTER_YAML}"
         fi
     fi  
     source activate "${MASTER_NAME}"
@@ -253,23 +257,13 @@ if [ ! -d "${INPUT_DIR}" ]; then
     exit 1
 fi
 
-if [ ${METADATA} != "NotProvided" ]; then
-    if [ ! -f ${METADATA} ] || [[ ! ${METADATA} =~ ".csv"$ ]]; then
-        minispacer
-        echo -e "ERROR! The provided metadata file (${METADATA}) does not exist or does not have the .csv extension." 
-        echo -e "Please provide an existing metadata .csv file."
-        minispacer
-        exit 1
-    fi
-fi
-
-
-
 ###############################################################################
 #####                      Generate sample sheet                          #####
 ###############################################################################
 
-if [  `ls -A "${INPUT_DIR}" | grep 'R[0-9]\{1\}.*\.f[ast]\{0,3\}q\.\?[gz]\{0,2\}$' | wc -l` -gt 0 ]; then
+if [ $(ls -A "${INPUT_DIR}" | grep 'R[0-9]\{1\}.*\.f[ast]\{0,3\}q\.\?[gz]\{0,2\}$' | wc -l) -gt 0 ] ; then
+    ## TODO: Input dir should also accept fasta files and look for them in sub directories (when input comes from Juno)
+    ## TODO: Sample sheet should also generate fasta files info (in main input dir and in subdirectories from Juno)
     minispacer
     echo -e "Files in input directory (${INPUT_DIR}) are present"
     echo -e "Generating sample sheet..."

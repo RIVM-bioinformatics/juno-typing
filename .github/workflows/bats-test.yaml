@@ -29,6 +29,8 @@ jobs:
           source activate mamba
           mamba env create -q -f tests/files/testing_env.yaml -n testing_env
           source activate testing_env
-          conda list
       - name: Test wrapper
-        run: bats ./tests/test_juno-typing.bats
+        run: |
+          source activate mamba
+          source activate testing_env
+          bats ./tests/test_juno-typing.bats
