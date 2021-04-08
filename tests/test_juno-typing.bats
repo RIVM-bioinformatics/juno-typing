@@ -19,9 +19,9 @@
   rm -f tests/test_sample_sheet.yaml
 }
 
-@test "Make sample sheet from fastq input (if combined with fasta, this one overwrites)" {
+@test "Make sample sheet from right input (fastq + fasta)" {
   python bin/generate_sample_sheet.py tests/example_input/ > tests/test_sample_sheet.yaml
-  sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/fastq_sample_sheet.yaml`
+  sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/correct_sample_sheet.yaml`
   [[ -z $sample_sheet_errors ]]
   rm -f tests/test_sample_sheet.yaml
 }
@@ -38,7 +38,7 @@
 
 ## Specific for MLST7
 
-@test "Making sample sheet fastq + metadata (species name)" {
+@test "Making sample sheet from right input + metadata (species name)" {
   python bin/generate_sample_sheet.py tests/example_input --metadata tests/files/example_metadata.csv > tests/test_sample_sheet.yaml
   sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/metadata_sample_sheet.yaml`
   [[ $(cat tests/test_sample_sheet.yaml) =~ "senterica" ]]
@@ -54,9 +54,16 @@
   [[ -f "bin/cge-mlst/mlst.py" ]]
 }
 
-@test "Test full pipeline (dry run)" {
+@test "Test full pipeline on Juno input (dry run)" {
+  bash juno-typing -i tests/juno_input/ -o out-test-juno -y -n --db "db_test" 
+  [[ "$status" -eq 0 ]]
+  rm -rf out-test-juno
+}
+
+@test "Test full pipeline on other type of input (dry run)" {
   bash juno-typing -i tests/example_input/ -o out-test -y -n --db "db_test" 
   [[ "$status" -eq 0 ]]
   rm -rf db_test
   rm -rf out-test
 }
+

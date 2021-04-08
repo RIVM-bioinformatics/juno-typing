@@ -1,9 +1,0 @@
-'123456':
-  R1: tests/example_fastq_input/123456_R1.fastq.gz
-  R2: tests/example_fastq_input/123456_R2.fastq.gz
-  species-mlst7: NotProvided
-sample1:
-  R1: tests/example_fastq_input/sample1_R1.fastq.gz
-  R2: tests/example_fastq_input/sample1_R2.fastq.gz
-  species-mlst7: NotProvided
-
