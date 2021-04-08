@@ -23,14 +23,10 @@ jobs:
           conda-channels: anaconda, conda-forge, bioconda, biocore  
       - name: check conda
         run: conda --version
-      - name: Make and activate necessary environments (mamba and testing_env)
+      - name: Make and activate necessary environments (mamba and testing_env) and run test
         run: |
           conda env create -f envs/mamba.yaml
           source activate mamba
           mamba env create -q -f tests/files/testing_env.yaml -n testing_env
-          conda deactivate
-      - name: Test wrapper
-        run: |
-          source activate mamba
           source activate testing_env
           bats ./tests/test_juno-typing.bats
