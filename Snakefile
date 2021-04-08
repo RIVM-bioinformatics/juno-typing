@@ -118,14 +118,15 @@ onsuccess:
 
 localrules:
     all,
-    salmonella_serotype_multireport
+    no_serotyper,
+    serotype_multireports
 
 rule all:
     input:
         expand(OUT + "/mlst7/{sample}/results_tab.tsv", sample = SAMPLES),
         expand(OUT + "/identify_species/{sample}/data.json", sample = SAMPLES),
         expand(OUT + "/identify_species/{sample}/best_species_hit.txt", sample = SAMPLES),
-        #expand(OUT+'/serotype/{sample}/SeqSero_result.tsv', sample=SAMPLES),
-        OUT+'/serotype/salmonella_serotype_multireport.csv'
+        OUT+'/serotype/salmonella_serotype_multireport.csv',
+        OUT + '/serotype/ecoli_serotype_multireport.csv'
 
 

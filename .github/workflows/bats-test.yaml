@@ -28,7 +28,7 @@ jobs:
           conda env create -f envs/mamba.yaml
           source activate mamba
           mamba env create -q -f tests/files/testing_env.yaml -n testing_env
-          source activate testing_env
+          conda deactivate
       - name: Test wrapper
         run: |
           source activate mamba
