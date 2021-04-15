@@ -47,6 +47,7 @@ MLST7_DB = config["mlst7_db"]
 include: "bin/rules/identify_species.smk"
 include: "bin/rules/mlst7_fastq.smk"
 #include: "bin/rules/mlst7_fasta.smk"
+include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
 
@@ -119,7 +120,8 @@ onsuccess:
 localrules:
     all,
     no_serotyper,
-    serotype_multireports
+    serotype_multireports,
+    mlst7_multireport
 
 rule all:
     input:
@@ -127,6 +129,7 @@ rule all:
         expand(OUT + "/identify_species/{sample}/data.json", sample = SAMPLES),
         expand(OUT + "/identify_species/{sample}/best_species_hit.txt", sample = SAMPLES),
         OUT+'/serotype/salmonella_serotype_multireport.csv',
-        OUT + '/serotype/ecoli_serotype_multireport.csv'
+        OUT + '/serotype/ecoli_serotype_multireport.csv',
+        OUT + "/mlst7/mlst7_multireport.csv"
 
 

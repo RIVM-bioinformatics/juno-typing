@@ -66,4 +66,3 @@
   rm -rf db_test
   rm -rf out-test
 }
-
