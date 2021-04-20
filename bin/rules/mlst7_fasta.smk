@@ -8,7 +8,11 @@ rule mlst7:
         db = MLST7_DB + "/senterica/senterica.length.b",
         species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output:
-        OUT + "/mlst7/{sample}/results_tab.tsv"
+        jjson = temp(OUT + "/mlst7/{sample}/data.json"),
+        txt = OUT + "/mlst7/{sample}/results.txt",
+        fasta = OUT + "/mlst7/{sample}/MLST_allele_seq.fsa",
+        hits = temp(OUT + "/mlst7/{sample}/Hit_in_genome_seq.fsa"),
+        tab = temp(OUT + "/mlst7/{sample}/results_tab.tsv")
     conda:
         "../../envs/mlst7.yaml"
     log:

@@ -2,7 +2,7 @@
 
 rule mlst7_multireport:
     input:
-        expand(OUT + "/mlst7/{sample}/results_tab.tsv", sample = SAMPLES)
+        expand(OUT + "/mlst7/{sample}/data.json", sample = SAMPLES)
     output:
         OUT + "/mlst7/mlst7_multireport.csv"
     benchmark:
