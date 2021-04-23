@@ -19,16 +19,9 @@
   rm -f tests/test_sample_sheet.yaml
 }
 
-@test "Make sample sheet from fastq input (if combined with fasta, this one overwrites)" {
-  python bin/generate_sample_sheet.py tests/example_fastq_input/ > tests/test_sample_sheet.yaml
-  sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/fastq_sample_sheet.yaml`
-  [[ -z $sample_sheet_errors ]]
-  rm -f tests/test_sample_sheet.yaml
-}
-
-@test "Make sample sheet from fasta input" {
-  python bin/generate_sample_sheet.py tests/example_fasta_input/ > tests/test_sample_sheet.yaml
-  sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/fasta_sample_sheet.yaml`
+@test "Make sample sheet from right input (fastq + fasta)" {
+  python bin/generate_sample_sheet.py tests/example_input/ > tests/test_sample_sheet.yaml
+  sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/correct_sample_sheet.yaml`
   [[ -z $sample_sheet_errors ]]
   rm -f tests/test_sample_sheet.yaml
 }
@@ -39,14 +32,14 @@
 # }
 
 # @test "Error if metadata has wrong extension (no .csv)" {
-#   bash juno-typing -i tests/example_fastq_input --metadata tests/files/testing_env.yaml 
+#   bash juno-typing -i tests/example_input --metadata tests/files/testing_env.yaml 
 #   [[ ! "$status" -eq 0 ]]
 # }
 
 ## Specific for MLST7
 
-@test "Making sample sheet fastq + metadata (species name)" {
-  python bin/generate_sample_sheet.py tests/example_fastq_input --metadata tests/files/example_metadata.csv > tests/test_sample_sheet.yaml
+@test "Making sample sheet from right input + metadata (species name)" {
+  python bin/generate_sample_sheet.py tests/example_input --metadata tests/files/example_metadata.csv > tests/test_sample_sheet.yaml
   sample_sheet_errors=`diff --suppress-common-lines tests/test_sample_sheet.yaml tests/example_output/metadata_sample_sheet.yaml`
   [[ $(cat tests/test_sample_sheet.yaml) =~ "senterica" ]]
   [[ -z $sample_sheet_errors ]]
@@ -61,8 +54,14 @@
   [[ -f "bin/cge-mlst/mlst.py" ]]
 }
 
-@test "Test full pipeline (dry run)" {
-  bash juno-typing -i tests/example_fastq_input/ -o out-test --species Salmonella enterica --db "db_test" -y -n
+@test "Test full pipeline on Juno input (dry run)" {
+  bash juno-typing -i tests/juno_input/ -o out-test-juno -y -n --db "db_test" 
+  [[ "$status" -eq 0 ]]
+  rm -rf out-test-juno
+}
+
+@test "Test full pipeline on other type of input (dry run)" {
+  bash juno-typing -i tests/example_input/ -o out-test -y -n --db "db_test" 
   [[ "$status" -eq 0 ]]
   rm -rf db_test
   rm -rf out-test

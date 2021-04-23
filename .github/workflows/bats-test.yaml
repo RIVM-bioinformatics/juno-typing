@@ -1,0 +1,32 @@
+# BATS testing for bash wrapper
+on: [push, pull_request]
+
+name: Test-bash-wrapper
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+    name: Test ${{ matrix.config.os }} using python ${{ matrix.python-version }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get conda
+        uses: s-weigand/setup-conda@v1
+        with: 
+          update-conda: true
+          python-version: ${{ matrix.python-version }}
+          conda-channels: anaconda, conda-forge, bioconda, biocore  
+      - name: check conda
+        run: conda --version
+      - name: Make and activate necessary environments (mamba and testing_env) and run test
+        run: |
+          conda env create -f envs/mamba.yaml
+          source activate mamba
+          mamba env create -q -f tests/files/testing_env.yaml -n testing_env
+          source activate testing_env
+          bats ./tests/test_juno-typing.bats

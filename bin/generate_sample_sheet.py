@@ -49,8 +49,21 @@ def add_metadata(metadata_file, samples_dic):
 def main(args):
     assert args.dir.is_dir(), "Argument must be a directory."
 
+    # If input comes from Juno, the directory with fastq and 
+    # the one with fasta should be different
+    if(args.dir.joinpath("clean_fastq").is_dir()):
+        fastq_dir = args.dir.joinpath("clean_fastq")
+    else:
+        fastq_dir = args.dir
+    
+    if (args.dir.joinpath("de_novo_assembly_filtered").is_dir()):
+        fasta_dir = args.dir.joinpath("de_novo_assembly_filtered")
+    else:
+        fasta_dir = args.dir
+
+
     samples = {}
-    for file_ in args.dir.iterdir():
+    for file_ in fastq_dir.iterdir():
         if file_.is_dir():
             continue
         match = fq_pattern.fullmatch(file_.name)
@@ -58,15 +71,14 @@ def main(args):
             sample = samples.setdefault(match.group(1), {})
             sample["R{}".format(match.group(2))] = str(file_)
             sample['species-mlst7'] = "NotProvided"
-    if len(samples) == 0 :
-        for file_ in args.dir.iterdir():
-            if file_.is_dir():
-                continue
-            match = fasta_pattern.fullmatch(file_.name)
-            if match:
-                sample = samples.setdefault(match.group(1), {})
-                sample["assembly"] = str(file_)
-                sample['species-mlst7'] = "NotProvided"
+    for file_ in fasta_dir.iterdir():
+        if file_.is_dir():
+            continue
+        match = fasta_pattern.fullmatch(file_.name)
+        if match:
+            sample = samples.setdefault(match.group(1), {})
+            sample["assembly"] = str(file_)
+            sample['species-mlst7'] = "NotProvided"
 
     if args.metadata is not None :
         add_metadata(args.metadata, samples)

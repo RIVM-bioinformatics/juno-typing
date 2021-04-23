@@ -8,7 +8,7 @@ rule identify_species:
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
         db = KMERFINDER_DB + "/bacteria/bacteria.ATG.length.b"
     output:
-        OUT + "/identify_species/{sample}/data.json"
+        kmerfinder = OUT + "/identify_species/{sample}/data.json"
     log:
         OUT + "/log/identify_species/{sample}.log"
     benchmark:
@@ -20,7 +20,7 @@ rule identify_species:
 DB_DIR=$(dirname {input.db})
 
 python bin/kmerfinder/kmerfinder.py -i "{input.r1}" "{input.r2}" \
--o "$(dirname {output})" \
+-o "$(dirname {output.kmerfinder})" \
 -db "${{DB_DIR}}/bacteria.ATG" \
 -tax "${{DB_DIR}}/bacteria.tax" \
 -x
@@ -34,3 +34,16 @@ fi
 # These errors cause a problem in the following steps of the pipeline.
 # However, often just re-running KmerFinder fixes it.
 # TODO: Find and fix the reason why it fails instead of just doing this quick fix.
+
+
+checkpoint which_species:
+    input:
+        OUT + "/identify_species/{sample}/data.json"
+    output:
+        OUT + "/identify_species/{sample}/best_species_hit.txt"
+    threads: 1
+    resources: mem_mb=2000
+    shell:
+        """
+python bin/get_species.py {input} > {output}
+        """

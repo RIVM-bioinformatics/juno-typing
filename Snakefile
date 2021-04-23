@@ -7,6 +7,7 @@ Date: 12-01-2021
 Documentation: 
 Snakemake rules (in order of execution):
     1. CGE-MLST
+    2. SeqSero2 for Salmonella serotyping
 """
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####
@@ -46,6 +47,9 @@ MLST7_DB = config["mlst7_db"]
 include: "bin/rules/identify_species.smk"
 include: "bin/rules/mlst7_fastq.smk"
 #include: "bin/rules/mlst7_fasta.smk"
+include: "bin/rules/mlst7_multireport.smk"
+include: "bin/rules/serotype.smk"
+include: "bin/rules/serotype_multireports.smk"
 
 #@################################################################################
 #@####                    Onstart checker codeblock                          #####
@@ -114,11 +118,16 @@ onsuccess:
 #################################################################################
 
 localrules:
-    all
+    all,
+    no_serotyper,
+    serotype_multireports,
+    mlst7_multireport
 
 rule all:
     input:
-        expand(OUT + "/mlst7/{sample}/results_tab.tsv", sample = SAMPLES),
-        expand(OUT + "/identify_species/{sample}/data.json", sample = SAMPLES)
+        expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
+        OUT+'/serotype/salmonella_serotype_multireport.csv',
+        OUT + '/serotype/ecoli_serotype_multireport.csv',
+        OUT + "/mlst7/mlst7_multireport.csv"
 
 
