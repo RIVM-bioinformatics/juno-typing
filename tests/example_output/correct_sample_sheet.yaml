@@ -1,17 +1,11 @@
 '123456':
-  Genus: Salmonella
   R1: tests/example_input/123456_R1.fastq.gz
   R2: tests/example_input/123456_R2.fastq.gz
-  Species: enterica
   assembly: tests/example_input/123456.fasta
-  genus-abbr: S
-  species-mlst7: senterica
+  species-mlst7: NotProvided
 sample1:
-  Genus: Salmonella
   R1: tests/example_input/sample1_R1.fastq.gz
   R2: tests/example_input/sample1_R2.fastq.gz
-  Species: enterica
   assembly: tests/example_input/sample1.fasta
-  genus-abbr: S
-  species-mlst7: senterica
+  species-mlst7: NotProvided
 

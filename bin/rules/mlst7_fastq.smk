@@ -7,9 +7,13 @@ rule mlst7:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
         db = MLST7_DB + "/senterica/senterica.length.b",
-        species = OUT + "/identify_species/{sample}/data.json"
+        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output:
-        OUT + "/mlst7/{sample}/results_tab.tsv"
+        json = temp(OUT + "/mlst7/{sample}/data.json"),
+        txt = OUT + "/mlst7/{sample}/results.txt",
+        fasta = OUT + "/mlst7/{sample}/MLST_allele_seq.fsa",
+        hits = temp(OUT + "/mlst7/{sample}/Hit_in_genome_seq.fsa"),
+        tab = temp(OUT + "/mlst7/{sample}/results_tab.tsv")
     conda:
         "../../envs/mlst7.yaml"
     log:
@@ -30,13 +34,12 @@ else
 fi
 
 python bin/cge-mlst/mlst.py -i {input.r1} {input.r2} \
--o $(dirname {output}) \
+-o $(dirname {output.json}) \
 -s $SPECIES \
 --database {params.mlst7_db} \
 -mp kma \
 -x 2> {log}
         """
-
 
 
 
