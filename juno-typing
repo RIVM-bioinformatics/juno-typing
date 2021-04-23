@@ -51,7 +51,7 @@ VERSION=$(git log -n 1 --pretty=format:"%H") ## TODO: this will not show up if n
 INPUT_DIR="raw_data"
 METADATA="NotProvided"
 OUTPUT_DIR="out"
-DB_DIR="db"
+DB_DIR="/mnt/db/juno_db/"
 LOCAL="FALSE"
 CORES="NotProvided"
 QUEUE="bio"
