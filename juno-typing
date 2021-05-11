@@ -268,21 +268,20 @@ fi
 #####                      Generate sample sheet                          #####
 ###############################################################################
 
-#TODO :  Give better feedback if neither the input contains only fastq (and it is not Juno)
+# TODO :  Give better feedback if neither the input contains only fastq (and it is not Juno)
 # Now it gives an awkward message saying that the input_dir/de_novo_assembly_filtered does not 
 # exist. The user might not know what this means
 if [ $(ls -A "${INPUT_DIR}" | grep 'R[0-9]\{1\}.*\.f[ast]\{0,3\}q\.\?[gz]\{0,2\}$' | wc -l) -gt 0 ] & 
     [ $(ls -A "${INPUT_DIR}" | grep '.fasta$' | wc -l) -gt 0 ]; then
     INPUT_FASTQ=$INPUT_DIR
     INPUT_FASTA=$INPUT_DIR
-elif [ $(ls -A "${INPUT_DIR}/clean_fastq" | grep 'R[0-9]\{1\}.*\.f[ast]\{0,3\}q\.\?[gz]\{0,2\}$' | wc -l) -gt 0 ] &
-    [ $(ls -A "${INPUT_DIR}/de_novo_assembly_filtered" | grep '.fasta$' | wc -l) -gt 0 ]; then
+elif [ -d "${INPUT_DIR}/clean_fastq" ] & [ -d "${INPUT_DIR}/de_novo_assembly_filtered" ]; then
     INPUT_FASTQ="$INPUT_DIR/clean_fastq"
     INPUT_FASTA="$INPUT_DIR/de_novo_assembly_filtered"
 else
     minispacer
     echo -e "The input directory you specified (${INPUT_DIR}) exists but is empty or does not contain any recognizable fastq and/or fasta files..."
-    echo -e "Please specify a directory with input-data."
+    echo -e "Please specify a directory with input data."
     exit 1
 fi
 

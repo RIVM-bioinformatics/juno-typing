@@ -59,7 +59,7 @@ def main(list_files, output_file):
         (results_df['wzx'] == 'O169') & (results_df['wzy'] == 'O169/O183'),
         (results_df['wzx'] == 'O183') & (results_df['wzy'] == 'O169/O183'),
         (results_df['wzx'] == 'O123') & (results_df['wzy'] == 'O123/O186'),
-        (results_df['wzx'] == 'O186') & (results_df['wzy'] == 'O169/O183'),
+        (results_df['wzx'] == 'O186') & (results_df['wzy'] == 'O123/O186'),
         (results_df['wzx'] == 'O17/O77') & (results_df['wzy'] == 'O17/O77'),
         (results_df['wzx'] == 'O44') & (results_df['wzy'] == 'O17/O44'),
         (results_df['wzx'] == 'O118/0151') & (results_df['wzy'] == 'O118/0151'),
