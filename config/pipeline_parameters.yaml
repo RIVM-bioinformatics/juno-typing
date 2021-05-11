@@ -6,6 +6,9 @@ serotypefinder:
     ecoli_db: '/mnt/db/ecoli_serotyper_db/'
     min_cov: '0.6'
     identity_thresh: '0.85'
+seroba:
+    seroba_db: '/mnt/db/seroba_db/'
+    min_cov: '20'
 
 # Pipeline parameters
 threads:
@@ -13,8 +16,10 @@ threads:
   kmerfinder: 1
   seqsero2: 6
   serotypefinder: 2
+  seroba: 1
 mem_mb:
   cgemlst: 4000
   kmerfinder: 4000
   seqsero2: 5000
   serotypefinder: 8000
+  seroba: 8000

@@ -1,0 +1,8 @@
+name: seroba
+channels:
+  - defaults
+  - bioconda
+dependencies:
+  - seroba=1.0.2
+  - biopython=1.74
+  - tbb=2020.3
