@@ -82,7 +82,7 @@ rule ecoli_serotyper:
     threads: config["threads"]["serotypefinder"]
     resources: mem_mb=config["mem_mb"]["serotypefinder"]
     params: 
-        ecoli_db = config['serotypefinder']['ecoli_db'],
+        ecoli_db = config['serotypefinder_db'],
         min_cov = config['serotypefinder']['min_cov'],
         identity_thresh = config['serotypefinder']['identity_thresh'],
         output_dir = OUT + '/serotype/{sample}/'
@@ -117,7 +117,7 @@ rule seroba:
     resources: mem_mb=config["mem_mb"]["seroba"]
     params:
         min_cov = config["seroba"]["min_cov"],
-        seroba_db = config["seroba"]["seroba_db"]
+        seroba_db = config["seroba_db"]
     shell:
         """
 rm -rf {wildcards.sample} 

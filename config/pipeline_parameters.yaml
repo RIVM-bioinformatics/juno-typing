@@ -1,15 +1,6 @@
 # General pipeline
 sample_sheet: "sample_sheet.yaml" 
 
-# Default parameters serotype finder
-serotypefinder:
-    ecoli_db: '/mnt/db/ecoli_serotyper_db/'
-    min_cov: '0.6'
-    identity_thresh: '0.85'
-seroba:
-    seroba_db: '/mnt/db/seroba_db/'
-    min_cov: '20'
-
 # Pipeline parameters
 threads:
   cgemlst: 1
