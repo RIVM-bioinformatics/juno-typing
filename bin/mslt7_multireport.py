@@ -23,7 +23,6 @@ def extract_from_mlst7(input):
     sample_res.append('-'.join(allele_list))
     alleles_res = []
     for allele_name in allele_list:
-        #sample_res.append(data['mlst']['results']['allele_profile'][allele_name]['allele'])
         alleles_res.append(data['mlst']['results']['allele_profile'][allele_name]['allele'])
     sample_res.append('-'.join(alleles_res))
     return sample_res

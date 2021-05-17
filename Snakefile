@@ -7,7 +7,10 @@ Date: 12-01-2021
 Documentation: 
 Snakemake rules (in order of execution):
     1. CGE-MLST
-    2. SeqSero2 for Salmonella serotyping
+    2. Bacterial serotyping
+        - SeqSero2 for Salmonella
+        - SerotypeFinder for E. coli
+        - Seroba for Shigella
 """
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####
@@ -46,7 +49,6 @@ MLST7_DB = config["mlst7_db"]
 
 include: "bin/rules/identify_species.smk"
 include: "bin/rules/mlst7_fastq.smk"
-#include: "bin/rules/mlst7_fasta.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
@@ -100,12 +102,15 @@ onstart:
 
 onerror:
     shell("""
+find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
 echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
     """)
 
 
 onsuccess:
     shell("""
+        find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
+        find {OUT}/serotype -type f -empty -exec rm {{}} \;
         echo -e "\tGenerating Snakemake report..."
         snakemake --profile config --cores 1 --unlock
         snakemake --profile config --cores 1 --report '{OUT}/audit_trail/snakemake_report.html'
@@ -128,6 +133,7 @@ rule all:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
         OUT+'/serotype/salmonella_serotype_multireport.csv',
         OUT + '/serotype/ecoli_serotype_multireport.csv',
+        OUT + '/serotype/spneumoniae_serotype_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv"
 
 
