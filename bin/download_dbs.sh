@@ -84,15 +84,12 @@ fi
 
 if [ ! -f "${SEROBA_DB%/}/database/cdhit_cluster" ]  || [ "$UPDATE_DBS" == "TRUE" ]; then
     echo -e "Downloading Seroba database"
-    conda env update -f envs/seroba.yaml
-    source activate seroba
     rm -rf "${SEROBA_DB}" 
     git clone --single-branch https://github.com/sanger-pathogens/seroba.git ${SEROBA_DB}
     cd $SEROBA_DB
     rm -rf seroba/scripts
     rm -rf seroba/seroba
     seroba createDBs database/ $SEROBA_KMER_SIZE
-    conda deactivate
     if [ ! -f "${SEROBA_DB%/}/database/cdhit_cluster" ]; then
         echo -e "Something went wrong while downloading/creating the seroba database"
         exit 1

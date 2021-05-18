@@ -133,7 +133,7 @@ do
         shift
         ;;
         --update-db)
-        UPDATE_DBS="FALSE"
+        UPDATE_DBS="TRUE"
         shift
         ;;
         -h|--help)
