@@ -47,7 +47,7 @@
 }
 
 @test "Downloading databases" {
-  bash bin/download_dbs.sh "./db_test" "TRUE" "./db_test/versions.yaml"
+  bash bin/download_dbs.sh "./db_test" "TRUE" "./db_test/versions.yaml" 71
   [[ -f "db_test/mlst7_db/senterica/senterica.length.b" ]]
   [[ -f "db_test/kmerfinder_db/bacteria/bacteria.ATG.length.b" ]]
   [[ -f "bin/kmerfinder/kmerfinder.py" ]]

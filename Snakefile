@@ -1,6 +1,6 @@
 """
 Juno-typing
-Authors: Alejandra Hernandez-Segura, Robert Verhagen, Maaike van der Beld
+Authors: Alejandra Hernandez-Segura, Maaike van der Beld
 Organization: Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 Department: Infektieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS), Bacteriologie (BPD)
 Date: 12-01-2021
@@ -10,7 +10,7 @@ Snakemake rules (in order of execution):
     2. Bacterial serotyping
         - SeqSero2 for Salmonella
         - SerotypeFinder for E. coli
-        - Seroba for Shigella
+        - Seroba for S. pneumoniae
 """
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####
@@ -19,12 +19,8 @@ Snakemake rules (in order of execution):
 configfile: "config/pipeline_parameters.yaml"
 configfile: "config/user_parameters.yaml"
 
-from pandas import *
-import pathlib
-import pprint
 import os
 import yaml
-import json
 
 
 #################################################################################

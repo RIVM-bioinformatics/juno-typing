@@ -1,7 +1,9 @@
 # BATS testing for bash wrapper
-on: [push, pull_request]
+# Based on: https://github.com/marketplace/actions/setup-miniconda#example-1-basic-usage
 
 name: Test-bash-wrapper
+
+on: [push, pull_request]
 
 jobs:
   build:
@@ -9,24 +11,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8]
-    name: Test ${{ matrix.config.os }} using python ${{ matrix.python-version }}
+        os: [ubuntu-latest, macOS-latest]
+    name: Testing ${{ matrix.config.os }}
 
     steps:
       - uses: actions/checkout@v2
-      - name: Get conda
-        uses: s-weigand/setup-conda@v1
-        with: 
-          update-conda: true
-          python-version: ${{ matrix.python-version }}
-          conda-channels: anaconda, conda-forge, bioconda, biocore  
-      - name: check conda
-        run: conda --version
-      - name: Make and activate necessary environments (mamba and testing_env) and run test
-        run: |
-          conda env create -f envs/mamba.yaml
-          source activate mamba
-          mamba env create -q -f tests/files/testing_env.yaml -n testing_env
-          source activate testing_env
-          bats ./tests/test_juno-typing.bats
+      - name: Setting up conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          mamba-version: "*"
+          channels: conda-forge, anaconda, bioconda, biocore, defaults
+          channel-priority: true
+          environment-file: tests/files/testing_env.yaml 
+          activate-environment: testing_env
+          auto-activate-base: false
+      - name: Conda list
+        shell: bash -l {0}
+        run: conda list
+      - name: Test the bash wrapper.
+        shell: bash -l {0}
+        run: bats ./tests/test_juno-typing.bats
