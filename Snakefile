@@ -16,9 +16,6 @@ Snakemake rules (in order of execution):
 ##### Import config file, sample_sheet and set output folder names          #####
 #################################################################################
 
-configfile: "config/pipeline_parameters.yaml"
-configfile: "config/user_parameters.yaml"
-
 import os
 import yaml
 
@@ -111,7 +108,7 @@ onsuccess:
         snakemake --profile config --cores 1 --unlock
         snakemake --profile config --cores 1 --report '{OUT}/audit_trail/snakemake_report.html'
         echo -e "Juno-typing finished successfully!"
-         """)
+        """)
 
 
 #################################################################################
@@ -120,9 +117,7 @@ onsuccess:
 
 localrules:
     all,
-    no_serotyper,
-    serotype_multireports,
-    mlst7_multireport
+    no_serotyper
 
 rule all:
     input:

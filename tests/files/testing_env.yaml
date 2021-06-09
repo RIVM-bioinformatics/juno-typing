@@ -7,7 +7,6 @@ channels:
   - defaults
 dependencies:
   - mamba
-  - bats
   - snakemake==6.2.1
   - drmaa==0.7.9
   - xlrd==1.2.0
