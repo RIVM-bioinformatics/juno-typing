@@ -9,6 +9,8 @@ rule serotype_multireports:
         spneumoniae = OUT + '/serotype/spneumoniae_serotype_multireport.csv'
     benchmark:
         OUT+'/log/benchmark/serotype/serotype_multireport.txt'
+    threads: 1
+    resources: mem_mb=2000
     log:
         OUT+'/log/serotype/serotype_multireport.log'
     shell:

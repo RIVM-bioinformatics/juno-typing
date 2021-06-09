@@ -1,0 +1,12 @@
+,fliC_85_AIHA01000023_H2,wzx_406_56-54Cigleris_O128ab,wzy_405_5564-64_O128ac
+HSP_length,1494,1443,1044
+accession,AIHA01000023,56-54Cigleris,5564-64
+contig_name,NA,NA,NA
+coverage,100.0,100.0,100.0
+gene,fliC,wzx,wzy
+hit_id,fliC_85_AIHA01000023_H2,wzx_406_56-54Cigleris_O128ab,wzy_405_5564-64_O128ac
+identity,100.0,100.0,99.9
+position_in_ref,1..1495,1..1444,1..1045
+positions_in_contig,NA..NA,NA..NA,NA..NA
+serotype,H2,O128ab,O128ac
+template_length,1494,1443,1044

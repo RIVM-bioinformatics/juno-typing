@@ -9,6 +9,8 @@ rule mlst7_multireport:
         OUT+'/log/benchmark/mlst7/mlst7_multireport.txt'
     log:
         OUT+'/log/mlst7/mlst7_multireport.log'
+    threads: 1
+    resources: mem_mb=2000
     shell:
         """
 python bin/mslt7_multireport.py  -i {input} -o {output}

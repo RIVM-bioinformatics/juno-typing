@@ -23,9 +23,10 @@ python bin/kmerfinder/kmerfinder.py -i "{input.r1}" "{input.r2}" \
 -o "$(dirname {output.kmerfinder})" \
 -db "${{DB_DIR}}/bacteria.ATG" \
 -tax "${{DB_DIR}}/bacteria.tax" \
--x
+-x 2> {log}
 
 if `cat {output} | grep -q "species_hits': {{}}"`; then
+    echo "No species were detected." 2> {log}
     rm -f {output}
 fi
         """

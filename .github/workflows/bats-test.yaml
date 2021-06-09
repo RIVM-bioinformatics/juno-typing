@@ -1,7 +1,7 @@
-# BATS testing for bash wrapper
+# BATS testing for python wrapper
 # Based on: https://github.com/marketplace/actions/setup-miniconda#example-1-basic-usage
 
-name: Test-bash-wrapper
+name: Juno-typing pipeline
 
 on: [push, pull_request]
 
@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest]
-    name: Testing ${{ matrix.config.os }}
+        os: [ubuntu-latest]
+    name: Testing bash wrapper ${{ matrix.config.os }}
 
     steps:
       - uses: actions/checkout@v2
@@ -30,4 +30,4 @@ jobs:
         run: conda list
       - name: Test the bash wrapper.
         shell: bash -l {0}
-        run: bats ./tests/test_juno-typing.bats
+        run: python ./tests/test_juno-typing.py

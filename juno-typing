@@ -51,7 +51,7 @@ VERSION=$(git log -n 1 --pretty=format:"%H") ## TODO: this will not show up if n
 INPUT_DIR="raw_data"
 METADATA="NotProvided"
 OUTPUT_DIR="out"
-DB_DIR="/mnt/db/juno_db/"
+DB_DIR="/mnt/db/juno/typing_db/"
 SEROTYPEFINDER_MIN_COV=0.6
 SEROTYPEFINDER_IDENTITY=0.85
 SEROBA_MIN_COV=20
@@ -337,8 +337,8 @@ fi
 #####      Download and installing databases and necessary software       #####
 ###############################################################################
 
-#TODO: include serotypefinder database
 LOG_SOFTWARE_VERSIONS="config/extra_software_versions.yaml"
+mkdir -p "${DB_DIR}"
 source bin/download_dbs.sh "$DB_DIR" "$UPDATE_DBS" "$LOG_SOFTWARE_VERSIONS" "$SEROBA_KMER_SIZE"
 
 ###############################################################################
@@ -385,7 +385,8 @@ if [[ $LOCAL == "TRUE" ]]; then
         CORES="4"
     fi
     echo "cores: ${CORES}" >> $PARAMETERS
-    snakemake --profile config --cores $CORES ${@}
+    snakemake --profile config --cores $CORES \
+    --configfile 'config/pipeline_parameters.yaml' 'config/user_parameters.yaml' ${@}
     RESULT=$?
 else
     if [[ $CORES == "NotProvided" ]]; then
@@ -394,6 +395,7 @@ else
     echo "cores: ${CORES}" >> $PARAMETERS
     echo "queue: ${QUEUE}" >> $PARAMETERS
     snakemake --profile config --cores $CORES \
+    --configfile 'config/pipeline_parameters.yaml' 'config/user_parameters.yaml' \
     --drmaa " -q ${QUEUE} -n {threads} \
     -o ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.out \
     -e ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.err \
