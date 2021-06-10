@@ -26,14 +26,13 @@ import yaml
 
 # Loading sample sheet as dictionary 
 # ("R1" and "R2" keys for fastq, and "assembly" for fasta)
+sample_sheet = config["sample_sheet"]
 SAMPLES = {}
-with open(config["sample_sheet"]) as sample_sheet_file:
+with open(sample_sheet) as sample_sheet_file:
     SAMPLES = yaml.safe_load(sample_sheet_file) 
 
 # OUT defines output directory for most rules.
 OUT = config["out"]
-KMERFINDER_DB=config["kmerfinder_db"]
-MLST7_DB = config["mlst7_db"]
 
 
 #@################################################################################
@@ -45,49 +44,6 @@ include: "bin/rules/mlst7_fastq.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
-
-#@################################################################################
-#@####                    Onstart checker codeblock                          #####
-#@################################################################################
-
-onstart:
-    try:
-        print("Checking if all specified files are accessible...")
-        important_files = [ config["sample_sheet"], MLST7_DB, KMERFINDER_DB ]
-        for filename in important_files:
-            if not os.path.exists(filename):
-                raise FileNotFoundError(filename)
-    except FileNotFoundError as e:
-        print("This file is not available or accessible: %s" % e)
-        sys.exit(1)
-    else:
-        print("\tAll specified files are present!")
-    shell("""
-        mkdir -p {OUT}
-        mkdir -p {OUT}/audit_trail
-        mkdir -p {OUT}/log/drmaa
-        LOG_CONDA="{OUT}/audit_trail/log_conda.txt"
-        LOG_CONFIG="{OUT}/audit_trail/log_config.txt"
-        LOG_GIT="{OUT}/audit_trail/log_git.txt"
-        echo -e "\nLogging pipeline settings..."
-        echo -e "This is the link to the code used for this analysis:"  > "${{LOG_GIT}}"
-        echo -e "\thttps://github.com/AleSR13/Juno-typing/tree/$(git log -n 1 --pretty=format:"%H")" >> "${{LOG_GIT}}"
-        echo -e "\tGenerating full software list of current Conda environment ..."
-        echo -e "Master environment:\n\n" > "${{LOG_CONDA}}"
-        conda list >> "${{LOG_CONDA}}"
-        echo -e "\tGenerating config file log..."
-        rm -f "${{LOG_CONFIG}}"
-        echo -e "Date run: $(date)" > "${{LOG_CONFIG}}"
-        touch "${{LOG_CONFIG}}"
-        for file in config/*.yaml
-        do
-            echo -e "\n==> Contents of file \"${{file}}\": <==" >> "${{LOG_CONFIG}}"
-            cat ${{file}} >> "${{LOG_CONFIG}}"
-            echo -e "\n\n" >> "${{LOG_CONFIG}}"
-        done
-        echo -e "\n\nSample sheet:\n" >> "${{LOG_CONFIG}}"
-        cat sample_sheet.yaml >> "${{LOG_CONFIG}}"
-    """)
 
 #@################################################################################
 #@####              Finalize pipeline (error/success)                        #####
@@ -105,8 +61,12 @@ onsuccess:
         find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
         find {OUT}/serotype -type f -empty -exec rm {{}} \;
         echo -e "\tGenerating Snakemake report..."
-        snakemake --profile config --cores 1 --unlock
-        snakemake --profile config --cores 1 --report '{OUT}/audit_trail/snakemake_report.html'
+        snakemake --config sample_sheet={sample_sheet} \
+                    --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
+                    --cores 1 --unlock
+        snakemake --config sample_sheet={sample_sheet} \
+                    --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
+                    --cores 1 --report '{OUT}/audit_trail/snakemake_report.html'
         echo -e "Juno-typing finished successfully!"
         """)
 

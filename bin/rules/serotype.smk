@@ -8,7 +8,8 @@ def choose_serotyper(wildcards):
         is_ecoli = species_res.find("escherichia") != -1
         is_strepto = species_res.find("streptococcus") != -1
         if is_salmonella:
-            return OUT+'/serotype/{sample}/SeqSero_result.tsv'
+            return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
+                    OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
         elif is_ecoli:
             return [OUT + '/serotype/{sample}/data.json',
                     OUT + '/serotype/{sample}/result_serotype.csv']
@@ -39,16 +40,18 @@ rule salmonella_serotyper:
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
         species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output:
-        OUT+'/serotype/{sample}/SeqSero_result.tsv',
-        temp(OUT+'/serotype/{sample}/SeqSero_result.txt'),
-        temp(OUT+'/serotype/{sample}/blasted_output.xml'),
-        temp(OUT+'/serotype/{sample}/data_log.txt')
+        seqsero = OUT+'/serotype/{sample}/SeqSero_result.tsv',
+        seqsero_tmp1 = temp(OUT+'/serotype/{sample}/SeqSero_result.txt'),
+        seqsero_tmp2 = temp(OUT+'/serotype/{sample}/blasted_output.xml'),
+        seqsero_tmp3 = temp(OUT+'/serotype/{sample}/data_log.txt'),
+        final_serotype = OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"
     benchmark:
         OUT+'/log/benchmark/serotype_salmonella/{sample}.txt'
     log:
         OUT+'/log/serotype_salmonella/{sample}.log'
     params:
-        output_dir = OUT + '/serotype/{sample}/'
+        output_dir = OUT + '/serotype/{sample}/',
+        min_cov = config['salmonellamonophasic']['min_cov']
     threads: 
         config["threads"]["seqsero2"]
     resources: 
@@ -59,9 +62,16 @@ rule salmonella_serotyper:
         """
 # Run seqsero2 
 # -m 'a' means microassembly mode and -t '2' refers to separated fastq files (no interleaved)
-SeqSero2_package.py -m 'a' -t '2' -i {input.r1} {input.r2} -d {params.output_dir} -p {threads}
+SeqSero2_package.py -m 'a' -t '2' -i {input.r1} {input.r2} -d {params.output_dir} -p {threads} &> {log}
+python bin/check_salmmonophasic.py -n {wildcards.sample} \
+                                    -i {output.seqsero} \
+                                    -f {input.r1} \
+                                    -r {input.r2} \
+                                    -o {output.final_serotype} \
+                                    -s {params.min_cov} \
+                                    -b {params.min_cov} \
+                                    -t {threads} &>> {log}
         """
-
 
 #-----------------------------------------------------------------------------#
 ### E. coli serotyper ###
@@ -92,9 +102,9 @@ python bin/serotypefinder/serotypefinder.py -i {input.assembly} \
     -o {params.output_dir} \
     -p {params.ecoli_db} \
     -l {params.min_cov} \
-    -t {params.identity_thresh} 2> {log}
+    -t {params.identity_thresh} &> {log}
 
-python bin/serotypefinder/extract_alleles_serotypefinder.py {output.json} {output.csv} 2>> {log}
+python bin/serotypefinder/extract_alleles_serotypefinder.py {output.json} {output.csv} &>> {log}
         """
 
 #-----------------------------------------------------------------------------#

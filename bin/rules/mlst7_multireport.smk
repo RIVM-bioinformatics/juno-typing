@@ -13,5 +13,5 @@ rule mlst7_multireport:
     resources: mem_mb=2000
     shell:
         """
-python bin/mslt7_multireport.py  -i {input} -o {output}
+python bin/mslt7_multireport.py  -i {input} -o {output} &> {log}
         """

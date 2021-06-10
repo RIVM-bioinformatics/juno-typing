@@ -128,10 +128,9 @@ class RunSnakemake:
     def __init__(self,
                 pipeline_name,
                 pipeline_version,
-                sample_dict,
                 output_dir,
                 workdir,
-                sample_sheet=pathlib.Path('sample_sheet.yaml'), 
+                sample_sheet=pathlib.Path('config/sample_sheet.yaml'), 
                 user_parameters=pathlib.Path('config/user_parameters.yaml'), 
                 fixed_parameters=pathlib.Path('config/pipeline_parameters.yaml'),
                 snakefile='Snakefile',
@@ -155,7 +154,6 @@ class RunSnakemake:
         self.path_to_audit = self.output_dir.joinpath('audit_trail')
         self.path_to_audit.mkdir(parents = True, exist_ok = True)
         self.generate_audit_trail(self.path_to_audit,
-                                    sample_dict,
                                     sample_sheet,
                                     pipeline_name,
                                     pipeline_version,
@@ -176,6 +174,7 @@ class RunSnakemake:
                             pipeline_name,
                             self.snakefile,
                             self.workdir,
+                            sample_sheet,
                             self.user_parameters,
                             self.fixed_parameters,
                             self.cores,
@@ -189,15 +188,16 @@ class RunSnakemake:
                             self.usesingularity,
                             self.singularityargs,
                             self.restarttimes,
-                            self.latency)
+                            self.latency,
+                            self.path_to_audit)
 
 
-    def get_git_audit(self, git_file, sample_dict):
+    def get_git_audit(self, git_file):
         print_message("Collecting information about the Git repository of this pipeline (see {})".format(git_file))
         git_audit = {"repo": subprocess.check_output(["git","config", "--get", "remote.origin.url"]).strip(),
                     "commit": subprocess.check_output(["git","log", "-n", "1" "--pretty=format:'%H'"]).strip()}
         with open(git_file, 'w') as file:
-            yaml.dump(sample_dict, file, default_flow_style=False)
+            yaml.dump(git_audit, file, default_flow_style=False)
 
     def get_pipeline_audit(self, pipeline_file, pipeline_name, pipeline_version):
         print_message("Collecting information about the pipeline (see {})".format(pipeline_file))
@@ -217,16 +217,15 @@ class RunSnakemake:
 
     def generate_audit_trail(self, 
                             path_to_audit,
-                            sample_dict,
                             sample_sheet,
                             pipeline_name,
                             pipeline_version,
                             user_parameters):
-        assert sample_sheet.exists(), "The sample sheet ({}) does not exist. This sample sheet is generated before starting your pipeline. Something must have gone wrong while creating it.".format(str(sample_sheet))
-        assert user_parameters.exists(), "The provided user_parameters ({}) was not created properly or was deleted before starting the pipeline".format(','.join(configfiles))
+        assert pathlib.Path(sample_sheet).exists(), "The sample sheet ({}) does not exist. This sample sheet is generated before starting your pipeline. Something must have gone wrong while creating it.".format(str(sample_sheet))
+        assert pathlib.Path(user_parameters).exists(), "The provided user_parameters ({}) was not created properly or was deleted before starting the pipeline".format(','.join(configfiles))
 
         git_file = path_to_audit.joinpath('log_git.yaml')
-        self.get_git_audit(git_file, sample_dict)
+        self.get_git_audit(git_file)
         conda_file = path_to_audit.joinpath('log_conda.txt')
         self.get_conda_audit(conda_file)
         pipeline_file = path_to_audit.joinpath('log_pipeline.yaml')
@@ -243,6 +242,7 @@ class RunSnakemake:
                     pipeline_name,
                     snakefile,
                     workdir,
+                    sample_sheet,
                     user_parameters,
                     fixed_parameters,
                     cores,
@@ -256,7 +256,8 @@ class RunSnakemake:
                     usesingularity,
                     singularityargs,
                     restarttimes,
-                    latency):
+                    latency,
+                    path_to_audit):
 
         print_message("Running {} pipeline.".format(pipeline_name))
 
@@ -276,6 +277,7 @@ class RunSnakemake:
             snakemake.snakemake(snakefile,
                             workdir=workdir,
                             configfiles=[user_parameters, fixed_parameters],
+                            config={"sample_sheet": str(sample_sheet)},
                             cores=cores,
                             nodes=cores,
                             drmaa = drmaa,
@@ -294,5 +296,6 @@ class RunSnakemake:
         except:
             print_error("An error occured while running the {} pipeline.".format(pipeline_name))
             raise
+
         print_message("Finished running pipeline!")
             
