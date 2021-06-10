@@ -22,6 +22,7 @@ Snakemake rules (in order of execution):
 
 # Dependencies
 import argparse
+import pandas as pd
 import pathlib
 import subprocess
 from sys import path
@@ -38,6 +39,7 @@ class JunoTypingRun:
     def __init__(self, 
                 input_dir, 
                 output_dir, 
+                metadata, 
                 db_dir = "db", 
                 serotypefinder_mincov=0.6, 
                 serotypefinder_identity=0.85,
@@ -56,6 +58,9 @@ class JunoTypingRun:
         self.pipeline_info = {'pipeline_name': "Juno-typing",
                                 'pipeline_version': "0.1"}
         self.snakefile = "Snakefile"
+        self.sample_sheet = "config/sample_sheet.yaml"
+        self.input_dir = pathlib.Path(input_dir)
+        self.metadata = metadata
         self.workdir = pathlib.Path(__file__).parent.absolute()
         self.useconda = True
         self.usesingularity = False
@@ -65,8 +70,10 @@ class JunoTypingRun:
         self.output_dir = output_dir
         self.restarttimes = 2       
         # Checking if the input_dir comes from the Juno-assembly pipeline 
-        self.startup = general_juno_pipeline.PipelineStartup(input_dir, 'both')
-        
+        self.startup = self.start_pipeline(self.input_dir, 
+                                            self.sample_sheet, 
+                                            self.metadata)
+
         # Parse arguments specific from the user
         self.user_params = self.write_userparameters(input_dir,
                                                     self.output_dir,
@@ -87,7 +94,7 @@ class JunoTypingRun:
         # Run snakemake
         general_juno_pipeline.RunSnakemake(pipeline_name = self.pipeline_info['pipeline_name'],
                                             pipeline_version = self.pipeline_info['pipeline_version'],
-                                            sample_dict = self.startup.sample_dict,
+                                            sample_sheet = self.sample_sheet,
                                             output_dir = self.output_dir,
                                             workdir = self.workdir,
                                             snakefile = self.snakefile,
@@ -121,19 +128,44 @@ class JunoTypingRun:
         # download_dbs.wait()
 
 
+    def add_species_to_sample(self, sample, samples_dic, species_dic):
+        try: 
+            samples_dic[sample].update(species_dic[sample])
+        except:
+            pass
+
+    def add_metadata(self, metadata, samples_dic):
+        assert metadata.is_file(), "Provided metadata file ({}) does not exist".format(metadata)
+        # Load species file
+        species_dic = pd.read_csv(metadata, index_col = 0, dtype={'Sample':str})
+        species_dic.index = species_dic.index.map(str)
+        species_dic['genus-abbr'] = species_dic['Genus'].apply(lambda x: x[0])
+        species_dic['species-mlst7'] = species_dic['genus-abbr'] + species_dic["Species"]
+        species_dic['species-mlst7'] = species_dic['species-mlst7'].apply(lambda x: x.lower())
+        species_dic = species_dic.transpose().to_dict()
+        # Update dictionary with species
+        for sample_name in samples_dic :
+            self.add_species_to_sample(sample_name, samples_dic, species_dic)
+        return species_dic
+
     def start_pipeline(self, 
-                        input_sudir, 
-                        sample_sheet):
+                        input_dir, 
+                        sample_sheet,
+                        metadata):
         """Function to start the pipeline (some steps from PipelineStartup need to be modified for the Juno-typing pipeline to accept fastq and fasta input"""
         # Taking fastq input as the Startup just to inherit all the same attributes
         # from parent class (PipelineStartup). The fasta sample sheet is created 
         # separately and appended to the original one
         startup = general_juno_pipeline.PipelineStartup(input_dir, input_type = 'both')
-
+        # Add species-mlst7 data if a metadata file was provided or indicate so if not provided
+        for sample in startup.sample_dict:
+            startup.sample_dict[sample]['species-mlst7'] = "NotProvided"
+        if metadata is not None:
+            startup.sample_dict = self.add_metadata(metadata, startup.sample_dict)
+        # Write sample_sheet
         with open(sample_sheet, 'w') as file:
             yaml.dump(startup.sample_dict, file, default_flow_style=False)
-        
-        return startup.sample_dict
+        return startup
     
     def write_userparameters(self,
                             input_dir,
@@ -178,6 +210,14 @@ if __name__ == '__main__':
         required = True,
         metavar = "DIR",
         help = "Relative or absolute path to the input directory. It must either be the output directory of the Juno-assembly pipeline or it must contain all the raw reads (fastq) and assemblies (fasta) files for all samples to be processed."
+    )
+    parser.add_argument(
+        "-m",
+        "--metadata",
+        type = pathlib.Path,
+        default = None,
+        metavar = "FILE",
+        help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. If a genus + species is provided for a sample, the MLST7 is not run."
     )
     parser.add_argument(
         "-o",
@@ -279,6 +319,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     JunoTypingRun(args.input, 
                     args.output, 
+                    args.metadata,
                     args.db_dir,
                     args.serotypefinder_mincov,
                     args.serotypefinder_identity,

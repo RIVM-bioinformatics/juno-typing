@@ -19,18 +19,18 @@ INPUT=$(tr ' ' $'\n' <<< '{input}')
 
 
 ## Salmonella serotype multireport
-declare -a StringArray=(${{INPUT//_done\.txt/\/SeqSero_result.tsv}})
+declare -a StringArray=(${{INPUT//_done\.txt/\/final_salmonella_serotype.tsv}})
 SEROTYPE_INPUT=""
 for val in ${{StringArray[@]}}; do
     if [ -f $val ]; then
         SEROTYPE_INPUT="${{SEROTYPE_INPUT}} ${{val}}"
     fi
-done 2> {log}
+done &> {log}
 
 if [[ ${{#SEROTYPE_INPUT}} -eq 0 ]]; then
     touch {output.salmonella}
 else
-    python bin/seqsero2_multireport.py -i ${{SEROTYPE_INPUT}} -o {output.salmonella} 2> {log}
+    python bin/seqsero2_multireport.py -i ${{SEROTYPE_INPUT}} -o {output.salmonella} &>> {log}
 fi
 
 # E. coli serotype multireport
@@ -40,12 +40,12 @@ for val in ${{StringArray[@]}}; do
     if [ -f $val ]; then
         SEROTYPE_INPUT="${{SEROTYPE_INPUT}} ${{val}}"
     fi
-done 2> {log}
+done &>> {log}
 
 if [[ ${{#SEROTYPE_INPUT}} -eq 0 ]]; then
     touch {output.ecoli}
 else
-    python bin/serotypefinder_multireport.py ${{SEROTYPE_INPUT}} {output.ecoli} 2> {log}
+    python bin/serotypefinder_multireport.py ${{SEROTYPE_INPUT}} {output.ecoli} &>> {log}
 fi
 
 # P. pneumoniae (seroba) serotype multireport
@@ -55,12 +55,12 @@ for val in ${{StringArray[@]}}; do
     if [ -f $val ]; then
         SEROTYPE_INPUT="${{SEROTYPE_INPUT}} ${{val}}"
     fi
-done 2> {log}
+done &>> {log}
 
 if [[ ${{#SEROTYPE_INPUT}} -eq 0 ]]; then
     touch {output.spneumoniae}
 else
-    python bin/seroba_multireport.py ${{SEROTYPE_INPUT}} -o {output.spneumoniae} 2> {log}
+    python bin/seroba_multireport.py ${{SEROTYPE_INPUT}} -o {output.spneumoniae} &>> {log}
 fi
         """
 

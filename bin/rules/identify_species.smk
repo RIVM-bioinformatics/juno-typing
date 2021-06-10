@@ -6,7 +6,7 @@ rule identify_species:
     input:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
-        db = KMERFINDER_DB + "/bacteria/bacteria.ATG.length.b"
+        db = config["kmerfinder_db"] + "/bacteria/bacteria.ATG.length.b"
     output:
         kmerfinder = OUT + "/identify_species/{sample}/data.json"
     log:
@@ -42,9 +42,11 @@ checkpoint which_species:
         OUT + "/identify_species/{sample}/data.json"
     output:
         temp(OUT + "/identify_species/{sample}/best_species_hit.txt")
-    threads: 1
-    resources: mem_mb=2000
+    threads: 
+        1
+    resources: 
+        mem_mb=2000
     shell:
         """
-python bin/get_species.py {input} > {output}
+python bin/get_species.py {input} > {output} 
         """

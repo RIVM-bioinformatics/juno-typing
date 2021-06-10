@@ -16,4 +16,5 @@ dependencies:
   - spades=3.13.1
   - sra-tools=2.10.0
   - seqsero2=1.1.1
+  - pandas==1.1.0
 

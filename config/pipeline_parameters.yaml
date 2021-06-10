@@ -1,12 +1,8 @@
-# General pipeline
-sample_sheet: "sample_sheet.yaml" 
-
 # Resources
 threads:
   cgemlst: 1
   kmerfinder: 1
   seqsero2: 6
-  salmonellamonophasic: 4
   serotypefinder: 2
   seroba: 1
 mem_mb:
@@ -18,6 +14,4 @@ mem_mb:
 
 # Pipeline parameters (not taken from user)
 salmonellamonophasic:
-  readthreshold:
-    styphi: 4000
-    biphasic: 4000
+  min_cov: 4000
