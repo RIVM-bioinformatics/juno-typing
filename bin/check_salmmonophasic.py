@@ -24,22 +24,24 @@ def generate_depth_file(amplicon_file,
     threads = str(threads)
     ampliconname = str(pathlib.Path(amplicon_file).stem)
     os.system("bwa index %s"%(amplicon_file))
-    os.system("bwa mem -k 17 -t %s %s %s %s > %s.sam"%(threads,amplicon_file,forward,reverse,sample_name))
+    os.system("bwa mem -k 17 -t %s %s %s %s > %s.sam"%(threads,amplicon_file,forward_read,reverse_read,sample_name))
     os.system("samtools sort -@ %s -n -O sam %s.sam | samtools fixmate -m -O bam - %s.bam"%(threads,sample_name,sample_name))
     os.system("rm %s.sam"%(sample_name))
     os.system("samtools sort -@ %s -O bam -o %s.sorted.bam %s.bam"%(threads,sample_name,sample_name))
     os.system("rm %s.bam"%(sample_name))
     os.system("samtools depth %s.sorted.bam | gzip > %s.%s.depth.txt.gz"%(sample_name,sample_name,ampliconname))
     os.system("rm %s.sorted.bam"%(sample_name))
-    os.system("gunzip %s.%s.depth.txt.gz"%(sample_name,ampliconname))
+    depth_file = "%s.%s.depth.txt.gz"%(sample_name,ampliconname)
+    os.system("gunzip -f %s"%(depth_file))
+    return depth_file.replace('.gz', '')
 
 
 def determine_allele_presence(depth_file,
-                                ampliconname,
                                 first_position,
-                                last_position):
+                                last_position,
+                                threshold):
+    count = 0
     with open(depth_file) as file:
-        count = 0
         # loop over every line in the depth file
         for read in file:
             # split the line based on tabs
@@ -65,26 +67,28 @@ def monophasic_or_biphasic(seqsero2output,
                             threads,
                             threshstyphi,
                             threshbiphasic):
-    current_dir = pathlib.Path(__file__).parent.absolute()
-    amplicons = {"FFLIB_FFLIA": {"file": current_dir.joinpath("amplicon/FFLIB_FFLIA.fasta"),
-                            "threshold": threshstyphi, 
-                            "first_position": 425,
-                            "last_position": 1130},
-                "sense_59_antisense_83": {"file": current_dir.joinpath("amplicon/sense_59_antisense_83.fasta"),
-                                            "threshold": threshbiphasic, 
-                                            "first_position": 425,
-                                            "last_position": 1130}}	
+    current_dir = pathlib.Path(__file__).parent.parent.absolute()
+    amplicons = {"FFLIB_FFLIA": current_dir.joinpath("files/salmonellamonophasic_amplicon/FFLIB_FFLIA.fasta"),
+                "sense_59_antisense_83": current_dir.joinpath("files/salmonellamonophasic_amplicon/sense_59_antisense_83.fasta")}	
     if suspected_typhimurium(seqsero2output):
-        sense_59_antisense_83output, countsense_59_antisense_83 = generate_depth_file(amplicons['FFLIB_FFLIA']['file'], 
-                                                                                        forwardreads, 
-                                                                                        reversereads, 
-                                                                                        sample_name, 
-                                                                                        threads)
-        FFLIB_FFLIAoutput, countFFLIB_FFLIA = generate_depth_file(amplicons['sense_59_antisense_83']['file'], 
-                                                                    forwardreads, 
-                                                                    reversereads, 
-                                                                    sample_name, 
-                                                                    threads)
+        depth_file_sense_59 = generate_depth_file(amplicons['sense_59_antisense_83'], 
+                                                    forwardreads, 
+                                                    reversereads, 
+                                                    sample_name, 
+                                                    threads)
+        depth_file_FFLIB = generate_depth_file(amplicons['FFLIB_FFLIA'], 
+                                                forwardreads, 
+                                                reversereads, 
+                                                sample_name, 
+                                                threads)
+        sense_59_antisense_83output, countsense_59_antisense_83 = determine_allele_presence(depth_file = depth_file_sense_59,
+                                                                                            first_position = 425,
+                                                                                            last_position = 1130,
+                                                                                            threshold = threshbiphasic)
+        FFLIB_FFLIAoutput, countFFLIB_FFLIA = determine_allele_presence(depth_file = depth_file_FFLIB,
+                                                                        first_position = 75,
+                                                                        last_position = 780,
+                                                                        threshold = threshstyphi)
         if FFLIB_FFLIAoutput == True and sense_59_antisense_83output == True:
             variant = "Biphasic"
         elif FFLIB_FFLIAoutput == True and sense_59_antisense_83output == False:
@@ -100,13 +104,14 @@ def monophasic_or_biphasic(seqsero2output,
 
 
 def main(args):
-    variant, countFFLIB_FFLIA, countsense_59_antisense_83 = monophasic_or_biphasic(args.seqsero2output,
-                                                                                    args.forwardreads,
-                                                                                    args.reversereads,
-                                                                                    args.sample_name,
-                                                                                    args.threads,
-                                                                                    args.threshbiphasic,
-                                                                                    args.threshstyphi)
+    variant, countFFLIB_FFLIA, countsense_59_antisense_83 = monophasic_or_biphasic(seqsero2output = args.seqsero2output,
+                                                                                    forwardreads = args.forwardreads,
+                                                                                    reversereads = args.reversereads,
+                                                                                    sample_name = args.sample_name,
+                                                                                    threads = args.threads,
+                                                                                    threshbiphasic = args.threshbiphasic,
+                                                                                    threshstyphi = args.threshstyphi)
+                            
     #add the output into a dataframe using pandas
     seqsero_report = pd.read_csv(args.seqsero2output, sep='\t')
     seqsero_report = seqsero_report.iloc[:,[0,3,4,5,6,7,8,9,10]]
