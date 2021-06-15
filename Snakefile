@@ -1,6 +1,6 @@
 """
 Juno-typing
-Authors: Alejandra Hernandez-Segura, Maaike van der Beld
+Author(s): Alejandra Hernandez-Segura, Kaitlin Weber, Edwin van der Kind and Maaike van den Beld
 Organization: Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 Department: Infektieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS), Bacteriologie (BPD)
 Date: 12-01-2021
@@ -11,6 +11,7 @@ Snakemake rules (in order of execution):
         - SeqSero2 for Salmonella
         - SerotypeFinder for E. coli
         - Seroba for S. pneumoniae
+    3. Multireports for serotyper and CGE-MLST
 """
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####
@@ -51,15 +52,21 @@ include: "bin/rules/serotype_multireports.smk"
 
 onerror:
     shell("""
+# TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
 find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
+find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
 echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
     """)
 
 
 onsuccess:
     shell("""
+        # Remove any file from check salmonella monophasic
+        # TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
+        find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
         find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
         find {OUT}/serotype -type f -empty -exec rm {{}} \;
+        find {OUT}/identify_species/ -type f -name best_species_hit.txt -exec rm {{}} \;
         echo -e "\tGenerating Snakemake report..."
         snakemake --config sample_sheet={sample_sheet} \
                     --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
@@ -67,7 +74,6 @@ onsuccess:
         snakemake --config sample_sheet={sample_sheet} \
                     --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
                     --cores 1 --report '{OUT}/audit_trail/snakemake_report.html'
-        echo -e "Juno-typing finished successfully!"
         """)
 
 
@@ -77,6 +83,7 @@ onsuccess:
 
 localrules:
     all,
+    aggregate_serotypes,
     no_serotyper
 
 rule all:

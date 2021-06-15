@@ -60,7 +60,14 @@ class JunoTypingRun:
         self.snakefile = "Snakefile"
         self.sample_sheet = "config/sample_sheet.yaml"
         self.input_dir = pathlib.Path(input_dir)
+        self.output_dir = pathlib.Path(output_dir)
         self.metadata = metadata
+        self.db_dir = pathlib.Path(db_dir)
+        self.serotypefinder_mincov=serotypefinder_mincov
+        self.serotypefinder_identity=serotypefinder_identity
+        self.seroba_mincov=seroba_mincov
+        self.seroba_kmersize = seroba_kmersize
+        self.update = update
         self.workdir = pathlib.Path(__file__).parent.absolute()
         self.useconda = True
         self.usesingularity = False
@@ -70,26 +77,14 @@ class JunoTypingRun:
         self.output_dir = output_dir
         self.restarttimes = 2       
         # Checking if the input_dir comes from the Juno-assembly pipeline 
-        self.startup = self.start_pipeline(self.input_dir, 
-                                            self.sample_sheet, 
-                                            self.metadata)
+        self.startup = self.start_pipeline()
 
         # Parse arguments specific from the user
-        self.user_params = self.write_userparameters(input_dir,
-                                                    self.output_dir,
-                                                    db_dir,
-                                                    serotypefinder_mincov,
-                                                    serotypefinder_identity,
-                                                    seroba_mincov, 
-                                                    seroba_kmersize,
-                                                    self.user_parameters)
+        self.user_params = self.write_userparameters()
         
         # Download databases if necessary
         if not unlock and not dryrun:
-            self.download_databases(db_dir, 
-                                    update,
-                                    self.extra_software_versions,
-                                    seroba_kmersize)
+            self.download_databases()
 
         # Run snakemake
         general_juno_pipeline.RunSnakemake(pipeline_name = self.pipeline_info['pipeline_name'],
@@ -109,35 +104,23 @@ class JunoTypingRun:
                                             singularityargs = self.singularityargs,
                                             restarttimes = self.restarttimes)
         
-    
-    
-    def download_databases(self, 
-                            db_dir, 
-                            updatedbs,
-                            log_software_versions,
-                            seroba_kmersize):
+    def download_databases(self):
         """Function to download software and databases necessary for running the Juno-typing pipeline"""
         # if updatedbs:
         #     update = "TRUE"
         # else:
         #     update = "FALSE"
 
-        db_dir.mkdir(parents = True, exist_ok = True)
-        download_dbs.get_downloads_juno_typing(db_dir, 'bin', updatedbs, seroba_kmersize)
-        # download_dbs = subprocess.run(['bash', 'bin/download_dbs.sh', str(db_dir), update, log_software_versions, str(seroba_kmersize)])
+        self.db_dir.mkdir(parents = True, exist_ok = True)
+        download_dbs.get_downloads_juno_typing(self.db_dir, 'bin', self.update, self.seroba_kmersize)
+        # download_dbs = subprocess.run(['bash', 'bin/download_dbs.sh', str(self.db_dir), self.update, self.log_software_versions, str(self.seroba_kmersize)])
         # download_dbs.wait()
 
 
-    def add_species_to_sample(self, sample, samples_dic, species_dic):
-        try: 
-            samples_dic[sample].update(species_dic[sample])
-        except:
-            pass
-
-    def add_metadata(self, metadata, samples_dic):
-        assert metadata.is_file(), "Provided metadata file ({}) does not exist".format(metadata)
+    def add_metadata(self, samples_dic):
+        assert self.metadata.is_file(), "Provided metadata file ({}) does not exist".format(self.metadata)
         # Load species file
-        species_dic = pd.read_csv(metadata, index_col = 0, dtype={'Sample':str})
+        species_dic = pd.read_csv(self.metadata, index_col = 0, dtype={'Sample':str})
         species_dic.index = species_dic.index.map(str)
         species_dic['genus-abbr'] = species_dic['Genus'].apply(lambda x: x[0])
         species_dic['species-mlst7'] = species_dic['genus-abbr'] + species_dic["Species"]
@@ -145,50 +128,42 @@ class JunoTypingRun:
         species_dic = species_dic.transpose().to_dict()
         # Update dictionary with species
         for sample_name in samples_dic :
-            self.add_species_to_sample(sample_name, samples_dic, species_dic)
+            try: 
+                samples_dic[sample_name].update(species_dic[sample_name])
+            except:
+                pass
         return species_dic
 
-    def start_pipeline(self, 
-                        input_dir, 
-                        sample_sheet,
-                        metadata):
+    def start_pipeline(self):
         """Function to start the pipeline (some steps from PipelineStartup need to be modified for the Juno-typing pipeline to accept fastq and fasta input"""
         # Taking fastq input as the Startup just to inherit all the same attributes
         # from parent class (PipelineStartup). The fasta sample sheet is created 
         # separately and appended to the original one
-        startup = general_juno_pipeline.PipelineStartup(input_dir, input_type = 'both')
+        startup = general_juno_pipeline.PipelineStartup(self.input_dir, input_type = 'both')
         # Add species-mlst7 data if a metadata file was provided or indicate so if not provided
         for sample in startup.sample_dict:
             startup.sample_dict[sample]['species-mlst7'] = "NotProvided"
-        if metadata is not None:
-            startup.sample_dict = self.add_metadata(metadata, startup.sample_dict)
+        if self.metadata is not None:
+            startup.sample_dict = self.add_metadata(startup.sample_dict)
         # Write sample_sheet
-        with open(sample_sheet, 'w') as file:
+        with open(self.sample_sheet, 'w') as file:
             yaml.dump(startup.sample_dict, file, default_flow_style=False)
         return startup
     
-    def write_userparameters(self,
-                            input_dir,
-                            output_dir,
-                            db_dir,
-                            serotypefinder_mincov,
-                            serotypefinder_identity,
-                            seroba_mincov, 
-                            seroba_kmersize,
-                            user_parameters):
+    def write_userparameters(self):
 
-        config_params = {'input_dir': str(input_dir),
-                        'out': str(output_dir),
-                        'kmerfinder_db': str(db_dir.joinpath('kmerfinder_db')),
-                        'mlst7_db': str(db_dir.joinpath('mlst7_db')),
-                        'seroba_db': str(db_dir.joinpath('seroba_db')),
-                        'serotypefinder_db': str(db_dir.joinpath('serotypefinder_db')),
-                        'serotypefinder': {'min_cov': serotypefinder_mincov,
-                                            'identity_thresh': serotypefinder_identity},
-                        'seroba': {'min_cov': seroba_mincov,
-                                    'kmer_size': seroba_kmersize}}
+        config_params = {'input_dir': str(self.input_dir),
+                        'out': str(self.output_dir),
+                        'kmerfinder_db': str(self.db_dir.joinpath('kmerfinder_db')),
+                        'mlst7_db': str(self.db_dir.joinpath('mlst7_db')),
+                        'seroba_db': str(self.db_dir.joinpath('seroba_db')),
+                        'serotypefinder_db': str(self.db_dir.joinpath('serotypefinder_db')),
+                        'serotypefinder': {'min_cov': self.serotypefinder_mincov,
+                                            'identity_thresh': self.serotypefinder_identity},
+                        'seroba': {'min_cov': self.seroba_mincov,
+                                    'kmer_size': self.seroba_kmersize}}
         
-        with open(user_parameters, 'w') as file:
+        with open(self.user_parameters, 'w') as file:
             yaml.dump(config_params, file, default_flow_style=False)
 
         return config_params

@@ -41,7 +41,7 @@ checkpoint which_species:
     input:
         OUT + "/identify_species/{sample}/data.json"
     output:
-        temp(OUT + "/identify_species/{sample}/best_species_hit.txt")
+        OUT + "/identify_species/{sample}/best_species_hit.txt"
     threads: 
         1
     resources: 
