@@ -6,7 +6,7 @@ rule identify_species:
     input:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
-        db = KMERFINDER_DB + "/bacteria/bacteria.ATG.length.b"
+        db = config["kmerfinder_db"] + "/bacteria/bacteria.ATG.length.b"
     output:
         kmerfinder = OUT + "/identify_species/{sample}/data.json"
     log:
@@ -23,9 +23,10 @@ python bin/kmerfinder/kmerfinder.py -i "{input.r1}" "{input.r2}" \
 -o "$(dirname {output.kmerfinder})" \
 -db "${{DB_DIR}}/bacteria.ATG" \
 -tax "${{DB_DIR}}/bacteria.tax" \
--x
+-x 2> {log}
 
 if `cat {output} | grep -q "species_hits': {{}}"`; then
+    echo "No species were detected." 2> {log}
     rm -f {output}
 fi
         """
@@ -41,9 +42,11 @@ checkpoint which_species:
         OUT + "/identify_species/{sample}/data.json"
     output:
         OUT + "/identify_species/{sample}/best_species_hit.txt"
-    threads: 1
-    resources: mem_mb=2000
+    threads: 
+        1
+    resources: 
+        mem_mb=2000
     shell:
         """
-python bin/get_species.py {input} > {output}
+python bin/get_species.py {input} > {output} 
         """

@@ -1,8 +1,12 @@
 ## Files to ignore
 # From previous tests
 sample_sheet.yaml
+config/sample_sheet.yaml
 config/variables.yaml
 tests/test_sample_sheet.yaml
+config/user_parameters.yaml
+wget-log
+
 # Jupyter notebook tests
 *.ipynb
 
@@ -12,8 +16,10 @@ tests/test_sample_sheet.yaml
 # From previous tests
 raw_data/
 out/
+output/
 db/
 db_test/
+fake_db/
 # Software downloaded
 bin/kma/
 bin/cge-mlst
@@ -22,3 +28,6 @@ bin/kmerfinder_db/
 # Snakemake
 .snakemake/
 .vscode/
+# Python
+__pycache__
+bin/__pycache__
