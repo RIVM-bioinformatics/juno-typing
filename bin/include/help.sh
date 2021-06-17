@@ -26,6 +26,26 @@ Input:
                                     exist or the databases are not present, they
                                     will be automatically downloaded.
 
+  --serotypefinder_min_cov [NUM]    Decimal number from 0-1 giving the minimum 
+                                    coverage threshold for SerotypeFinder (E. coli
+                                    serotyper). Default is 0.6 (same than on CGE 
+                                    server)
+
+  --serotypefinder_identity [NUM]   Decimal number from 0-1 giving the identity 
+                                    threshold to use for SerotypeFinder (E. coli
+                                    serotyper). Default is 0.85 (same than on
+                                    CGE server)
+
+  --seroba_min_cov [INT]            Integer (interpreted as percentage) giving
+                                    the minimum coverage threshold for Seroba 
+                                    (S. pneumoniae serotyper). Default is 20 as
+                                    is the default in Seroba.
+
+  -k, --serobakmersize [INT]        Kmer size to construct the database for 
+                                    Seroba (S. pneumoniae serotyper). Default is
+                                    71, which is also the default of the Seroba 
+                                    software.
+
   --update-db                       If this flag is present, the databases will 
                                     be updated, even if they are present. Note
                                     that the KmerFinder database uses the version

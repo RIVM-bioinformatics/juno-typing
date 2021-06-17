@@ -5,7 +5,7 @@
 rule mlst7:
     input:
         assembly = lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
-        db = MLST7_DB + "/senterica/senterica.length.b",
+        db = config["mlst7_db"] + "/senterica/senterica.length.b",
         species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output:
         jjson = temp(OUT + "/mlst7/{sample}/data.json"),
@@ -23,11 +23,11 @@ rule mlst7:
     resources: mem_mb=config["mem_mb"]["cgemlst"]
     params:
         species = lambda wildcards: SAMPLES[wildcards.sample]["species-mlst7"],
-        mlst7_db = MLST7_DB
+        mlst7_db = config["mlst7_db"]
     shell:
         """
 if [ {params.species} == "NotProvided" ]; then
-    SPECIES=$(python bin/get_mlst7_db_name.py {input.species}) 2> {log}
+    SPECIES=$(python bin/get_mlst7_db_name.py {input.species}) &> {log}
 else
     SPECIES={params.species}
 fi
@@ -36,6 +36,6 @@ python bin/cge-mlst/mlst.py -i {input.r1} {input.r2} \
 -o $(dirname {output}) \
 -s $SPECIES \
 --database {params.mlst7_db} \
--x 2> {log}
+-x &>> {log}
         """
 

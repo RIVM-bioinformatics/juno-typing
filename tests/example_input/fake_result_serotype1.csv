@@ -1,0 +1,12 @@
+,fliC_1_AY249991_H6,wzx_57_EU549863_O50/O2,wzy_48_EU549863_O2
+HSP_length,1647,1263,963
+accession,AY249991,EU549863,EU549863
+contig_name,NA,NA,NA
+coverage,100.0,100.0,100.0
+gene,fliC,wzx,wzy
+hit_id,fliC_1_AY249991_H6,wzx_57_EU549863_O50/O2,wzy_48_EU549863_O2
+identity,99.88,98.65,98.03
+position_in_ref,1..1648,1..1264,1..964
+positions_in_contig,NA..NA,NA..NA,NA..NA
+serotype,H6,O50/O2,O2
+template_length,1647,1263,963

@@ -51,7 +51,11 @@ VERSION=$(git log -n 1 --pretty=format:"%H") ## TODO: this will not show up if n
 INPUT_DIR="raw_data"
 METADATA="NotProvided"
 OUTPUT_DIR="out"
-DB_DIR="/mnt/db/juno_db/"
+DB_DIR="/mnt/db/juno/typing_db/"
+SEROTYPEFINDER_MIN_COV=0.6
+SEROTYPEFINDER_IDENTITY=0.85
+SEROBA_MIN_COV=20
+SEROBA_KMER_SIZE=71
 LOCAL="FALSE"
 CORES="NotProvided"
 QUEUE="bio"
@@ -85,6 +89,26 @@ do
         shift
         shift
         ;;
+        --serotypefinder_min_cov)
+        SEROTYPEFINDER_MIN_COV="${2}"
+        shift
+        shift
+        ;;
+        --serotypefinder_identity)
+        SEROTYPEFINDER_IDENTITY="${2}"
+        shift
+        shift
+        ;;
+        --seroba_min_cov)
+        SEROBA_MIN_COV="${2}"
+        shift
+        shift
+        ;;
+        -k|--serobakmersize)
+        SEROBA_KMER_SIZE="${2}"
+        shift
+        shift
+        ;;
         -q|--queue)
         QUEUE="${2}"
         shift
@@ -109,7 +133,7 @@ do
         shift
         ;;
         --update-db)
-        UPDATE_DBS="FALSE"
+        UPDATE_DBS="TRUE"
         shift
         ;;
         -h|--help)
@@ -139,7 +163,7 @@ set -- "${POSITIONAL[@]:-}"
 ###
 
 set +eu
-if [ ! -z ${irods_runsheet_sys__runsheet__lsf_queue} ]; then
+if [ $QUEUE == 'bio' ] & [ ! -z ${irods_runsheet_sys__runsheet__lsf_queue} ]; then
     QUEUE=${irods_runsheet_sys__runsheet__lsf_queue}
 fi
 set -eu
@@ -268,21 +292,20 @@ fi
 #####                      Generate sample sheet                          #####
 ###############################################################################
 
-#TODO :  Give better feedback if neither the input contains only fastq (and it is not Juno)
+# TODO :  Give better feedback if neither the input contains only fastq (and it is not Juno)
 # Now it gives an awkward message saying that the input_dir/de_novo_assembly_filtered does not 
 # exist. The user might not know what this means
 if [ $(ls -A "${INPUT_DIR}" | grep 'R[0-9]\{1\}.*\.f[ast]\{0,3\}q\.\?[gz]\{0,2\}$' | wc -l) -gt 0 ] & 
     [ $(ls -A "${INPUT_DIR}" | grep '.fasta$' | wc -l) -gt 0 ]; then
     INPUT_FASTQ=$INPUT_DIR
     INPUT_FASTA=$INPUT_DIR
-elif [ $(ls -A "${INPUT_DIR}/clean_fastq" | grep 'R[0-9]\{1\}.*\.f[ast]\{0,3\}q\.\?[gz]\{0,2\}$' | wc -l) -gt 0 ] &
-    [ $(ls -A "${INPUT_DIR}/de_novo_assembly_filtered" | grep '.fasta$' | wc -l) -gt 0 ]; then
+elif [ -d "${INPUT_DIR}/clean_fastq" ] & [ -d "${INPUT_DIR}/de_novo_assembly_filtered" ]; then
     INPUT_FASTQ="$INPUT_DIR/clean_fastq"
     INPUT_FASTA="$INPUT_DIR/de_novo_assembly_filtered"
 else
     minispacer
     echo -e "The input directory you specified (${INPUT_DIR}) exists but is empty or does not contain any recognizable fastq and/or fasta files..."
-    echo -e "Please specify a directory with input-data."
+    echo -e "Please specify a directory with input data."
     exit 1
 fi
 
@@ -314,9 +337,9 @@ fi
 #####      Download and installing databases and necessary software       #####
 ###############################################################################
 
-#TODO: include serotypefinder database
 LOG_SOFTWARE_VERSIONS="config/extra_software_versions.yaml"
-source bin/download_dbs.sh "$DB_DIR" "$UPDATE_DBS" "$LOG_SOFTWARE_VERSIONS"
+mkdir -p "${DB_DIR}"
+source bin/download_dbs.sh "$DB_DIR" "$UPDATE_DBS" "$LOG_SOFTWARE_VERSIONS" "$SEROBA_KMER_SIZE"
 
 ###############################################################################
 #####                       Run snakemake                                 #####
@@ -332,6 +355,14 @@ out: "${OUTPUT_DIR}"
 metadata: "$METADATA"
 mlst7_db: "${MLST7_DB}"
 kmerfinder_db: "${KMERFINDER_DB}"
+serotypefinder_db: '${SEROTYPEFINDER_DB%/}'
+seroba_db: '${SEROBA_DB%/}'
+serotypefinder:
+    min_cov: "${SEROTYPEFINDER_MIN_COV}"
+    identity_thresh: "${SEROTYPEFINDER_IDENTITY}"
+seroba:
+    min_cov: "${SEROBA_MIN_COV}"
+    kmer_size: "${SEROBA_KMER_SIZE}"
 "
 echo "$__USERPARAMETERS" > $PARAMETERS
 
@@ -354,7 +385,8 @@ if [[ $LOCAL == "TRUE" ]]; then
         CORES="4"
     fi
     echo "cores: ${CORES}" >> $PARAMETERS
-    snakemake --profile config --cores $CORES ${@}
+    snakemake --profile config --cores $CORES \
+    --configfile 'config/pipeline_parameters.yaml' 'config/user_parameters.yaml' ${@}
     RESULT=$?
 else
     if [[ $CORES == "NotProvided" ]]; then
@@ -363,6 +395,7 @@ else
     echo "cores: ${CORES}" >> $PARAMETERS
     echo "queue: ${QUEUE}" >> $PARAMETERS
     snakemake --profile config --cores $CORES \
+    --configfile 'config/pipeline_parameters.yaml' 'config/user_parameters.yaml' \
     --drmaa " -q ${QUEUE} -n {threads} \
     -o ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.out \
     -e ${OUTPUT_DIR}/log/drmaa/{name}_{wildcards}_{jobid}.err \
