@@ -165,10 +165,19 @@ class RunSnakemake:
         self.run_snakemake()
 
 
+    def is_not_repo(self):
+        git_remote = subprocess.check_output(["git","remote", "-v"])
+        return git_remote == b''
+        
     def get_git_audit(self, git_file):
         print_message("Collecting information about the Git repository of this pipeline (see {})".format(git_file))
-        git_audit = {"repo": subprocess.check_output(["git","config", "--get", "remote.origin.url"]).strip(),
-                    "commit": subprocess.check_output(["git","log", "-n", "1" "--pretty=format:'%H'"]).strip()}
+        if not self.is_not_repo():
+            git_audit = {"repo": subprocess.check_output(["git","config", "--get", "remote.origin.url"]).strip(),
+                        "commit": subprocess.check_output(["git","log", "-n", "1" "--pretty=format:'%H'"]).strip()}
+        else:
+            git_audit = {"repo": "NA (folder is not a repo or was not cloned through git command)",
+                        "commit": "NA (folder is not a repo or was not cloned through git command)"}
+
         with open(git_file, 'w') as file:
             yaml.dump(git_audit, file, default_flow_style=False)
 
