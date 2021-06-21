@@ -16,7 +16,7 @@ fi
 
 source activate "${MAMBA_NAME}"
 
-if ! $(echo $envs_list | grep -q seroba_master)
+if ! $(echo $envs_list | grep -q "${MASTER_NAME}")
 then
     mamba env update -f "${PATH_MASTER_YAML}"
 fi
