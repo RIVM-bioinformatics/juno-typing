@@ -269,12 +269,6 @@ if __name__ == '__main__':
     )
     # Snakemake arguments
     parser.add_argument(
-        "-sh",
-        "--snakemake_help",
-        action = 'store_true',
-        help = "Print Snakemake help (passed to snakemake)."
-    )
-    parser.add_argument(
         "-u",
         "--unlock",
         action = 'store_true',
