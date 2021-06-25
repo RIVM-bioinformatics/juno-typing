@@ -10,6 +10,7 @@ import argparse
 import pathlib
 import json
 import pandas as pd
+import warnings
 
 def parse_kmerfinder(json_file):
     with open(json_file) as kmerfinder_json:
@@ -30,14 +31,33 @@ def parse_kmerfinder(json_file):
 
         return species.lower()
 
+def get_species_from_metadata(genus, species):
+    species = genus.lower() + ' ' + species.lower()
+    return species
+
 
 def main(args):
     assert args.kmerfinder_res.is_file(), "kmerfinder_res must be an existing file."
-    print(parse_kmerfinder(args.kmerfinder_res))
+    species_kmerfinder = parse_kmerfinder(args.kmerfinder_res)
+    species_metadata = get_species_from_metadata(args.genus, args.species)
+    if species_metadata == "notprovided notprovided":
+        species = species_kmerfinder
+    elif species_metadata == species_kmerfinder:
+        species = species_metadata
+    else:
+        species = species_metadata
+        warnings.warn(f'\033[0;31mThe species provided in the metadata ({species_metadata}) does not agree with the species found by KmerFinder ({species_kmerfinder}). The species given as metadata will be used.\033[0;0m')
+    print(species)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("kmerfinder_res", type=pathlib.Path, 
                        help="json file containing the results of KmerFinder.")
+    parser.add_argument('--genus', type = str,
+                        default = "NotProvided",
+                        help = "Genus of the sample as provided in the metadata")
+    parser.add_argument('--species', type = str,
+                        default = "NotProvided",
+                        help = "Species of the sample as provided in the metadata")
     main(parser.parse_args())

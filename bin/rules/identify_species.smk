@@ -10,7 +10,7 @@ rule identify_species:
     output:
         kmerfinder = OUT + "/identify_species/{sample}/data.json"
     log:
-        OUT + "/log/identify_species/{sample}.log"
+        OUT + "/log/identify_species/{sample}_identify_species.log"
     benchmark:
         OUT + "/log/benchmark/identify_species_{sample}.txt"
     threads: config["threads"]["kmerfinder"]
@@ -42,11 +42,13 @@ checkpoint which_species:
         OUT + "/identify_species/{sample}/data.json"
     output:
         OUT + "/identify_species/{sample}/best_species_hit.txt"
+    log:
+        OUT + "/log/identify_species/{sample}_which_species.log"
     threads: 
         1
     resources: 
         mem_mb=2000
     shell:
         """
-python bin/get_species.py {input} > {output} 
+python bin/get_species.py {input} > {output} 2> {log}
         """
