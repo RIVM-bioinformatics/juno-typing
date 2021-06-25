@@ -32,6 +32,8 @@ The Juno-typing pipeline will then perform the following steps:
     - _E. coli_ serotyper by using the [SerotypeFinder](https://bitbucket.org/genomicepidemiology/serotypefinder/src/master/) tool.
     - _S. pneumoniae_ serotyper by using the [Seroba](https://github.com/sanger-pathogens/seroba) tool.
 
+![](files/DAG.svg)
+
 ## Prerequisities
 
 * **Linux + conda** A Linux-like environment with at least 'miniconda' installed. 
@@ -65,6 +67,14 @@ conda env install -f envs/master_env.yaml
 * ```-i, --input``` Directory with the input (fasta) files. The fasta files should be all in this directory (no subdirectories) and have the extension '.fasta'. 
 
 ### Optional parameters
+
+* `-m --metadata` Relative or absolute path to a csv file containing at least one column with the 'Sample' name (name of the file but removing [_S##]_R1.fastq.gz), a column called 'Genus' and a column called 'Species'. If a genus + species is provided for a sample, it will overwrite the species identification performed by this pipeline when choosing the scheme for MLST and the serotyper. Example metadata file:
+
+| __Sample__ | __Genus__ | __Species__ |
+| :---: | :--- | :--- |
+| sample1 | Salmonella | enterica |
+
+*Note:* The fastq files corresponding to this sample would probably be something like sample1_S1_R1_0001.fastq.gz and sample2_S1_R1_0001.fastq.gz and the fasta file sample1.fasta.
 
 * ```-o --output``` Directory (if not existing it will be created) where the output of the pipeline will be collected. The default behavior is to create a folder called 'output' within the pipeline directory. 
 * ```-d --db_dir``` Directory (if not existing it will be created) where the databases used by this pipeline will be downloaded or where they are expected to be present. Default is '/mnt/db/juno/typing_db' (internal RIVM path to the databases of the Juno pipelines). It is advisable to provide your own path if you are not working inside the RIVM Linux environment.

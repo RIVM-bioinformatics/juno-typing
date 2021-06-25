@@ -1,3 +1,4 @@
+import csv
 import os
 import pathlib
 from sys import path
@@ -101,70 +102,70 @@ class TestPipelineStartup(unittest.TestCase):
 
 
 
-@unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
-                     "Skipped in non-RIVM environments (for sake of time)")
-class TestDownloadDbs(unittest.TestCase):
-    """Testing the downloading of databases and software used by the pipeline"""
+# @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
+#                      "Skipped in non-RIVM environments (for sake of time)")
+# class TestDownloadDbs(unittest.TestCase):
+#     """Testing the downloading of databases and software used by the pipeline"""
 
-    def setUpClass():
-        pathlib.Path('fake_db').mkdir(exist_ok = True)
+#     def setUpClass():
+#         pathlib.Path('fake_db').mkdir(exist_ok = True)
 
-    def tearDownClass():
-        os.system('rm -rf fake_db')
+#     def tearDownClass():
+#         os.system('rm -rf fake_db')
 
-    def test_download_kmerfinder_software(self):
-        """Testing kmerfinder is properly downloaded and set up"""
+#     def test_download_kmerfinder_software(self):
+#         """Testing kmerfinder is properly downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db', 'kmerfinder_soft')
-        download_dbs.download_software_kmerfinder(path_to_db)
-        self.assertTrue(path_to_db.joinpath('kmerfinder.py').exists())
+#         path_to_db = pathlib.Path('fake_db', 'kmerfinder_soft')
+#         download_dbs.download_software_kmerfinder(path_to_db)
+#         self.assertTrue(path_to_db.joinpath('kmerfinder.py').exists())
 
-    def test_download_mlst7_software(self):
-        """Testing cge-mlst is properly downloaded and set up"""
+#     def test_download_mlst7_software(self):
+#         """Testing cge-mlst is properly downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db', 'mlst7_soft')
-        download_dbs.download_software_mlst7(path_to_db)
-        self.assertTrue(path_to_db.joinpath('mlst.py').exists())
+#         path_to_db = pathlib.Path('fake_db', 'mlst7_soft')
+#         download_dbs.download_software_mlst7(path_to_db)
+#         self.assertTrue(path_to_db.joinpath('mlst.py').exists())
 
-    def test_download_kmerfinder_db(self):
-        """Testing kmerfinder database is properly downloaded and set up"""
+#     def test_download_kmerfinder_db(self):
+#         """Testing kmerfinder database is properly downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db', 'kmerfinder_db')
-        download_dbs.download_db_kmerfinder(path_to_db)
-        self.assertTrue(path_to_db.joinpath('config').exists())
+#         path_to_db = pathlib.Path('fake_db', 'kmerfinder_db')
+#         download_dbs.download_db_kmerfinder(path_to_db)
+#         self.assertTrue(path_to_db.joinpath('config').exists())
 
-    def test_download_mlst7_db(self):
-        """Testing cge-mlst database is properly downloaded and set up"""
+#     def test_download_mlst7_db(self):
+#         """Testing cge-mlst database is properly downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db', 'mlst7_db')
-        download_dbs.download_db_mlst7(path_to_db)
-        self.assertTrue(path_to_db.joinpath('senterica', 'senterica.length.b').exists())
+#         path_to_db = pathlib.Path('fake_db', 'mlst7_db')
+#         download_dbs.download_db_mlst7(path_to_db)
+#         self.assertTrue(path_to_db.joinpath('senterica', 'senterica.length.b').exists())
 
-    def test_download_serotypefinder_db(self):
-        """Testing SerotypeFinder database is properly downloaded and set up"""
+#     def test_download_serotypefinder_db(self):
+#         """Testing SerotypeFinder database is properly downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db', 'serotypefinder_db')
-        download_dbs.download_db_serotypefinder(path_to_db)
-        self.assertTrue(path_to_db.joinpath('H_type.seq.b').exists())
+#         path_to_db = pathlib.Path('fake_db', 'serotypefinder_db')
+#         download_dbs.download_db_serotypefinder(path_to_db)
+#         self.assertTrue(path_to_db.joinpath('H_type.seq.b').exists())
 
-    def test_download_seroba_db(self):
-        """Testing seroba database is properly downloaded and set up"""
+#     def test_download_seroba_db(self):
+#         """Testing seroba database is properly downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db', 'seroba_db')
-        download_dbs.download_db_seroba(path_to_db, kmersize = 71)
-        self.assertTrue(path_to_db.joinpath('database', 'cdhit_cluster').exists())
+#         path_to_db = pathlib.Path('fake_db', 'seroba_db')
+#         download_dbs.download_db_seroba(path_to_db, kmersize = 71)
+#         self.assertTrue(path_to_db.joinpath('database', 'cdhit_cluster').exists())
 
-    def test_download_all_dbs(self):
-        """Testing all databases/software are downloaded and set up"""
+#     def test_download_all_dbs(self):
+#         """Testing all databases/software are downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db')
-        download_dbs.get_downloads_juno_typing(path_to_db, path_to_db, False, 71)
-        self.assertTrue(path_to_db.joinpath('kmerfinder', 'kmerfinder.py').exists())
-        self.assertTrue(path_to_db.joinpath('cge-mlst', 'mlst.py').exists())
-        self.assertTrue(path_to_db.joinpath('kmerfinder_db', 'config').exists())
-        self.assertTrue(path_to_db.joinpath('mlst7_db', 'senterica', 'senterica.length.b').exists())
-        self.assertTrue(path_to_db.joinpath('serotypefinder_db', 'H_type.seq.b').exists())
-        self.assertTrue(path_to_db.joinpath('seroba_db', 'database', 'cdhit_cluster').exists())
+#         path_to_db = pathlib.Path('fake_db')
+#         download_dbs.get_downloads_juno_typing(path_to_db, path_to_db, False, 71)
+#         self.assertTrue(path_to_db.joinpath('kmerfinder', 'kmerfinder.py').exists())
+#         self.assertTrue(path_to_db.joinpath('cge-mlst', 'mlst.py').exists())
+#         self.assertTrue(path_to_db.joinpath('kmerfinder_db', 'config').exists())
+#         self.assertTrue(path_to_db.joinpath('mlst7_db', 'senterica', 'senterica.length.b').exists())
+#         self.assertTrue(path_to_db.joinpath('serotypefinder_db', 'H_type.seq.b').exists())
+#         self.assertTrue(path_to_db.joinpath('seroba_db', 'database', 'cdhit_cluster').exists())
 
 
 
@@ -199,6 +200,14 @@ class TestJunoTypingDryRun(unittest.TestCase):
         for file_ in fake_files:
             pathlib.Path(file_).touch(exist_ok = True)
 
+        with open('fake_dir_wsamples/fake_metadata.csv', mode='w') as metadata_file:
+            metadata_writer = csv.writer(metadata_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+            metadata_writer.writerow(['Sample', 'Genus', 'Species'])
+            metadata_writer.writerow(['sample1', 'Salmonella', 'enterica'])
+            metadata_writer.writerow(['sample2', 'Escherichia', 'coli'])
+
+
     def tearDownClass():
         fake_dirs = ['fake_dir_wsamples', 
                     'fake_dir_juno', 
@@ -220,10 +229,24 @@ class TestJunoTypingDryRun(unittest.TestCase):
             raise
         self.assertFalse(raised, 'Exception raised when running a dryrun')
 
+    def test_junotyping_dryrun_wMetadata(self):
+        """Testing the pipeline runs properly as a dry run when providing a metadata file"""
+        raised = False
+        try:
+            juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
+                                    metadata= 'fake_dir_wsamples/fake_metadata.csv',
+                                    output_dir = pathlib.Path('output'), 
+                                    db_dir = pathlib.Path('fake_db'),
+                                    dryrun = True)
+        except:
+            raised = True
+            raise
+        self.assertFalse(raised, 'Exception raised when running a dryrun and providing a metadata file')
+
 
 
 @unittest.skipIf(not pathlib.Path('/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/').exists(),
-                     "Skipped in non-RIVM environments (for sake of time)")
+                    "Skipped in non-RIVM environments (for sake of time)")
 class TestJunoTypingPipeline(unittest.TestCase):
     """Testing the JunoTyping class (code specific for this pipeline)"""
 
@@ -234,13 +257,25 @@ class TestJunoTypingPipeline(unittest.TestCase):
         os.system('rm -rf test_output')
     
     def test_junotyping_run(self):
-        """Testing the pipeline runs properly as a dry run"""
+        """Testing the pipeline runs properly with real samples"""
         raised = False
         try:
             juno_typing.JunoTypingRun(input_dir = '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/', 
-                                    metadata= None,
-                                    output_dir = pathlib.Path('test_output'),
-                                    dryrun = False)
+                                    db_dir = '/mnt/db/juno/typing_db',
+                                    output_dir = pathlib.Path('test_output'))
+        except:
+            raised = True
+            raise
+        self.assertFalse(raised, 'Exception raised when running a dryrun')
+
+    def test_junotyping_run_wMetadata(self):
+        """Testing the pipeline runs properly with real samples when providing a metadata file"""
+        raised = False
+        try:
+            juno_typing.JunoTypingRun(input_dir = '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/', 
+                                    db_dir = '/mnt/db/juno/typing_db',
+                                    metadata= '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/metadata.csv',
+                                    output_dir = pathlib.Path('test_output'))
         except:
             raised = True
             raise

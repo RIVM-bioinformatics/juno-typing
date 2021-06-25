@@ -39,14 +39,14 @@ class JunoTypingRun:
     def __init__(self, 
                 input_dir, 
                 output_dir, 
-                metadata, 
-                db_dir = "db", 
+                metadata = None, 
+                db_dir = "/mnt/db/juno/typing_db", 
                 serotypefinder_mincov=0.6, 
                 serotypefinder_identity=0.85,
                 seroba_mincov=20, 
                 seroba_kmersize=71,
-                cores=8,
-                local=True,
+                cores=300,
+                local=False,
                 queue='bio',
                 unlock=False,
                 rerunincomplete=False,
@@ -61,7 +61,10 @@ class JunoTypingRun:
         self.sample_sheet = "config/sample_sheet.yaml"
         self.input_dir = pathlib.Path(input_dir)
         self.output_dir = pathlib.Path(output_dir)
-        self.metadata = metadata
+        if metadata is not None:
+            self.metadata = pathlib.Path(metadata)
+        else:
+            self.metadata = None
         self.db_dir = pathlib.Path(db_dir)
         self.serotypefinder_mincov=serotypefinder_mincov
         self.serotypefinder_identity=serotypefinder_identity
@@ -106,15 +109,9 @@ class JunoTypingRun:
         
     def download_databases(self):
         """Function to download software and databases necessary for running the Juno-typing pipeline"""
-        # if updatedbs:
-        #     update = "TRUE"
-        # else:
-        #     update = "FALSE"
 
         self.db_dir.mkdir(parents = True, exist_ok = True)
         download_dbs.get_downloads_juno_typing(self.db_dir, 'bin', self.update, self.seroba_kmersize)
-        # download_dbs = subprocess.run(['bash', 'bin/download_dbs.sh', str(self.db_dir), self.update, self.log_software_versions, str(self.seroba_kmersize)])
-        # download_dbs.wait()
 
 
     def add_metadata(self, samples_dic):
@@ -128,11 +125,12 @@ class JunoTypingRun:
         species_dic = species_dic.transpose().to_dict()
         # Update dictionary with species
         for sample_name in samples_dic :
-            try: 
-                samples_dic[sample_name].update(species_dic[sample_name])
+            try:
+                samples_dic[sample_name]['Genus'] =  species_dic[sample_name]['Genus']
+                samples_dic[sample_name]['Species'] = species_dic[sample_name]['Species']
+                samples_dic[sample_name]['species-mlst7'] = species_dic[sample_name]['species-mlst7']
             except:
                 pass
-        return species_dic
 
     def start_pipeline(self):
         """Function to start the pipeline (some steps from PipelineStartup need to be modified for the Juno-typing pipeline to accept fastq and fasta input"""
@@ -143,8 +141,10 @@ class JunoTypingRun:
         # Add species-mlst7 data if a metadata file was provided or indicate so if not provided
         for sample in startup.sample_dict:
             startup.sample_dict[sample]['species-mlst7'] = "NotProvided"
+            startup.sample_dict[sample]['Genus'] = "NotProvided"
+            startup.sample_dict[sample]['Species'] = "NotProvided"
         if self.metadata is not None:
-            startup.sample_dict = self.add_metadata(startup.sample_dict)
+            self.add_metadata(startup.sample_dict)
         # Write sample_sheet
         with open(self.sample_sheet, 'w') as file:
             yaml.dump(startup.sample_dict, file, default_flow_style=False)
@@ -192,7 +192,7 @@ if __name__ == '__main__':
         type = pathlib.Path,
         default = None,
         metavar = "FILE",
-        help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. If a genus + species is provided for a sample, the MLST7 is not run."
+        help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. The genus and species provided will be used to choose the serotyper and the MLST schema."
     )
     parser.add_argument(
         "-o",
@@ -286,18 +286,18 @@ if __name__ == '__main__':
         help="Re-run jobs if they are marked as incomplete (passed to snakemake)."
     )
     args = parser.parse_args()
-    JunoTypingRun(args.input, 
-                    args.output, 
-                    args.metadata,
-                    args.db_dir,
-                    args.serotypefinder_mincov,
-                    args.serotypefinder_identity,
-                    args.seroba_mincov,
-                    args.seroba_kmersize,
-                    args.cores,
-                    args.local,
-                    args.queue,
-                    args.unlock,
-                    args.rerunincomplete,
-                    args.dryrun,
-                    args.update)
+    JunoTypingRun(input_dir = args.input, 
+                    output_dir = args.output, 
+                    metadata = args.metadata,
+                    db_dir = args.db_dir,
+                    serotypefinder_mincov = args.serotypefinder_mincov,
+                    serotypefinder_identity = args.serotypefinder_identity,
+                    seroba_mincov = args.seroba_mincov,
+                    seroba_kmersize = args.seroba_kmersize,
+                    cores = args.cores,
+                    local = args.local,
+                    queue = args.queue,
+                    unlock = args.unlock,
+                    rerunincomplete = args.rerunincomplete,
+                    dryrun = args.dryrun,
+                    update = args.update)

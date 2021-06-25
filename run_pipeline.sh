@@ -33,3 +33,9 @@ else
 fi
 
 python juno_typing.py --queue "${QUEUE}" ${@}
+
+# Produce svg with rules
+# snakemake --config sample_sheet=config/sample_sheet.yaml \
+#             --configfiles config/pipeline_parameters.yaml config/user_parameters.yaml \
+#             -j 1 --use-conda \
+#             --rulegraph | dot -Tsvg > files/DAG.svg
