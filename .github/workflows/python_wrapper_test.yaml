@@ -15,7 +15,7 @@ jobs:
           - {os: macOS-latest}
           - {os: ubuntu-18.04}
           - {os: ubuntu-latest}
-    name: Testing python wrapper ${{ matrix.config.os }
+    name: Testing python wrapper ${{ matrix.config.os }}
 
     steps:
       - uses: actions/checkout@v2
