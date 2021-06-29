@@ -11,17 +11,10 @@ MASTER_NAME=$(head -n 1 ${PATH_MASTER_YAML} | cut -f2 -d ' ')
 
 envs_list=$(conda env list)
 
-if ! $(echo $envs_list | grep -q mamba)
-then
-    conda env update -f "${PATH_MAMBA_YAML}"
-fi
-
+conda env update -f "${PATH_MAMBA_YAML}"
 source activate "${MAMBA_NAME}"
 
-if ! $(echo $envs_list | grep -q "${MASTER_NAME}")
-then
-    mamba env update -f "${PATH_MASTER_YAML}"
-fi
+mamba env update -f "${PATH_MASTER_YAML}"
 
 source activate "${MASTER_NAME}"
 
