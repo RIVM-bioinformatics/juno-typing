@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Wrapper for juno typing pipeline
 
 #----------------------------------------------#

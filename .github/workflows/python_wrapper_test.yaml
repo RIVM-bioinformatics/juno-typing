@@ -7,12 +7,15 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-    name: Testing python wrapper ${{ matrix.os }}
+        config: 
+          - {os: macOS-latest}
+          - {os: ubuntu-18.04}
+          - {os: ubuntu-latest}
+    name: Testing python wrapper ${{ matrix.config.os }
 
     steps:
       - uses: actions/checkout@v2
