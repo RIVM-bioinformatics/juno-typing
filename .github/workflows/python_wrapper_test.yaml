@@ -25,8 +25,8 @@ jobs:
           mamba-version: "*"
           channels: conda-forge, anaconda, bioconda, biocore, defaults
           channel-priority: true
-          environment-file: tests/files/testing_env.yaml 
-          activate-environment: testing_env
+          environment-file: envs/master_env.yaml 
+          activate-environment: juno_typing
           auto-activate-base: false
       - name: Conda list
         shell: bash -l {0}
