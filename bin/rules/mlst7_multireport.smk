@@ -10,7 +10,7 @@ rule mlst7_multireport:
     log:
         OUT+'/log/mlst7/mlst7_multireport.log'
     threads: 1
-    resources: mem_mb=2000
+    resources: mem_gb=config["mem_gb"]["other"]
     shell:
         """
 python bin/mslt7_multireport.py  -i {input} -o {output} &> {log}

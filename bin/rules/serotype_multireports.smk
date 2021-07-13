@@ -10,7 +10,7 @@ rule serotype_multireports:
     benchmark:
         OUT+'/log/benchmark/serotype/serotype_multireport.txt'
     threads: 1
-    resources: mem_mb=2000
+    resources: mem_gb=config["mem_gb"]["other"]
     log:
         OUT+'/log/serotype/serotype_multireport.log'
     shell:
