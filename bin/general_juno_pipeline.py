@@ -221,16 +221,17 @@ class RunSnakemake:
 
         if self.local:
             print_message("Jobs will run locally")
-            drmaa = None
+            cluster_args = None
         else:
             print_message("Jobs will be sent to the cluster")
-            pathlib.Path(str(self.output_dir)).joinpath('log', 'drmaa').mkdir(parents = True, exist_ok = True)
-            drmaa = " -q %s \
+            pathlib.Path(str(self.output_dir)).joinpath('log', 'cluster_args').mkdir(parents = True, exist_ok = True)
+            cluster_args = "bsub -q %s \
                     -n {threads} \
-                    -o %s/log/drmaa/{name}_{wildcards}_{jobid}.out \
-                    -e %s/log/drmaa/{name}_{wildcards}_{jobid}.err \
+                    -o %s/log/cluster_args/{name}_{wildcards}_{jobid}.out \
+                    -e %s/log/cluster_args/{name}_{wildcards}_{jobid}.err \
                     -R \"span[hosts=1]\" \
-                    -R \"rusage[mem={resources.mem_mb}]\" " % (str(self.queue), str(self.output_dir), str(self.output_dir))
+                    -M {resources.mem_mb}M \
+                    -W 60" % (str(self.queue), str(self.output_dir), str(self.output_dir))
         
         try:
             snakemake.snakemake(self.snakefile,
@@ -239,7 +240,7 @@ class RunSnakemake:
                             config={"sample_sheet": str(self.sample_sheet)},
                             cores=self.cores,
                             nodes=self.cores,
-                            drmaa = drmaa,
+                            cluster = cluster_args,
                             jobname=self.pipeline_name + "_{name}.jobid{jobid}",
                             use_conda=self.useconda,
                             conda_frontend=self.conda_frontend,
