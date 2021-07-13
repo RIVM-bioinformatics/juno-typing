@@ -15,6 +15,6 @@ dependencies:
   - biopython=1.74
   - tbb=2020.3
   - pip:
-    - PyYAML==5.4.1
+    - PyYAML>=5.0
     - git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git
 
