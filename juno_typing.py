@@ -30,7 +30,7 @@ import yaml
 
 # Own scripts
 path.insert(0, 'bin/')
-import general_juno_pipeline
+import base_juno_pipeline
 import download_dbs
 
 class JunoTypingRun:
@@ -90,7 +90,7 @@ class JunoTypingRun:
             self.download_databases()
 
         # Run snakemake
-        general_juno_pipeline.RunSnakemake(pipeline_name = self.pipeline_info['pipeline_name'],
+        snakemake_run = base_juno_pipeline.RunSnakemake(pipeline_name = self.pipeline_info['pipeline_name'],
                                             pipeline_version = self.pipeline_info['pipeline_version'],
                                             sample_sheet = self.sample_sheet,
                                             output_dir = self.output_dir,
@@ -106,6 +106,7 @@ class JunoTypingRun:
                                             usesingularity = self.usesingularity,
                                             singularityargs = self.singularityargs,
                                             restarttimes = self.restarttimes)
+        snakemake_run.run_snakemake()
         
     def download_databases(self):
         """Function to download software and databases necessary for running the Juno-typing pipeline"""
@@ -137,7 +138,7 @@ class JunoTypingRun:
         # Taking fastq input as the Startup just to inherit all the same attributes
         # from parent class (PipelineStartup). The fasta sample sheet is created 
         # separately and appended to the original one
-        startup = general_juno_pipeline.PipelineStartup(self.input_dir, input_type = 'both')
+        startup = base_juno_pipeline.PipelineStartup(self.input_dir, input_type = 'both')
         # Add species-mlst7 data if a metadata file was provided or indicate so if not provided
         for sample in startup.sample_dict:
             startup.sample_dict[sample]['species-mlst7'] = "NotProvided"

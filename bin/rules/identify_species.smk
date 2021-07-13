@@ -14,7 +14,7 @@ rule identify_species:
     benchmark:
         OUT + "/log/benchmark/identify_species_{sample}.txt"
     threads: config["threads"]["kmerfinder"]
-    resources: mem_mb=config["mem_mb"]["kmerfinder"]
+    resources: mem_gb=config["mem_gb"]["kmerfinder"]
     shell:
         """
 DB_DIR=$(dirname {input.db})
@@ -47,7 +47,7 @@ checkpoint which_species:
     threads: 
         1
     resources: 
-        mem_mb=2000
+        mem_gb=config["mem_gb"]["other"]
     shell:
         """
 python bin/get_species.py {input} > {output} 2> {log}

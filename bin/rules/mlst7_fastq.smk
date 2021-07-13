@@ -21,7 +21,7 @@ rule mlst7:
     benchmark:
         OUT + "/log/benchmark/mlst7_{sample}.txt"
     threads: config["threads"]["cgemlst"]
-    resources: mem_mb=config["mem_mb"]["cgemlst"]
+    resources: mem_gb=config["mem_gb"]["cgemlst"]
     params:
         species = lambda wildcards: SAMPLES[wildcards.sample]["species-mlst7"],
         mlst7_db = config["mlst7_db"]

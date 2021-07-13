@@ -27,7 +27,7 @@ rule aggregate_serotypes:
     output:
         temp(OUT+'/serotype/{sample}_done.txt')
     threads: 1
-    resources: mem_mb=2000
+    resources: mem_gb=config["mem_gb"]["other"]
     shell:
         'touch {output}'
 
@@ -55,7 +55,7 @@ rule salmonella_serotyper:
     threads: 
         config["threads"]["seqsero2"]
     resources: 
-        mem_mb=config["mem_mb"]["seqsero2"]
+        mem_gb=config["mem_gb"]["seqsero2"]
     conda:
         '../../envs/seqsero.yaml'
     shell:
@@ -90,7 +90,7 @@ rule ecoli_serotyper:
     conda: 
         '../../envs/serotypefinder.yaml'
     threads: config["threads"]["serotypefinder"]
-    resources: mem_mb=config["mem_mb"]["serotypefinder"]
+    resources: mem_gb=config["mem_gb"]["serotypefinder"]
     params: 
         ecoli_db = config['serotypefinder_db'],
         min_cov = config['serotypefinder']['min_cov'],
@@ -124,7 +124,7 @@ rule seroba:
     conda:
         "../../envs/seroba.yaml"
     threads: config["threads"]["seroba"]
-    resources: mem_mb=config["mem_mb"]["seroba"]
+    resources: mem_gb=config["mem_gb"]["seroba"]
     params:
         min_cov = config["seroba"]["min_cov"],
         seroba_db = config["seroba_db"]
@@ -149,7 +149,7 @@ rule no_serotyper:
     output: 
         OUT + "/serotype/{sample}/no_serotype_necessary.txt"
     threads: 1
-    resources: mem_mb=1000
+    resources: mem_gb=config["mem_gb"]["other"]
     shell:
         """
 touch {output}

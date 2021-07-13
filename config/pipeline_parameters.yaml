@@ -5,13 +5,14 @@ threads:
   seqsero2: 6
   serotypefinder: 2
   seroba: 1
-mem_mb:
-  cgemlst: 4000
-  kmerfinder: 4000
-  seqsero2: 5000
-  serotypefinder: 8000
-  seroba: 8000
+mem_gb:
+  other: 4
+  cgemlst: 10
+  kmerfinder: 10
+  seqsero2: 10
+  serotypefinder: 10
+  seroba: 10
 
 # Pipeline parameters (not taken from user)
 salmonellamonophasic:
-  min_cov: 4000
+  min_cov: 10
