@@ -1,4 +1,4 @@
-name: s_serotyper
+name: seqsero2
 channels:
   - bioconda
   - defaults

@@ -31,3 +31,6 @@ bin/kmerfinder_db/
 # Python
 __pycache__
 bin/__pycache__
+# Envs
+envs/src/
+

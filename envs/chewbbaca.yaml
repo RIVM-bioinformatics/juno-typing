@@ -1,0 +1,10 @@
+name: chewbbaca
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - chewbbaca==2.8.4
+  - pip==19.2.3
+  - pip:
+    - PyYAML

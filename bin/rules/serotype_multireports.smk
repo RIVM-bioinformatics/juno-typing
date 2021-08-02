@@ -7,8 +7,8 @@ rule serotype_multireports:
         salmonella = OUT + '/serotype/salmonella_serotype_multireport.csv',
         ecoli = OUT + '/serotype/ecoli_serotype_multireport.csv',
         spneumoniae = OUT + '/serotype/spneumoniae_serotype_multireport.csv'
-    benchmark:
-        OUT+'/log/benchmark/serotype/serotype_multireport.txt'
+    # benchmark:
+    #     OUT+'/log/benchmark/serotype/serotype_multireport.txt'
     threads: 1
     resources: mem_gb=config["mem_gb"]["other"]
     log:

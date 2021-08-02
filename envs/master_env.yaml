@@ -7,6 +7,7 @@ channels:
   - defaults
 dependencies:
   - snakemake==6.2.1
+  - mamba
   - git
   - pip==19.2.3
   - pandas==1.1.0
@@ -15,6 +16,5 @@ dependencies:
   - biopython=1.74
   - tbb=2020.3
   - pip:
-    - PyYAML>=5.0
-    - git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git
+    - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.1.0#egg=Juno-bacteriology-pipelines"
 

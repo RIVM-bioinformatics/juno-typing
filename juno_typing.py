@@ -21,6 +21,7 @@ Snakemake rules (in order of execution):
 """
 
 # Dependencies
+import base_juno_pipeline
 import argparse
 import pandas as pd
 import pathlib
@@ -29,11 +30,9 @@ from sys import path
 import yaml
 
 # Own scripts
-path.insert(0, 'bin/')
-import base_juno_pipeline
-import download_dbs
+import bin.download_dbs
 
-class JunoTypingRun:
+class JunoTypingRun():
     """Class with the arguments and specifications that are only for the Juno-typing pipeline but inherit from PipelineStartup and RunSnakemake"""
 
     def __init__(self, 
@@ -51,7 +50,7 @@ class JunoTypingRun:
                 unlock=False,
                 rerunincomplete=False,
                 dryrun=False,
-                update=False):
+                update_dbs=False):
         """Initiating Juno-typing pipeline"""
 
         # Pipeline attributes
@@ -70,7 +69,7 @@ class JunoTypingRun:
         self.serotypefinder_identity=serotypefinder_identity
         self.seroba_mincov=seroba_mincov
         self.seroba_kmersize = seroba_kmersize
-        self.update = update
+        self.update_dbs = update_dbs
         self.workdir = pathlib.Path(__file__).parent.absolute()
         self.useconda = True
         self.usesingularity = False
@@ -78,16 +77,25 @@ class JunoTypingRun:
         self.user_parameters = pathlib.Path("config/user_parameters.yaml")
         self.extra_software_versions = pathlib.Path('config/extra_software_versions.yaml')
         self.output_dir = output_dir
-        self.restarttimes = 2       
+        self.restarttimes = 1      
         # Checking if the input_dir comes from the Juno-assembly pipeline 
         self.startup = self.start_pipeline()
 
         # Parse arguments specific from the user
-        self.user_params = self.write_userparameters()
+        if not unlock and not dryrun:
+            self.user_params = self.write_userparameters()
         
         # Download databases if necessary
         if not unlock and not dryrun:
-            self.download_databases()
+            downloads_juno_typing = bin.download_dbs.DownloadsJunoTyping(self.db_dir,
+                                                                        update_dbs=self.update_dbs,
+                                                                        kmerfinder_asked_version='3.0.2',
+                                                                        cge_mlst_asked_version='2.0.4',
+                                                                        kmerfinder_db_asked_version='20210425',
+                                                                        mlst7_db_asked_version='master',
+                                                                        serotypefinder_db_asked_version='master',
+                                                                        seroba_db_asked_version='master')
+            self.downloads_versions = downloads_juno_typing.downloaded_versions
 
         # Run snakemake
         snakemake_run = base_juno_pipeline.RunSnakemake(pipeline_name = self.pipeline_info['pipeline_name'],
@@ -106,17 +114,16 @@ class JunoTypingRun:
                                             usesingularity = self.usesingularity,
                                             singularityargs = self.singularityargs,
                                             restarttimes = self.restarttimes)
-        snakemake_run.run_snakemake()
-        
-    def download_databases(self):
-        """Function to download software and databases necessary for running the Juno-typing pipeline"""
-
-        self.db_dir.mkdir(parents = True, exist_ok = True)
-        download_dbs.get_downloads_juno_typing(self.db_dir, 'bin', self.update, self.seroba_kmersize)
+        if not unlock and not dryrun:
+            db_audit_file = snakemake_run.path_to_audit.joinpath('database_versions')
+            with open(db_audit_file, 'w') as file:
+                yaml.dump(self.downloads_versions, file, default_flow_style=False)
+        self.successful_run = snakemake_run.run_snakemake()
+        assert self.successful_run, f'Please check the log files'
 
 
     def add_metadata(self, samples_dic):
-        assert self.metadata.is_file(), "Provided metadata file ({}) does not exist".format(self.metadata)
+        assert self.metadata.is_file(), f"Provided metadata file ({self.metadata}) does not exist"
         # Load species file
         species_dic = pd.read_csv(self.metadata, index_col = 0, dtype={'Sample':str})
         species_dic.index = species_dic.index.map(str)
@@ -162,7 +169,8 @@ class JunoTypingRun:
                         'serotypefinder': {'min_cov': self.serotypefinder_mincov,
                                             'identity_thresh': self.serotypefinder_identity},
                         'seroba': {'min_cov': self.seroba_mincov,
-                                    'kmer_size': self.seroba_kmersize}}
+                                    'kmer_size': self.seroba_kmersize},
+                        'cgmlst_db': str(self.db_dir.joinpath('cgmlst'))}
         
         with open(self.user_parameters, 'w') as file:
             yaml.dump(config_params, file, default_flow_style=False)
@@ -301,4 +309,4 @@ if __name__ == '__main__':
                     unlock = args.unlock,
                     rerunincomplete = args.rerunincomplete,
                     dryrun = args.dryrun,
-                    update = args.update)
+                    update_dbs = args.update)

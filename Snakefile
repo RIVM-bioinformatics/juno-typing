@@ -17,9 +17,7 @@ Snakemake rules (in order of execution):
 ##### Import config file, sample_sheet and set output folder names          #####
 #################################################################################
 
-import os
-import yaml
-
+from yaml import safe_load
 
 #################################################################################
 #####     Load samplesheet, load genus dict and define output directory     #####
@@ -30,10 +28,11 @@ import yaml
 sample_sheet = config["sample_sheet"]
 SAMPLES = {}
 with open(sample_sheet) as sample_sheet_file:
-    SAMPLES = yaml.safe_load(sample_sheet_file) 
+    SAMPLES = safe_load(sample_sheet_file) 
 
 # OUT defines output directory for most rules.
 OUT = config["out"]
+CGMLST_DB = config["cgmlst_db"]
 
 
 #@################################################################################
@@ -45,16 +44,18 @@ include: "bin/rules/mlst7_fastq.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
+include: "bin/rules/cgmlst.smk"
 
 #@################################################################################
 #@####              Finalize pipeline (error/success)                        #####
 #@################################################################################
 
+# TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
 onerror:
     shell("""
-# TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
 find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
 find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
+find {OUT}/cgmlst -maxdepth 1 -type d -name "results_*" -exec rm -rf {{}} \;
 echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
     """)
 
@@ -92,6 +93,7 @@ rule all:
         OUT+'/serotype/salmonella_serotype_multireport.csv',
         OUT + '/serotype/ecoli_serotype_multireport.csv',
         OUT + '/serotype/spneumoniae_serotype_multireport.csv',
-        OUT + "/mlst7/mlst7_multireport.csv"
+        OUT + "/mlst7/mlst7_multireport.csv",
+        result = OUT + '/cgmlst/cgmlst_finished.txt'
 
 
