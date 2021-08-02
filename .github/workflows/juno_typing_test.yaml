@@ -1,7 +1,7 @@
-# BATS testing for python wrapper
+# Testing for pipeline python wrapper and scripts used inside rules
 # Based on: https://github.com/marketplace/actions/setup-miniconda#example-1-basic-usage
 
-name: Juno-typing pipeline
+name: Juno_typing test
 
 on: [push, pull_request]
 
@@ -15,7 +15,7 @@ jobs:
           - {os: macOS-latest}
           - {os: ubuntu-18.04}
           - {os: ubuntu-latest}
-    name: Testing python wrapper ${{ matrix.config.os }}
+    name: Testing Juno_typing ${{ matrix.config.os }}
 
     steps:
       - uses: actions/checkout@v2
@@ -34,3 +34,6 @@ jobs:
       - name: Test the python wrapper using base_juno_pipeline.
         shell: bash -l {0}
         run: python ./tests/test_juno-typing.py
+      - name: Test the individual scripts used inside the snakemake rules.
+        shell: bash -l {0}
+        run: python ./tests/test_scripts_used_in_rules.py

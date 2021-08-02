@@ -1,13 +1,18 @@
 # Resources
 threads:
+  other: 1
+  chewbbaca_preparation: 8
+  chewbbaca: 8
   cgemlst: 1
   kmerfinder: 1
   seqsero2: 6
   serotypefinder: 2
   seroba: 1
 mem_gb:
-  other: 4
-  cgemlst: 10
+  other: 8
+  cgemlst: 16
+  chewbbaca_preparation: 8
+  chewbbaca: 10
   kmerfinder: 10
   seqsero2: 10
   serotypefinder: 10

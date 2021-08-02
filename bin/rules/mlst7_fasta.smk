@@ -17,8 +17,8 @@ rule mlst7:
         "../../envs/mlst7.yaml"
     log:
         OUT + "/log/mlst7/{sample}.log"
-    benchmark:
-        OUT + "/log/benchmark/mlst7_{sample}.txt"
+    # benchmark:
+    #     OUT + "/log/benchmark/mlst7_{sample}.txt"
     threads: config["threads"]["cgemlst"]
     resources: mem_gb=config["mem_gb"]["cgemlst"]
     params:

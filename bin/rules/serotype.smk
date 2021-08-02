@@ -1,6 +1,6 @@
 # ## SEROTYPE ACCORDING TO GENUS ##
 
-# ---------- Choose serotyper and make the multireport accordingly -----------#
+# --------------- Choose serotyper according to genus/species ----------------#
 def choose_serotyper(wildcards):
     with checkpoints.which_species.get(sample=wildcards.sample).output[0].open() as f:
         species_res = f.read().strip()
@@ -85,8 +85,8 @@ rule ecoli_serotyper:
         csv = OUT + '/serotype/{sample}/result_serotype.csv'
     log:
         OUT+'/log/serotype_ecoli/{sample}.log'
-    benchmark:
-        OUT+'/log/benchmark/serotype_ecoli/{sample}.txt'
+    # benchmark:
+    #     OUT+'/log/benchmark/serotype_ecoli/{sample}.txt'
     conda: 
         '../../envs/serotypefinder.yaml'
     threads: config["threads"]["serotypefinder"]
@@ -119,8 +119,8 @@ rule seroba:
         OUT + "/serotype/{sample}/pred.tsv"
     log:
         OUT+'/log/serotype_spneumoniae/{sample}.log'
-    benchmark:
-        OUT+'/log/benchmark/serotype_spneumoniae/{sample}.txt'
+    # benchmark:
+    #     OUT+'/log/benchmark/serotype_spneumoniae/{sample}.txt'
     conda:
         "../../envs/seroba.yaml"
     threads: config["threads"]["seroba"]

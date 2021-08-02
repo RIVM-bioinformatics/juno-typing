@@ -1,185 +1,203 @@
+import argparse
 import pathlib
 import subprocess
+from base_juno_pipeline import helper_functions
 
-def download_git_repo(version, url, dest_dir):
-    """Function to download a git repo"""
-    # Delete old output dir if existing and create parent dirs if not existing
-    try:
-        rm_dir = subprocess.run(['rm','-rf', str(dest_dir)], check = True, timeout = 60)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-        rm_dir.kill()
-        raise
 
-    if not isinstance(dest_dir, pathlib.PosixPath):
-        dest_dir = pathlib.Path(dest_dir)
+class DownloadsJunoTyping(helper_functions.GitHelpers):
+    """Class that performs all necessary software and database downloads for
+    the Juno typing pipeline if necessary"""
 
-    dest_dir.parent.mkdir(exist_ok = True)
-    # Download
-    try:
-        downloading = subprocess.run(['git', 'clone', 
-                                        '-b', version, 
-                                        '--single-branch', '--depth=1', 
-                                        url, str(dest_dir)],
-                                        check = True,
-                                        timeout = 500)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-        downloading.kill()
-        raise
+    def __init__(self,
+                    db_dir, 
+                    update_dbs=False, 
+                    kmerfinder_asked_version='3.0.2',
+                    cge_mlst_asked_version='2.0.4',
+                    kmerfinder_db_asked_version='20210425',
+                    mlst7_db_asked_version='master',
+                    serotypefinder_db_asked_version='master',
+                    seroba_db_asked_version='master',
+                    seroba_kmersize=71):
+        self.db_dir = pathlib.Path(db_dir)
+        self.update_dbs = update_dbs
+        self.seroba_kmersize = seroba_kmersize
+        self.downloaded_versions = self.get_downloads_juno_typing(kmerfinder_asked_version=kmerfinder_asked_version,
+                                                                    cge_mlst_asked_version=cge_mlst_asked_version,
+                                                                    kmerfinder_db_asked_version=kmerfinder_db_asked_version,
+                                                                    mlst7_db_asked_version=mlst7_db_asked_version,
+                                                                    serotypefinder_db_asked_version=serotypefinder_db_asked_version,
+                                                                    seroba_db_asked_version=seroba_db_asked_version)
+
+    def download_software_kmerfinder(self, version):
+        """Function to download kmerfinder if it is not present"""
+        kmerfinder_software_dir = self.db_dir.joinpath('kmerfinder')
+        if not kmerfinder_software_dir.joinpath('kmerfinder.py').is_file():
+            print("\x1b[0;33m Downloading kmerfinder software...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://bitbucket.org/genomicepidemiology/kmerfinder.git',
+                            kmerfinder_software_dir)
+        return version
         
+    def download_software_mlst7(self, version):
+        """Function to download MLST (CGE) if it is not present"""
+        mlst7_software_dir = self.db_dir.joinpath('cge-mlst')
+        if not mlst7_software_dir.joinpath('mlst.py').is_file():
+            print("\x1b[0;33m Downloading MLST (CGE) software...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://bitbucket.org/genomicepidemiology/mlst.git',
+                            mlst7_software_dir)
+        return version
 
-def get_commit_git(gitrepo_dir):
-    """Function to get the commit number from a folder (must be a git repo)"""
-    try:
-        commit = subprocess.check_output(['git', 
-                                        '--git-dir', 
-                                        '{}/.git'.format(str(gitrepo_dir)), 
-                                        'log', '-n', '1', '--pretty=format:"%H"'],
-                                        timeout = 30)
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-        commit.kill()
-        raise                    
-    return commit
-
-def download_software_kmerfinder(kmerfinder_software_dir, version = '3.0.2'):
-    """Function to download kmerfinder if it is not present"""
-    if not isinstance(kmerfinder_software_dir, pathlib.PosixPath):
-        kmerfinder_software_dir = pathlib.Path(kmerfinder_software_dir)
-    if not kmerfinder_software_dir.joinpath('kmerfinder.py').is_file():
-        print("\x1b[0;33m Downloading kmerfinder software...\n\033[0;0m")
-        download_git_repo(version, 
-                        'https://bitbucket.org/genomicepidemiology/kmerfinder.git',
-                        kmerfinder_software_dir)
-    return version
-    
-def download_software_mlst7(mlst7_software_dir, version = '2.0.4'):
-    """Function to download MLST (CGE) if it is not present"""
-    if not isinstance(mlst7_software_dir, pathlib.PosixPath):
-        mlst7_software_dir = pathlib.Path(mlst7_software_dir)
-    if not mlst7_software_dir.joinpath('mlst.py').is_file():
-        print("\x1b[0;33m Downloading MLST (CGE) software...\n\033[0;0m")
-        download_git_repo(version, 
-                        'https://bitbucket.org/genomicepidemiology/mlst.git',
-                        mlst7_software_dir)
-    return version
-
-def download_db_kmerfinder(kmerfinder_db_dir, version = '20210425'):
-    """Function to download kmerfinder database if it is not present"""
-    if not isinstance(kmerfinder_db_dir, pathlib.PosixPath):
-        kmerfinder_db_dir = pathlib.Path(kmerfinder_db_dir)
-    if not kmerfinder_db_dir.joinpath('config').exists():
-        print("\x1b[0;33m Downloading KmerFinder database...\n\033[0;0m")
-        download_git_repo('master', 
-                        'https://bitbucket.org/genomicepidemiology/kmerfinder_db.git',
-                        kmerfinder_db_dir)
-        try:
-            build = subprocess.run(['bash', 
-                                'INSTALL.sh',
-                                str(kmerfinder_db_dir.absolute()), 
-                                'bacteria', 
-                                version],
-                                cwd = str(kmerfinder_db_dir),
-                                check=True,
-                                timeout = 3000)
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-            build.kill()
-            raise
-        version = get_commit_git(kmerfinder_db_dir)
-    return version
-
-def download_db_mlst7(mlst7_db_dir, version = 'master'):
-    """Function to download the MLST (CGE) database if it is not present"""
-    if not isinstance(mlst7_db_dir, pathlib.PosixPath):
-        mlst7_db_dir = pathlib.Path(mlst7_db_dir)
-    if not mlst7_db_dir.joinpath('senterica', 'senterica.length.b').is_file():
-        print("\x1b[0;33m Downloading MLST (CGE) database...\n\033[0;0m")
-        download_git_repo(version, 
-                        'https://bitbucket.org/genomicepidemiology/mlst_db.git',
-                        mlst7_db_dir)
-        try:
-            build = subprocess.run(['python', 
-                            'INSTALL.py',
-                            'kma_index'], 
-                            check = True,
-                            cwd = str(mlst7_db_dir),
-                            timeout=800)
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-            build.kill()
-            raise 
-        version = get_commit_git(mlst7_db_dir)
-    return version
-
-def download_db_serotypefinder(serotypefinder_db_dir, version = 'master'):
-    """Function to download the SerotypeFinder database if it is not present"""
-    if not isinstance(serotypefinder_db_dir, pathlib.PosixPath):
-        serotypefinder_db_dir = pathlib.Path(serotypefinder_db_dir)
-    if not serotypefinder_db_dir.joinpath('H_type.seq.b').is_file():
-        print("\x1b[0;33m Downloading SerotypeFinder database...\n\033[0;0m")
-        download_git_repo(version, 
-                        'https://bitbucket.org/genomicepidemiology/serotypefinder_db.git',
-                        serotypefinder_db_dir)
-        try:
-            build = subprocess.run(['python', 
-                            str('INSTALL.py'),
-                            'kma_index'], 
-                            cwd = str(serotypefinder_db_dir),
-                            check=True,
-                            timeout = 800)        
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-            build.kill()
-            raise 
-        version = get_commit_git(serotypefinder_db_dir)
-    return version
-
-
-def download_db_seroba(seroba_db_dir, version='master', kmersize = 71):
-    """Function to download the Seroba database if it is not present"""
-    if not isinstance(seroba_db_dir, pathlib.PosixPath):
-        seroba_db_dir = pathlib.Path(seroba_db_dir)
-    if not seroba_db_dir.joinpath('database', 'cdhit_cluster').is_file():
-        print("\x1b[0;33m Downloading Seroba database...\n\033[0;0m")
-        download_git_repo(version, 
-                        'https://github.com/sanger-pathogens/seroba.git',
-                        seroba_db_dir)
-        try:
-            kmersize = str(kmersize)
-            rm_dir = subprocess.run(['rm', '-rf', str(seroba_db_dir.joinpath('scripts')),
-                                            '&&', 'rm', '-rf', str(seroba_db_dir.joinpath('seroba'))],
-                                        check = True, timeout=60)
-            build = subprocess.run(['seroba', 'createDBs', 
-                                    'database',
-                                    kmersize], 
-                                    cwd = str(seroba_db_dir),
+    def download_db_kmerfinder(self, version):
+        """Function to download kmerfinder database if it is not present"""
+        kmerfinder_db_dir = self.db_dir.joinpath('kmerfinder_db')
+        if not kmerfinder_db_dir.joinpath('config').exists():
+            print("\x1b[0;33m Downloading KmerFinder database...\n\033[0;0m")
+            self.download_git_repo('master', 
+                            'https://bitbucket.org/genomicepidemiology/kmerfinder_db.git',
+                            kmerfinder_db_dir)
+            try:
+                build = subprocess.run(['bash', 
+                                    'INSTALL.sh',
+                                    str(kmerfinder_db_dir.absolute()), 
+                                    'bacteria', 
+                                    version],
+                                    cwd = str(kmerfinder_db_dir),
                                     check=True,
-                                    timeout = 800)
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-            build.kill()
-            raise 
-        version = get_commit_git(seroba_db_dir)
-    return version
+                                    timeout = 3000)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
+                build.kill()
+                raise
+        return version
 
-def get_downloads_juno_typing(db_dir, current_dir, update_dbs, seroba_kmersize):
-    if not isinstance(db_dir, pathlib.PosixPath):
-        db_dir = pathlib.Path(db_dir)
-    if not isinstance(current_dir, pathlib.PosixPath):
-        current_dir = pathlib.Path(current_dir)
-    if update_dbs:
-        try:
-            rm_dir = subprocess.run(['rm', '-rf', str(db_dir)], check = True, timeout = 60)
-        except:
-            rm_dir.kill()
-            raise
-    software_version = {'kmerfinder': download_software_kmerfinder(current_dir.joinpath('kmerfinder')),
-                        'mlst7': download_software_mlst7(current_dir.joinpath('cge-mlst')),
-                        'kmerfinder_db': download_db_kmerfinder(db_dir.joinpath('kmerfinder_db')),
-                        'mlst7_db': download_db_mlst7(db_dir.joinpath('mlst7_db')),
-                        'serotypefinder_db': download_db_serotypefinder(db_dir.joinpath('serotypefinder_db')),
-                        'seroba_db': download_db_seroba(db_dir.joinpath('seroba_db'), kmersize = seroba_kmersize)}
-    return software_version
+    def download_db_mlst7(self, version):
+        """Function to download the MLST (CGE) database if it is not present"""
+        mlst7_db_dir = self.db_dir.joinpath('mlst7_db')
+        if not mlst7_db_dir.joinpath('senterica', 'senterica.length.b').is_file():
+            print("\x1b[0;33m Downloading 7-locus MLST (CGE) database...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://bitbucket.org/genomicepidemiology/mlst_db.git',
+                            mlst7_db_dir)
+            try:
+                build = subprocess.run(['python', 
+                                'INSTALL.py',
+                                'kma_index'], 
+                                check = True,
+                                cwd = str(mlst7_db_dir),
+                                timeout=800)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
+                build.kill()
+                raise 
+        version = self.get_commit_git(mlst7_db_dir)
+        return version
 
-# if __name__ == '__main__':
-#     current_dir = pathlib.Path(__file__).parent.absolute()
-#     db_dir = current_dir.joinpath('fake_db')
-#     update_dbs = False
-#     seroba_kmersize=71
-#     versions = get_downloads_juno_typing(db_dir, current_dir, update_dbs, seroba_kmersize)
-#     print(versions)
+    def download_db_serotypefinder(self, version):
+        """Function to download the SerotypeFinder database if it is not present"""
+        serotypefinder_db_dir = self.db_dir.joinpath('serotypefinder_db')
+        if not serotypefinder_db_dir.joinpath('H_type.seq.b').is_file():
+            print("\x1b[0;33m Downloading SerotypeFinder database...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://bitbucket.org/genomicepidemiology/serotypefinder_db.git',
+                            serotypefinder_db_dir)
+            try:
+                build = subprocess.run(['python', 
+                                str('INSTALL.py'),
+                                'kma_index'], 
+                                cwd = str(serotypefinder_db_dir),
+                                check=True,
+                                timeout = 800)        
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
+                build.kill()
+                raise 
+        version = self.get_commit_git(serotypefinder_db_dir)
+        return version
+
+
+    def download_db_seroba(self, version, kmersize=71):
+        """Function to download the Seroba database if it is not present"""
+        seroba_db_dir = self.db_dir.joinpath('seroba_db')
+        if not seroba_db_dir.joinpath('database', 'cdhit_cluster').is_file():
+            print("\x1b[0;33m Downloading Seroba database...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://github.com/sanger-pathogens/seroba.git',
+                            seroba_db_dir)
+            try:
+                kmersize = str(kmersize)
+                rm_dir = subprocess.run(['rm', '-rf', str(seroba_db_dir.joinpath('scripts')),
+                                                '&&', 'rm', '-rf', str(seroba_db_dir.joinpath('seroba'))],
+                                            check = True, timeout=60)
+                build = subprocess.run(['seroba', 'createDBs', 
+                                        'database',
+                                        kmersize], 
+                                        cwd = str(seroba_db_dir),
+                                        check=True,
+                                        timeout = 800)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
+                build.kill()
+                raise 
+        version = self.get_commit_git(seroba_db_dir)
+        return version
+
+    def get_downloads_juno_typing(self, kmerfinder_asked_version, 
+                                    cge_mlst_asked_version,
+                                    kmerfinder_db_asked_version,
+                                    mlst7_db_asked_version,
+                                    serotypefinder_db_asked_version,
+                                    seroba_db_asked_version):
+        if self.update_dbs:
+            try:
+                rm_dir = subprocess.run(['rm', '-rf', str(self.db_dir)], 
+                                        check = True, timeout = 60)
+            except:
+                rm_dir.kill()
+                raise
+            
+        software_version = {'kmerfinder': self.download_software_kmerfinder(version=kmerfinder_asked_version),
+                            'mlst7': self.download_software_mlst7(version=cge_mlst_asked_version),
+                            'kmerfinder_db': self.download_db_kmerfinder(version=kmerfinder_db_asked_version),
+                            'mlst7_db': self.download_db_mlst7(version=mlst7_db_asked_version),
+                            'serotypefinder_db': self.download_db_serotypefinder(version=serotypefinder_db_asked_version),
+                            'seroba_db': self.download_db_seroba(version=seroba_db_asked_version, 
+                                                                kmersize = self.seroba_kmersize)}
+
+        return software_version
+
+if __name__ == '__main__':
+    argument_parser = argparse.ArgumentParser(description='Download cgMLST schemes.')
+    argument_parser.add_argument('-d', '--db-dir', type=pathlib.Path, 
+                        default='db',
+                        help='Database directory where the databases will be stored.')
+    argument_parser.add_argument('-kv', '--kmerfinder-version', type=str, 
+                        default='3.0.2',
+                        help='Version to download for the kmerfinder software.')
+    argument_parser.add_argument('-mv', '--cgemlst-version', type=str, 
+                        default='2.0.4',
+                        help='Version to download for the MLST software from CGE.')
+    argument_parser.add_argument('-kdv', '--kmerfinder-db-version', type=str, 
+                        default='20210425',
+                        help='Version to download for the kmerfinder database.')
+    argument_parser.add_argument('-mdv', '--cgemlst-db-version', type=str, 
+                        default='master',
+                        help='Version to download for the MLST database (CGE).')
+    argument_parser.add_argument('-sdv', '--serotypefinder-db-version', type=str, 
+                        default='master',
+                        help='Version to download for the SerotypeFinder database.')
+    argument_parser.add_argument('-serv', '--seroba-db-version', type=str, 
+                        default='master',
+                        help='Version to download for the Seroba database.')
+    argument_parser.add_argument('--seroba-kmer-size', type=int, 
+                        default=71,
+                        help="Kmer size to be used to build Seroba's database.")
+    argument_parser.add_argument('--update', dest='update_dbs', 
+                                action='store_true')
+    args = argument_parser.parse_args()
+    downloads = DownloadsJunoTyping(db_dir=args.db_dir,
+                                    update_dbs=args.update_dbs, 
+                                    kmerfinder_asked_version=args.kmerfinder_version,
+                                    cge_mlst_asked_version=args.cgemlst_version,
+                                    kmerfinder_db_asked_version=args.kmerfinder_db_version,
+                                    mlst7_db_asked_version=args.cgemlst_db_version,
+                                    serotypefinder_db_asked_version=args.serotypefinder_db_version,
+                                    seroba_db_asked_version=args.seroba_db_version,
+                                    seroba_kmersize=args.seroba_kmer_size)
+    print(downloads.downloaded_versions)
