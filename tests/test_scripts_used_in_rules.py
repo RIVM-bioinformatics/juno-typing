@@ -13,7 +13,7 @@ from bin import chewbbaca_per_genus
 
 class TestSerotypeFinderMultireport(unittest.TestCase):
     def setUpClass():
-        assert pathlib.Path('tests/example_input/fake_result_serotype1.csv').exists, \
+        assert pathlib.Path('tests/example_output/expected_result_serotype1.csv').exists, \
             "Missing input file for TestSerotypeFinderMultireport test"
     
     def test_findallele(self):
@@ -21,7 +21,7 @@ class TestSerotypeFinderMultireport(unittest.TestCase):
         the results of SerotypeFinder (E. coli serotyper)
         """
 
-        result_csv = read_csv('tests/example_input/fake_result_serotype1.csv', index_col = 0)
+        result_csv = read_csv('tests/example_output/expected_result_serotype1.csv', index_col = 0)
         allele = serotypefinder_multireport.find_allele(result_csv, 'wzx')
         self.assertEqual(allele, 'O50/O2')
 
@@ -30,7 +30,7 @@ class TestSerotypeFinderMultireport(unittest.TestCase):
         from the results of SerotypeFinder (E. coli serotyper)
         """
 
-        alleles = serotypefinder_multireport.get_sample_serotype('tests/example_input/fake_result_serotype1.csv')
+        alleles = serotypefinder_multireport.get_sample_serotype('tests/example_output/expected_result_serotype1.csv')
         for allele in ['O50/O2', 'O2','H6']:
             self.assertTrue(allele in alleles, 'The result_serotype.csv obtained by SerotypeFinder is not being properly processed')
 
@@ -38,9 +38,9 @@ class TestSerotypeFinderMultireport(unittest.TestCase):
         """Testing properly reporting of O-type. Especial attention to \
         multiple alleles arranged from smaller to larger from SerotypeFinder (E. coli serotyper)"""
 
-        list_files = ['tests/example_input/fake_result_serotype1.csv',
-                    'tests/example_input/fake_result_serotype2.csv',
-                    'tests/example_input/fake_result_serotype3.csv']
+        list_files = ['tests/example_output/expected_result_serotype1.csv',
+                    'tests/example_output/expected_result_serotype2.csv',
+                    'tests/example_output/expected_result_serotype3.csv']
         sample_names = ['sample1', 'sample2', 'sample3']
         multireport = serotypefinder_multireport.merge_multiple_reports(list_files, sample_names)
         self.assertEqual(multireport.loc['sample1','O type'].iat[0], 'O2/O50')
@@ -56,106 +56,110 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
     def tearDownClass():
         os.system('rm -rf test_output')
 
-    def test_output_dir_is_created(self):
-        """Testing there is no error if output dir does not exist and that
-        it is created then
-        """
+    # def test_output_dir_is_created(self):
+    #     """Testing there is no error if output dir does not exist and that
+    #     it is created then
+    #     """
 
-        os.system('rm -rf test_output')
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['Salmonella'],
-                                                        output_dir='test_output',
-                                                        threads=2,
-                                                        download_loci=False)
-        self.assertTrue(pathlib.Path('test_output').is_dir())
+    #     os.system('rm -rf test_output')
+    #     cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['salmonella'],
+    #                                                     output_dir='test_output',
+    #                                                     threads=2,
+    #                                                     download_loci=False)
+    #     self.assertTrue(pathlib.Path('test_output').is_dir())
         
-    def test_salmonella_and_escherichia_cgMLSTschemes(self):
-        """The Salmonella and Escherichia schemes should be properly
-        found from pubmlst
-        """
+    # def test_salmonella_and_escherichia_cgMLSTschemes(self):
+    #     """The Salmonella and Escherichia schemes should be properly
+    #     found from pubmlst
+    #     """
 
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['Salmonella', 'Escherichia'],
-                                                        output_dir='test_output',
-                                                        threads=2,
-                                                        download_loci=False)
-        expected_result = {'Salmonella': \
-                            {'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/4',
-                            'scheme_summary_file': 'salmonella_scheme.json',
-                            'locus_count': 3002,
-                            'scheme_description': 'cgMLST v2 (Enterobase)'},
-                        'Escherichia': \
-                            {'url': 'https://rest.pubmlst.org/db/pubmlst_escherichia_seqdef/schemes/6',
-                            'scheme_summary_file': 'escherichia_scheme.json',
-                            'locus_count': 2513,
-                            'scheme_description': 'cgMLST'}}
-        self.assertTrue(len(cgMLSTschemes_result.schemes) == 2)
-        self.assertTrue('Salmonella' in cgMLSTschemes_result.schemes)
-        self.assertTrue('Escherichia' in cgMLSTschemes_result.schemes)
-        self.assertTrue(len(cgMLSTschemes_result.schemes['Salmonella']) == 4)
-        self.assertTrue(len(cgMLSTschemes_result.schemes['Escherichia']) == 4)
-        self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
+    #     cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['salmonella', 'escherichia'],
+    #                                                     output_dir='test_output',
+    #                                                     threads=2,
+    #                                                     download_loci=False)
+    #     expected_result = {'salmonella': \
+    #                         {'source': 'pubmlst',
+    #                         'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/4',
+    #                         'scheme_summary_file': 'salmonella_scheme.json',
+    #                         'locus_count': 3002,
+    #                         'scheme_description': 'cgMLST v2 (Enterobase)'},
+    #                     'escherichia': \
+    #                         {'source': 'pubmlst',
+    #                         'url': 'https://rest.pubmlst.org/db/pubmlst_escherichia_seqdef/schemes/6',
+    #                         'scheme_summary_file': 'escherichia_scheme.json',
+    #                         'locus_count': 2513,
+    #                         'scheme_description': 'cgMLST'}}
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes) == 2)
+    #     self.assertTrue('salmonella' in cgMLSTschemes_result.schemes)
+    #     self.assertTrue('escherichia' in cgMLSTschemes_result.schemes)
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes['salmonella']) == 5)
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes['escherichia']) == 5)
+    #     self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
 
-    def test_warning_when_some_species_not_supported_for_cgMLST(self):
-        """If at least one of the species/genera provided for downloading the
-        cgMLST scheme is not supported (not on the list of downloadable
-        schemes) then a warning should be thrown
-        """
+    # def test_warning_when_some_species_not_supported_for_cgMLST(self):
+    #     """If at least one of the species/genera provided for downloading the
+    #     cgMLST scheme is not supported (not on the list of downloadable
+    #     schemes) then a warning should be thrown
+    #     """
 
-        self.assertWarnsRegex(UserWarning, 'not supported', 
-                                download_cgmlst_scheme.cgMLSTSchemes, 
-                                ['Salmonella', 'Campylobacter'], 
-                                output_dir='output', threads=2,
-                                download_loci=False)
+    #     self.assertWarnsRegex(UserWarning, 'not supported', 
+    #                             download_cgmlst_scheme.cgMLSTSchemes, 
+    #                             ['salmonella', 'no_real_species'], 
+    #                             output_dir='output', threads=2,
+    #                             download_loci=False)
     
-    def test_error_when_none_of_listed_species_are_supported(self):
-        """If none of the species/genera provided for downloading the 
-        cgMLST scheme is supported (none of them is on the list of 
-        downloadable schemes) then an error should be thrown
-        """
+    # def test_error_when_none_of_listed_species_are_supported(self):
+    #     """If none of the species/genera provided for downloading the 
+    #     cgMLST scheme is supported (none of them is on the list of 
+    #     downloadable schemes) then an error should be thrown
+    #     """
 
-        self.assertRaisesRegex(ValueError, 
-                                'None of the provided species is supported for cgMLST', 
-                                download_cgmlst_scheme.cgMLSTSchemes, 
-                                ['Campylobacter'], 
-                                output_dir='output', threads=2,
-                                download_loci=False)
+    #     self.assertRaisesRegex(ValueError, 
+    #                             'None of the provided species is supported for cgMLST', 
+    #                             download_cgmlst_scheme.cgMLSTSchemes, 
+    #                             ['no_real_species'], 
+    #                             output_dir='output', threads=2,
+    #                             download_loci=False)
 
-    def test_genus_given_in_small_letters(self):
-        """The Salmonella scheme should be found even if the genus name
-        is given in small letters (no first capital)
-        """
+    # def test_genus_given_in_capital_letters(self):
+    #     """The Salmonella scheme should be found even if the genus name
+    #     is given in small letters (no first capital)
+    #     """
 
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['salmonella'],
-                                                        output_dir='test_output',
-                                                        threads=2,
-                                                        download_loci=False)
-        expected_result = {'Salmonella': \
-                            {'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/4',
-                            'scheme_summary_file': 'salmonella_scheme.json',
-                            'locus_count': 3002,
-                            'scheme_description': 'cgMLST v2 (Enterobase)'}}
-        self.assertTrue(len(cgMLSTschemes_result.schemes) == 1)
-        self.assertTrue('Salmonella' in cgMLSTschemes_result.schemes)
-        self.assertTrue(len(cgMLSTschemes_result.schemes['Salmonella']) == 4)
-        self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
+    #     cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['SALMONELLA'],
+    #                                                     output_dir='test_output',
+    #                                                     threads=2,
+    #                                                     download_loci=False)
+    #     expected_result = {'salmonella': \
+    #                         {'source': 'pubmlst',
+    #                         'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/4',
+    #                         'scheme_summary_file': 'salmonella_scheme.json',
+    #                         'locus_count': 3002,
+    #                         'scheme_description': 'cgMLST v2 (Enterobase)'}}
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes) == 1)
+    #     self.assertTrue('salmonella' in cgMLSTschemes_result.schemes)
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes['salmonella']) == 5)
+    #     self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
 
-    def test_genus_given_in_capital_letters(self):
-        """The Salmonella scheme should be found even if the genus name
-        is given in all capital letters (no first capital and other small)
-        """
+    # def test_genus_given_in_firstcapital_letter(self):
+    #     """The Salmonella scheme should be found even if the genus name
+    #     is given in all capital letters (no first capital and other small)
+    #     """
 
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['SALMONELLA'],
-                                                        output_dir='test_output',
-                                                        threads=2,
-                                                        download_loci=False)
-        expected_result = {'Salmonella': \
-                            {'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/4',
-                            'scheme_summary_file': 'salmonella_scheme.json',
-                            'locus_count': 3002,
-                            'scheme_description': 'cgMLST v2 (Enterobase)'}}
-        self.assertTrue(len(cgMLSTschemes_result.schemes) == 1)
-        self.assertTrue('Salmonella' in cgMLSTschemes_result.schemes)
-        self.assertTrue(len(cgMLSTschemes_result.schemes['Salmonella']) == 4)
-        self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
+    #     cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['Salmonella'],
+    #                                                     output_dir='test_output',
+    #                                                     threads=2,
+    #                                                     download_loci=False)
+    #     expected_result = {'salmonella': \
+    #                         {'source': 'pubmlst',
+    #                         'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/4',
+    #                         'scheme_summary_file': 'salmonella_scheme.json',
+    #                         'locus_count': 3002,
+    #                         'scheme_description': 'cgMLST v2 (Enterobase)'}}
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes) == 1)
+    #     self.assertTrue('salmonella' in cgMLSTschemes_result.schemes)
+    #     self.assertTrue(len(cgMLSTschemes_result.schemes['salmonella']) == 5)
+    #     self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
 
     @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
                     "Skipped in non-RIVM environments (for sake of time)")
@@ -164,25 +168,54 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
         should be downloaded
         """
 
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['test'],
+        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['test_pubmlst'],
                                                         output_dir='test_output',
                                                         threads=1,
                                                         download_loci=True)
-        expected_result = {'Test': \
-                            {'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/2',
+        expected_result = {'test_pubmlst': \
+                            {'source': 'pubmlst',
+                            'url': 'https://rest.pubmlst.org/db/pubmlst_salmonella_seqdef/schemes/2',
                             'scheme_summary_file': 'test_scheme.json',
                             'locus_count': 7,
                             'scheme_description': 'MLST'}}
         self.assertTrue(len(cgMLSTschemes_result.schemes) == 1)
-        self.assertTrue('Test' in cgMLSTschemes_result.schemes)
-        self.assertTrue(len(cgMLSTschemes_result.schemes['Test']) == 4)
+        self.assertTrue('test_pubmlst' in cgMLSTschemes_result.schemes)
+        self.assertTrue(len(cgMLSTschemes_result.schemes['test_pubmlst']) == 5)
         self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
-        dir_with_downloaded_scheme = pathlib.Path('test_output', 'test')
+        dir_with_downloaded_scheme = pathlib.Path('test_output', 'test_pubmlst')
         self.assertTrue(dir_with_downloaded_scheme.is_dir())
         files_in_downloaded_scheme = os.listdir(dir_with_downloaded_scheme)
         fasta_files_in_downloaded_scheme = [file_ for file_ in files_in_downloaded_scheme if str(file_).endswith('.fasta')]
         len(fasta_files_in_downloaded_scheme)
-        self.assertEqual(len(fasta_files_in_downloaded_scheme), expected_result['Test']['locus_count'])
+        self.assertEqual(len(fasta_files_in_downloaded_scheme), expected_result['test_pubmlst']['locus_count'])
+
+    @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
+                    "Skipped in non-RIVM environments (for sake of time)")
+    def test_enterobase_scheme_is_properly_downloaded(self):
+        """A test subfolder should be created and a fasta files per locus
+        should be downloaded
+        """
+
+        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['test_enterobase'],
+                                                        output_dir='test_output',
+                                                        threads=1,
+                                                        download_loci=True)
+        expected_result = {'test_enterobase': \
+                            {'source': 'enterobase',
+                            'url': 'https://enterobase.warwick.ac.uk/schemes/Yersinia.Achtman7GeneMLST/',
+                            'scheme_summary_file': 'test_scheme.json',
+                            'locus_count': 7,
+                            'scheme_description': None}}
+        self.assertTrue(len(cgMLSTschemes_result.schemes) == 1)
+        self.assertTrue('test_enterobase' in cgMLSTschemes_result.schemes)
+        self.assertTrue(len(cgMLSTschemes_result.schemes['test_enterobase']) == 5)
+        self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
+        dir_with_downloaded_scheme = pathlib.Path('test_output', 'test_enterobase')
+        self.assertTrue(dir_with_downloaded_scheme.is_dir())
+        files_in_downloaded_scheme = os.listdir(dir_with_downloaded_scheme)
+        fasta_files_in_downloaded_scheme = [file_ for file_ in files_in_downloaded_scheme if str(file_).endswith('.fasta')]
+        len(fasta_files_in_downloaded_scheme)
+        self.assertEqual(len(fasta_files_in_downloaded_scheme), expected_result['test_enterobase']['locus_count'])
 
 
 class TestChewbbacaPerGenus(unittest.TestCase):

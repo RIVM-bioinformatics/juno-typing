@@ -82,8 +82,7 @@ class JunoTypingRun():
         self.startup = self.start_pipeline()
 
         # Parse arguments specific from the user
-        if not unlock and not dryrun:
-            self.user_params = self.write_userparameters()
+        self.user_params = self.write_userparameters()
         
         # Download databases if necessary
         if not unlock and not dryrun:
