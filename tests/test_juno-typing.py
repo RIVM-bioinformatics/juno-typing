@@ -92,7 +92,8 @@ class TestJunoTypingDryRun(unittest.TestCase):
     def tearDownClass():
         fake_dirs = ['fake_dir_wsamples', 
                     'fake_dir_juno', 
-                    'fake_db']
+                    'fake_db',
+                    'test_output']
         for folder in fake_dirs:
             os.system('rm -rf {}'.format(str(folder)))
     
@@ -102,7 +103,7 @@ class TestJunoTypingDryRun(unittest.TestCase):
         try:
             juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
                                     metadata= None,
-                                    output_dir = pathlib.Path('output'), 
+                                    output_dir = pathlib.Path('test_output'), 
                                     db_dir = pathlib.Path('fake_db'),
                                     dryrun = True)
         except:
@@ -116,7 +117,7 @@ class TestJunoTypingDryRun(unittest.TestCase):
         try:
             juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
                                     metadata= 'fake_dir_wsamples/fake_metadata.csv',
-                                    output_dir = pathlib.Path('output'), 
+                                    output_dir = pathlib.Path('test_output'), 
                                     db_dir = pathlib.Path('fake_db'),
                                     dryrun = True)
         except:

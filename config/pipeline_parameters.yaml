@@ -20,4 +20,4 @@ mem_gb:
 
 # Pipeline parameters (not taken from user)
 salmonellamonophasic:
-  min_cov: 10
+  min_cov: 4000
