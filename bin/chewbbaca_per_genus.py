@@ -1,11 +1,12 @@
 import argparse
+import base_juno_pipeline.helper_functions
 from os import system
 import pathlib
 import subprocess
 from yaml import safe_load
 
 
-class runChewBBACA():
+class runChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
     """Class to produce and enlist (in a dictionary) the parameters necessary
     to run chewBBACA for different genera. The samples can be run also by calling
     the runChewBBACA method
@@ -73,15 +74,14 @@ class runChewBBACA():
             if genus_cgmlst_db.is_dir():
                 chewbbaca_parameters[genus]['cgmlst_scheme'] = str(genus_cgmlst_db)
             else:
-                print(f'\nThere is no recognizable cgMLST scheme for the genus {genus} in the {self.cgmlst_db_dir} directory.\n')
+                print(self.error_formatter(f'There is no recognizable cgMLST scheme for the genus {genus.title()} in the {self.cgmlst_db_dir} directory.'))
                 chewbbaca_parameters[genus]['cgmlst_scheme'] = None
-        print(chewbbaca_parameters)
         return chewbbaca_parameters
 
     def run_chewbbaca(self):
         for genus in self.chewbbaca_parameters:
             if self.chewbbaca_parameters[genus]['cgmlst_scheme'] is not None:
-                print(f'\nRunning samples for genus: {genus}')
+                print(self.message_formatter(f'Running samples for genus: {genus}'))
                 chewbbaca_command = ['chewBBACA.py', 'AlleleCall', 
                                     '--cpu',  str(self.threads), 
                                     '--input-files', 

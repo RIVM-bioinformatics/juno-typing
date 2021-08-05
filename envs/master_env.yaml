@@ -17,4 +17,5 @@ dependencies:
   - tbb=2020.3
   - pip:
     - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.1.0#egg=Juno-bacteriology-pipelines"
+    - numpy
 
