@@ -6,7 +6,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - snakemake==6.2.1
+  - snakemake==6.6.1
   - mamba
   - git
   - pip==19.2.3
@@ -16,6 +16,6 @@ dependencies:
   - biopython=1.74
   - tbb=2020.3
   - pip:
-    - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.1.0#egg=Juno-bacteriology-pipelines"
     - numpy
+    - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.1.0#egg=Juno-bacteriology-pipelines"
 
