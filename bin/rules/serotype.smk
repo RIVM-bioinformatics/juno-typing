@@ -1,6 +1,7 @@
 # ## SEROTYPE ACCORDING TO GENUS ##
 
 # --------------- Choose serotyper according to genus/species ----------------#
+
 def choose_serotyper(wildcards):
     with checkpoints.which_species.get(sample=wildcards.sample).output[0].open() as f:
         species_res = f.read().strip()

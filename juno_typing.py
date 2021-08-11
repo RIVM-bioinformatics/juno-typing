@@ -64,7 +64,7 @@ class JunoTypingRun():
             self.metadata = pathlib.Path(metadata)
         else:
             self.metadata = None
-        self.db_dir = pathlib.Path(db_dir)
+        self.db_dir = pathlib.Path(db_dir).absolute()
         self.serotypefinder_mincov=serotypefinder_mincov
         self.serotypefinder_identity=serotypefinder_identity
         self.seroba_mincov=seroba_mincov
@@ -77,7 +77,7 @@ class JunoTypingRun():
         self.user_parameters = pathlib.Path("config/user_parameters.yaml")
         self.extra_software_versions = pathlib.Path('config/extra_software_versions.yaml')
         self.output_dir = output_dir
-        self.restarttimes = 1      
+        self.restarttimes = 1     
         # Checking if the input_dir comes from the Juno-assembly pipeline 
         self.startup = self.start_pipeline()
 
@@ -114,7 +114,7 @@ class JunoTypingRun():
                                             singularityargs = self.singularityargs,
                                             restarttimes = self.restarttimes)
         if not unlock and not dryrun:
-            db_audit_file = snakemake_run.path_to_audit.joinpath('database_versions')
+            db_audit_file = snakemake_run.path_to_audit.joinpath('database_versions.yaml')
             with open(db_audit_file, 'w') as file:
                 yaml.dump(self.downloads_versions, file, default_flow_style=False)
         self.successful_run = snakemake_run.run_snakemake()
