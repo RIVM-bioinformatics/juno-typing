@@ -1,0 +1,6 @@
+name: shigatyper
+channels:
+  - defaults
+  - bioconda
+dependencies:
+  - shigatyper=1.0.6
