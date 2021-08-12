@@ -19,6 +19,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                     seroba_db_asked_version='master',
                     seroba_kmersize=71):
         self.db_dir = pathlib.Path(db_dir)
+        self.bin_dir = pathlib.Path(__file__).parent.absolute()
         self.update_dbs = update_dbs
         self.seroba_kmersize = seroba_kmersize
         self.downloaded_versions = self.get_downloads_juno_typing(kmerfinder_asked_version=kmerfinder_asked_version,
@@ -30,7 +31,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
 
     def download_software_kmerfinder(self, version):
         """Function to download kmerfinder if it is not present"""
-        kmerfinder_software_dir = self.db_dir.joinpath('kmerfinder')
+        kmerfinder_software_dir = self.bin_dir.joinpath('kmerfinder')
         if not kmerfinder_software_dir.joinpath('kmerfinder.py').is_file():
             print("\x1b[0;33m Downloading kmerfinder software...\n\033[0;0m")
             self.download_git_repo(version, 
@@ -40,7 +41,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         
     def download_software_mlst7(self, version):
         """Function to download MLST (CGE) if it is not present"""
-        mlst7_software_dir = self.db_dir.joinpath('cge-mlst')
+        mlst7_software_dir = self.bin_dir.joinpath('cge-mlst')
         if not mlst7_software_dir.joinpath('mlst.py').is_file():
             print("\x1b[0;33m Downloading MLST (CGE) software...\n\033[0;0m")
             self.download_git_repo(version, 
