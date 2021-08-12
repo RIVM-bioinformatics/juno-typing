@@ -75,7 +75,7 @@ class inputChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
             with open(genus_file, 'w') as file_:
                 for sample in genera_input_dict[genus]['samples']:
                     assembly_file = self.sample_sheet_dict[sample]['assembly']
-                    file_.write(assembly_file)
+                    file_.write(assembly_file+'\n')
             genera_input_dict[genus]['genus_file'] = str(genus_file)
         print(f'Files with samples per genus will be written in {self.output_dir}!\n')
         self.genera_input_dict = genera_input_dict
