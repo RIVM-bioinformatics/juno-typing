@@ -8,7 +8,6 @@ import unittest
 main_script_path = str(pathlib.Path(pathlib.Path(__file__).parent.absolute()).parent.absolute())
 path.insert(0, main_script_path)
 from bin import download_dbs
-from bin import serotypefinder_multireport
 import juno_typing
 
 
@@ -144,6 +143,18 @@ class TestJunoTypingPipeline(unittest.TestCase):
                                     db_dir = '/mnt/db/juno/typing_db',
                                     output_dir = pathlib.Path('test_output'))
         self.assertTrue(juno_typing_run.successful_run, 'Exception raised when running a dryrun')
+        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'salmonella', 'results_alleles.tsv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'escherichia', 'results_alleles.tsv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'shigella', 'results_alleles.tsv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('serotype', 'serotyper_multireport.csv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('mlst7', 'mlst7_multireport.csv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_git.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_pipeline.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_conda.txt').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'snakemake_report.html').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'sample_sheet.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_parameters.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'database_versions.yaml').exists())
 
     def test_junotyping_run_wMetadata(self):
         """Testing the pipeline runs properly with real samples when providing a metadata file"""
@@ -152,6 +163,18 @@ class TestJunoTypingPipeline(unittest.TestCase):
                                     metadata= '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/metadata.csv',
                                     output_dir = pathlib.Path('test_output'))
         self.assertTrue(pipeline_run.successful_run, 'Exception raised when running a dryrun')
+        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'salmonella', 'results_alleles.tsv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'escherichia', 'results_alleles.tsv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'shigella', 'results_alleles.tsv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('serotype', 'serotyper_multireport.csv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('mlst7', 'mlst7_multireport.csv').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_git.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_pipeline.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_conda.txt').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'snakemake_report.html').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'sample_sheet.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_parameters.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'database_versions.yaml').exists())
 
 
 if __name__ == '__main__':
