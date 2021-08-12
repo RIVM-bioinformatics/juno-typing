@@ -17,8 +17,8 @@ class TestSerotypeFinderMultireport(unittest.TestCase):
             "Missing input file for TestSerotypeFinderMultireport test"
         pathlib.Path('test_output').mkdir(exist_ok=True)
     
-    # def tearDownClass():
-    #     pathlib.Path('test_output').rmdir()
+    def tearDownClass():
+        pathlib.Path('test_output').rmdir()
 
     def test_findallele(self):
         """The code should look for the allele result (wzx in this case) in \
