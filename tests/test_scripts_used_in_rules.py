@@ -6,23 +6,29 @@ import unittest
 
 main_script_path = str(pathlib.Path(pathlib.Path(__file__).parent.absolute()).parent.absolute())
 path.insert(0, main_script_path)
-from bin import serotypefinder_multireport
 from bin import download_cgmlst_scheme
-from bin import chewbbaca_per_genus
+from bin import chewbbaca_input_files
+from bin import serotyper_multireport
 
 
 class TestSerotypeFinderMultireport(unittest.TestCase):
     def setUpClass():
         assert pathlib.Path('tests/example_output/expected_result_serotype1.csv').exists, \
             "Missing input file for TestSerotypeFinderMultireport test"
+        pathlib.Path('test_output').mkdir(exist_ok=True)
     
+    # def tearDownClass():
+    #     pathlib.Path('test_output').rmdir()
+
     def test_findallele(self):
         """The code should look for the allele result (wzx in this case) in \
         the results of SerotypeFinder (E. coli serotyper)
         """
 
+        serotyper = serotyper_multireport.SerotypeFinderMultireport(input_files=['tests/example_output/expected_result_serotype1.csv'], 
+                                                                    output_file='test_output/serotypefinder_multireport.csv')
         result_csv = read_csv('tests/example_output/expected_result_serotype1.csv', index_col = 0)
-        allele = serotypefinder_multireport.find_allele(result_csv, 'wzx')
+        allele = serotyper.find_allele(result_csv, 'wzx')
         self.assertEqual(allele, 'O50/O2')
 
     def test_getsampleserotype(self):
@@ -30,7 +36,9 @@ class TestSerotypeFinderMultireport(unittest.TestCase):
         from the results of SerotypeFinder (E. coli serotyper)
         """
 
-        alleles = serotypefinder_multireport.get_sample_serotype('tests/example_output/expected_result_serotype1.csv')
+        serotyper = serotyper_multireport.SerotypeFinderMultireport(input_files=['tests/example_output/expected_result_serotype1.csv'], 
+                                                                    output_file='test_output/serotypefinder_multireport.csv')
+        alleles = serotyper.get_sample_serotype('tests/example_output/expected_result_serotype1.csv')
         for allele in ['O50/O2', 'O2','H6']:
             self.assertTrue(allele in alleles, 'The result_serotype.csv obtained by SerotypeFinder is not being properly processed')
 
@@ -42,10 +50,14 @@ class TestSerotypeFinderMultireport(unittest.TestCase):
                     'tests/example_output/expected_result_serotype2.csv',
                     'tests/example_output/expected_result_serotype3.csv']
         sample_names = ['sample1', 'sample2', 'sample3']
-        multireport = serotypefinder_multireport.merge_multiple_reports(list_files, sample_names)
-        self.assertEqual(multireport.loc['sample1','O type'].iat[0], 'O2/O50')
-        self.assertEqual(multireport.loc['sample2','O type'].iat[0], 'O128')
-        self.assertEqual(multireport.loc['sample3','O type'].iat[0], 'Error! No O type found')
+        serotyper = serotyper_multireport.SerotypeFinderMultireport(input_files=['tests/example_output/expected_result_serotype1.csv',
+                                                                                'tests/example_output/expected_result_serotype2.csv',
+                                                                                'tests/example_output/expected_result_serotype3.csv'], 
+                                                                    output_file='test_output/serotypefinder_multireport.csv')
+        serotyper.make_multireport()
+        self.assertEqual(serotyper.multireport.loc[0,'O type'], 'O2/O50', serotyper.multireport)
+        self.assertEqual(serotyper.multireport.loc[1,'O type'], 'O128')
+        self.assertEqual(serotyper.multireport.loc[2,'O type'], 'Error! No O type found')
 
 
 class TestDownloadcgMLSTSchemes(unittest.TestCase):
@@ -231,8 +243,6 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
         self.assertTrue('salmonella' in cgMLSTschemes_result.schemes)
         self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
 
-    @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
-                    "Skipped in non-RIVM environments (for sake of time)")
     def test_pubmlst_scheme_is_properly_downloaded(self):
         """A test subfolder should be created and a fasta files per locus
         should be downloaded
@@ -281,8 +291,6 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
         len(fasta_files_in_downloaded_scheme)
         self.assertEqual(len(fasta_files_in_downloaded_scheme), expected_result['test_bigsdb_pasteur']['locus_count'])
 
-    @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
-                    "Skipped in non-RIVM environments (for sake of time)")
     def test_enterobase_scheme_is_properly_downloaded(self):
         """A test subfolder should be created and a fasta files per locus
         should be downloaded
@@ -315,96 +323,167 @@ class TestChewbbacaPerGenus(unittest.TestCase):
         os.system('mkdir -p test_chewbbaca_per_genus/sample1')
         os.system('mkdir -p test_chewbbaca_per_genus/sample2')
         os.system('mkdir -p test_chewbbaca_per_genus/sample3')
+        os.system('mkdir -p test_chewbbaca_per_genus/sample4')
+        os.system('mkdir -p test_chewbbaca_per_genus/sample5')
+        os.system('mkdir -p test_chewbbaca_per_genus/sample6')
         os.system('mkdir -p test_chewbbaca_per_genus/output')
-        os.system('mkdir -p test_chewbbaca_per_genus/db_cgmlst/salmonella')
-        os.system('mkdir -p test_chewbbaca_per_genus/db_cgmlst/escherichia')
         with open('test_chewbbaca_per_genus/sample_sheet.yaml', 'w') as file_:
-            file_.write('sample1:\n  assembly: sample1.fasta\nsample2:\n  assembly: sample2.fasta\nsample3:\n  assembly: sample3.fasta')
+            file_.write('sample1:\n  assembly: sample1.fasta\nsample2:\n  assembly: sample2.fasta\nsample3:\n  assembly: sample3.fasta\nsample4:\n  assembly: sample4.fasta\nsample5:\n  assembly: sample5.fasta\nsample6:\n  assembly: sample6.fasta')
         with open('test_chewbbaca_per_genus/sample1/best_species_hit.txt', 'w') as file_:
-            file_.write('salmonella')
+            file_.write('salmonella enterica')
         with open('test_chewbbaca_per_genus/sample2/best_species_hit.txt', 'w') as file_:
-            file_.write('escherichia coli')
+            file_.write('salmonella')
         with open('test_chewbbaca_per_genus/sample3/best_species_hit.txt', 'w') as file_:
-            file_.write('streptococcus pneumoniae')
-            
+            file_.write('listeria monocytogenes')
+        with open('test_chewbbaca_per_genus/sample4/best_species_hit.txt', 'w') as file_:
+            file_.write('escherichia coli')
+        with open('test_chewbbaca_per_genus/sample5/best_species_hit.txt', 'w') as file_:
+            file_.write('shigella flexnerii')
+        with open('test_chewbbaca_per_genus/sample6/best_species_hit.txt', 'w') as file_:
+            file_.write('fakegenus fakespecies')
+        
     def tearDownClass():
         os.system('rm -rf test_chewbbaca_per_genus')
-
-    def test_chewbbaca_parameters(self):
-        """Testing whether the parameters used to run chewbbaca are properly 
-        created for given best_species_hit. Ran in the best 'perfect' scenario
-        """
-
-        best_hit_files = ['test_chewbbaca_per_genus/sample2/best_species_hit.txt']
-        chewbbaca_run = chewbbaca_per_genus.runChewBBACA(best_hit_kmerfinder_files=best_hit_files,
-                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
-                                                        output_dir='test_chewbbaca_per_genus/output',
-                                                        cgmlst_db_dir='test_chewbbaca_per_genus/db_cgmlst/',
-                                                        threads=1)
-        expected_output = {'escherichia': {'samples': ['sample2'], 
-                                            'genus_file': 'test_chewbbaca_per_genus/output/escherichia', 
-                                            'cgmlst_scheme': 'test_chewbbaca_per_genus/db_cgmlst/escherichia'}}
-        actual_output = chewbbaca_run.chewbbaca_parameters
-        self.assertEqual(expected_output, actual_output)
         
-    def test_chewbbaca_parameters_when_non_supported_species(self):
-        """Testing whether the parameters used to run chewbbaca are properly 
-        created for given best_species_hit. The sample tested here is not supported
-        """
-
-        best_hit_files = ['test_chewbbaca_per_genus/sample3/best_species_hit.txt']
-        chewbbaca_run = chewbbaca_per_genus.runChewBBACA(best_hit_kmerfinder_files=best_hit_files,
-                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
-                                                        output_dir='test_chewbbaca_per_genus/output',
-                                                        cgmlst_db_dir='test_chewbbaca_per_genus/db_cgmlst/',
-                                                        threads=1)
-        expected_output = {'streptococcus': {'samples': ['sample3'], 
-                                            'genus_file': 'test_chewbbaca_per_genus/output/streptococcus', 
-                                            'cgmlst_scheme': None}}
-        actual_output = chewbbaca_run.chewbbaca_parameters
-        self.assertEqual(expected_output, actual_output)
-
-    def test_chewbbaca_parameters_work_when_only_genus_no_species_in_besthit_files(self):
-        """Testing whether the parameters used to run chewbbaca are properly 
-        created even when the besthit file just contains the genus and not
-        the species
+    def test_dict_with_samples_per_genus(self):
+        """Testing whether the dictionary with samples belonging to a
+        genus is created properly for a simple sample
         """
 
         best_hit_files = ['test_chewbbaca_per_genus/sample1/best_species_hit.txt']
-        chewbbaca_run = chewbbaca_per_genus.runChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
                                                         sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
-                                                        output_dir='test_chewbbaca_per_genus/output',
-                                                        cgmlst_db_dir='test_chewbbaca_per_genus/db_cgmlst/',
-                                                        threads=1)
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
         expected_output = {'salmonella': {'samples': ['sample1'], 
-                                            'genus_file': 'test_chewbbaca_per_genus/output/salmonella', 
-                                            'cgmlst_scheme': 'test_chewbbaca_per_genus/db_cgmlst/salmonella'}}
-        actual_output = chewbbaca_run.chewbbaca_parameters
+                                            'genus_file': 'test_chewbbaca_per_genus/output/salmonella_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
         self.assertEqual(expected_output, actual_output)
-        
-    def test_chewbbaca_parameters_multifiles_multigenera(self):
-        """Testing whether the parameters used to run chewbbaca are properly 
-        created for different best_hit files for multiple genera in one run
+
+    def test_dict_with_samples_per_genus_if_besthitfile_contains_only_genus(self):
+        """Testing whether the dictionary with samples belonging to a
+        genus is created properly for a sample where only the genus (Salmonella)
+        and not the species (enterica) is provided
+        """
+
+        best_hit_files = ['test_chewbbaca_per_genus/sample2/best_species_hit.txt']
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
+        expected_output = {'salmonella': {'samples': ['sample2'], 
+                                            'genus_file': 'test_chewbbaca_per_genus/output/salmonella_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
+        self.assertEqual(expected_output, actual_output)
+
+    def test_dict_with_samples_per_genus_if_two_cgmlst_schemes_needed(self):
+        """Testing whether the dictionary with samples belonging to a
+        genus is created properly for a Listeria, where two cgMLST schemes are needed
+        """
+
+        best_hit_files = ['test_chewbbaca_per_genus/sample3/best_species_hit.txt']
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
+        expected_output = {'listeria': {'samples': ['sample3'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/listeria_samples.txt'},
+                            'listeria_optional': {'samples': ['sample3'], 
+                                                'genus_file': 'test_chewbbaca_per_genus/output/listeria_optional_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
+        self.assertEqual(expected_output, actual_output)
+
+    def test_dict_with_samples_for_escherichia(self):
+        """Testing whether the dictionary with samples belonging to a
+        genus is created properly for a Escherichia, where two cgMLST schemes 
+        are needed one of them being Escherichia and the other one Shigella
+        """
+
+        best_hit_files = ['test_chewbbaca_per_genus/sample4/best_species_hit.txt']
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
+        expected_output = {'escherichia': {'samples': ['sample4'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
+                            'shigella': {'samples': ['sample4'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/shigella_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
+        self.assertEqual(expected_output, actual_output)
+
+    def test_dict_with_samples_for_escherichia_if_also_shigella_samples_present(self):
+        """Testing whether the dictionary with samples belonging to a
+        genus is created properly for a Escherichia and Shigella samples
+        combined. They should not overwrite each other
+        """
+
+        best_hit_files = ['test_chewbbaca_per_genus/sample4/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample5/best_species_hit.txt']
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
+        expected_output = {'escherichia': {'samples': ['sample4'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
+                            'shigella': {'samples': ['sample4', 'sample5'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/shigella_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
+        self.assertEqual(expected_output, actual_output)
+
+    def test_genus_dict_for_multifiles_multigenera(self):
+        """Testing whether the dictionary with sample files is created properly
+        when multiple samples from multiple genera are included
         """
 
         best_hit_files = ['test_chewbbaca_per_genus/sample1/best_species_hit.txt', 
                             'test_chewbbaca_per_genus/sample2/best_species_hit.txt',
-                            'test_chewbbaca_per_genus/sample3/best_species_hit.txt']
-        chewbbaca_run = chewbbaca_per_genus.runChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+                            'test_chewbbaca_per_genus/sample3/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample4/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample5/best_species_hit.txt']
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
                                                         sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
-                                                        output_dir='test_chewbbaca_per_genus/output',
-                                                        cgmlst_db_dir='test_chewbbaca_per_genus/db_cgmlst/',
-                                                        threads=1)
-        expected_output = {'escherichia': {'samples': ['sample2'], 
-                                            'genus_file': 'test_chewbbaca_per_genus/output/escherichia', 
-                                            'cgmlst_scheme': 'test_chewbbaca_per_genus/db_cgmlst/escherichia'}, 
-                            'streptococcus': {'samples': ['sample3'], 
-                                            'genus_file': 'test_chewbbaca_per_genus/output/streptococcus', 
-                                            'cgmlst_scheme': None}, 
-                            'salmonella': {'samples': ['sample1'], 
-                                            'genus_file': 'test_chewbbaca_per_genus/output/salmonella', 
-                                            'cgmlst_scheme': 'test_chewbbaca_per_genus/db_cgmlst/salmonella'}}
-        actual_output = chewbbaca_run.chewbbaca_parameters
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
+        expected_output = {'escherichia': {'samples': ['sample4'], 
+                                            'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
+                            'listeria': {'samples': ['sample3'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/listeria_samples.txt'},
+                            'listeria_optional': {'samples': ['sample3'], 
+                                                'genus_file': 'test_chewbbaca_per_genus/output/listeria_optional_samples.txt'},
+                            'salmonella': {'samples': ['sample1', 'sample2'], 
+                                            'genus_file': 'test_chewbbaca_per_genus/output/salmonella_samples.txt'},
+                            'shigella': {'samples': ['sample4', 'sample5'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/shigella_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
+        self.assertEqual(expected_output, actual_output)
+
+    def test_genus_dict_multifiles_multigenera_ignoring_nonsupported(self):
+        """Testing whether the dictionary with sample files is created properly
+        when multiple samples from multiple genera are included. However, 
+        unsupported genera (in this case fakegenus) should be ignored.
+        """
+
+        best_hit_files = ['test_chewbbaca_per_genus/sample1/best_species_hit.txt', 
+                            'test_chewbbaca_per_genus/sample2/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample3/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample4/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample5/best_species_hit.txt',
+                            'test_chewbbaca_per_genus/sample6/best_species_hit.txt']
+        input_chewbbaca = chewbbaca_input_files.inputChewBBACA(best_hit_kmerfinder_files=best_hit_files,
+                                                        sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
+                                                        output_dir='test_chewbbaca_per_genus/output')
+        input_chewbbaca.make_file_with_samples_per_genus()
+        expected_output = {'escherichia': {'samples': ['sample4'], 
+                                            'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
+                            'listeria': {'samples': ['sample3'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/listeria_samples.txt'},
+                            'listeria_optional': {'samples': ['sample3'], 
+                                                'genus_file': 'test_chewbbaca_per_genus/output/listeria_optional_samples.txt'},
+                            'salmonella': {'samples': ['sample1', 'sample2'], 
+                                            'genus_file': 'test_chewbbaca_per_genus/output/salmonella_samples.txt'},
+                            'shigella': {'samples': ['sample4', 'sample5'], 
+                                        'genus_file': 'test_chewbbaca_per_genus/output/shigella_samples.txt'}}
+        actual_output = input_chewbbaca.genera_input_dict
         self.assertEqual(expected_output, actual_output)
 
 

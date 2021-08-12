@@ -17,6 +17,7 @@ Snakemake rules (in order of execution):
 ##### Import config file, sample_sheet and set output folder names          #####
 #################################################################################
 
+from os.path import getsize, exists, abspath
 from yaml import safe_load
 
 #################################################################################
@@ -55,7 +56,9 @@ onerror:
     shell("""
 find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
 find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
-find {OUT}/cgmlst -maxdepth 1 -type d -name "results_*" -exec rm -rf {{}} \;
+if [ -f '{OUT}/cgmlst' ]; then
+    find {OUT}/cgmlst -maxdepth 1 -type d -name "results_*" -exec rm -rf {{}} \;
+fi
 echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
     """)
 
@@ -64,10 +67,9 @@ onsuccess:
     shell("""
         # Remove any file from check salmonella monophasic
         # TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
-        find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
-        find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
-        find {OUT}/serotype -type f -empty -exec rm {{}} \;
-        find {OUT}/identify_species/ -type f -name best_species_hit.txt -exec rm {{}} \;
+        find {OUT} -type f -name best_species_hit.txt -exec rm {{}} \;
+        find {OUT} -type f -empty -exec rm {{}} \;
+        find {OUT} -type d -empty -exec rm -rf {{}} \;
         echo -e "\tGenerating Snakemake report..."
         snakemake --config sample_sheet={sample_sheet} \
                     --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
@@ -85,15 +87,15 @@ onsuccess:
 localrules:
     all,
     aggregate_serotypes,
-    no_serotyper
+    no_serotyper,
+    enlist_samples_for_cgmlst_scheme,
+    cgmlst_multireport
 
 rule all:
     input:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
-        OUT+'/serotype/salmonella_serotype_multireport.csv',
-        OUT + '/serotype/ecoli_serotype_multireport.csv',
-        OUT + '/serotype/spneumoniae_serotype_multireport.csv',
+        OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv",
-        result = OUT + '/cgmlst/cgmlst_finished.txt'
+        result = OUT + '/cgmlst_multireport.csv'
 
 

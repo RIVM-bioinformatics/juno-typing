@@ -67,6 +67,7 @@ class cgMLSTSchemes(base_juno_pipeline.helper_functions.JunoHelpers):
             species_to_download.append('shigella')
         if 'listeria' in species_to_download:
             species_to_download.append('listeria_optional')
+        species_to_download = list(set(species_to_download))
         species_not_found = [species for species in self.species_list if species not in self.schemes]
         
         some_species_not_supported = len(species_not_found) > 0
@@ -101,7 +102,7 @@ class cgMLSTSchemes(base_juno_pipeline.helper_functions.JunoHelpers):
                         check = True, timeout=200, 
                         cwd=output_dir_species)
         subprocess.run(['gunzip', output_file], 
-                        check = True, timeout=600, 
+                        check = True, timeout=100, 
                         cwd=output_dir_species)
         return True
 
@@ -213,7 +214,7 @@ if __name__ == '__main__':
                                             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     argument_parser.add_argument('-s','--species', metavar='N', 
                         type=str, nargs='+',
-                        choices=['campylobacter', 'escherichia', 'listeria', 'salmonella', 'shigella', 'yersinia'],
+                        choices=['campylobacter', 'escherichia', 'listeria', 'listeria_optional', 'salmonella', 'shigella', 'yersinia'],
                         default=['campylobacter', 'escherichia', 'listeria', 'salmonella', 'shigella', 'yersinia'],
                         help='Species whose cgMLST scheme should be downloaded')
     argument_parser.add_argument('-o', '--output_dir', type=pathlib.Path, 
