@@ -90,8 +90,6 @@ rule ecoli_serotyper:
         csv = OUT + '/serotype/{sample}/result_serotype.csv'
     log:
         OUT+'/log/serotype_ecoli/{sample}.log'
-    # benchmark:
-    #     OUT+'/log/benchmark/serotype_ecoli/{sample}.txt'
     conda: 
         '../../envs/serotypefinder.yaml'
     threads: config["threads"]["serotypefinder"]
@@ -124,8 +122,6 @@ rule seroba:
         OUT + "/serotype/{sample}/pred.tsv"
     log:
         OUT+'/log/serotype_spneumoniae/{sample}.log'
-    # benchmark:
-    #     OUT+'/log/benchmark/serotype_spneumoniae/{sample}.txt'
     conda:
         "../../envs/seroba.yaml"
     threads: config["threads"]["seroba"]

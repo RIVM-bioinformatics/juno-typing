@@ -4,17 +4,8 @@ rule serotype_multireports:
     input:
         expand(OUT+'/serotype/{sample}_done.txt', sample = SAMPLES)
     output:
-<<<<<<< HEAD
-        salmonella = OUT + '/serotype/salmonella_serotype_multireport.csv',
-        ecoli = OUT + '/serotype/ecoli_serotype_multireport.csv',
-        spneumoniae = OUT + '/serotype/spneumoniae_serotype_multireport.csv'        
-    # benchmark:
-    #     OUT+'/log/benchmark/serotype/serotype_multireport.txt'
-    threads: 1
-=======
         OUT + '/serotype/serotyper_multireport.csv'
     threads: config["threads"]["other"]
->>>>>>> 9f0c35587ec974eca5e4d64feacc9ca05f72253c
     resources: mem_gb=config["mem_gb"]["other"]
     log:
         OUT+'/log/serotype/serotype_multireport.log'
