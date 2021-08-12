@@ -8,6 +8,7 @@ def choose_serotyper(wildcards):
         is_salmonella = species_res.find("salmonella") != -1
         is_ecoli = species_res.find("escherichia") != -1
         is_strepto = species_res.find("streptococcus") != -1
+        is_shigella = species_res.find("shigella") != -1
         if is_salmonella:
             return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
                     OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
@@ -16,6 +17,9 @@ def choose_serotyper(wildcards):
                     OUT + '/serotype/{sample}/result_serotype.csv']
         elif is_strepto:
             return [OUT + '/serotype/{sample}/pred.tsv']
+        elif is_shigella:
+            #TODO fill in what to return here for shigella, depends on the tool
+            return [OUT + 'serotype/command_line/{sample}.txt']
         else:
             return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
@@ -141,6 +145,38 @@ mv {wildcards.sample}/* $OUTPUT_DIR
         """
 
 #-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+### Shigella serotyper ###
+
+#TODO change name to tool being used
+rule shigatyper:
+    input:
+        r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
+        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
+        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
+    output:
+        #TODO give correct output, same as at the start of this file
+        #OUT + 'serotype/{sample}/test.csv'
+        OUT + 'serotype/command_line/{sample}.txt'
+    log:
+        OUT+'/log/serotype_shigella/{sample}.log'
+    conda:
+        #TODO make shigella yaml file of the env, depends on tool
+        "../../envs/shigatyper.yaml"
+    #TODO threads depending on the tool being used
+    #threads: config["threads"]["seroba"]
+    #TODO where are these coming from?
+    resources: mem_gb=config["mem_gb"]["seroba"]
+
+    shell:
+    #TODO add shigella pipeline command
+        """
+shigatyper {input.r1} {input.r2} > {output}
+        """
+
+#-----------------------------------------------------------------------------#
+
 ## No serotyper necessary
 
 rule no_serotyper:
