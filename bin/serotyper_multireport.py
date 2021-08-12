@@ -42,7 +42,6 @@ class SeqSero2Multireport(SerotyperMultireport):
                                                 ignore_index=True)
         # In file names, remove everything after the first underscore
         multireport["Sample name"] = self.sample_names
-        #multireport["Sample name"] = [ file_n.split("_")[0] for file_n in multireport["Sample name"].tolist() ]
         self.multireport = multireport
     
 
