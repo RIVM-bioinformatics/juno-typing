@@ -78,9 +78,10 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
                                                         output_dir='test_output',
                                                         threads=2,
                                                         download_loci=False)
-        self.assertFalse(pathlib.Path('test_output').is_dir())
         dir_with_downloaded_scheme = pathlib.Path('test_output', 'salmonella')
         self.assertFalse(dir_with_downloaded_scheme.is_dir())
+        self.assertFalse(pathlib.Path('test_output').is_dir())
+        
 
     def test_output_dir_is_not_removed_if_not_empty(self):
         """Testing there is no error if output dir does not exist and that
@@ -416,6 +417,7 @@ class TestChewbbacaPerGenus(unittest.TestCase):
         genus is created properly for a Escherichia and Shigella samples
         combined. They should not overwrite each other
         """
+        # TODO: This might change if we improve identification and then Shigella only needs to run one schema
 
         best_hit_files = ['test_chewbbaca_per_genus/sample4/best_species_hit.txt',
                             'test_chewbbaca_per_genus/sample5/best_species_hit.txt']
@@ -423,7 +425,7 @@ class TestChewbbacaPerGenus(unittest.TestCase):
                                                         sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
                                                         output_dir='test_chewbbaca_per_genus/output')
         input_chewbbaca.make_file_with_samples_per_genus()
-        expected_output = {'escherichia': {'samples': ['sample4'], 
+        expected_output = {'escherichia': {'samples': ['sample4', 'sample5'], 
                                         'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
                             'shigella': {'samples': ['sample4', 'sample5'], 
                                         'genus_file': 'test_chewbbaca_per_genus/output/shigella_samples.txt'}}
@@ -434,6 +436,7 @@ class TestChewbbacaPerGenus(unittest.TestCase):
         """Testing whether the dictionary with sample files is created properly
         when multiple samples from multiple genera are included
         """
+        # TODO: This might change if we improve identification and then Shigella only needs to run one schema
 
         best_hit_files = ['test_chewbbaca_per_genus/sample1/best_species_hit.txt', 
                             'test_chewbbaca_per_genus/sample2/best_species_hit.txt',
@@ -444,7 +447,7 @@ class TestChewbbacaPerGenus(unittest.TestCase):
                                                         sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
                                                         output_dir='test_chewbbaca_per_genus/output')
         input_chewbbaca.make_file_with_samples_per_genus()
-        expected_output = {'escherichia': {'samples': ['sample4'], 
+        expected_output = {'escherichia': {'samples': ['sample4', 'sample5'], 
                                             'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
                             'listeria': {'samples': ['sample3'], 
                                         'genus_file': 'test_chewbbaca_per_genus/output/listeria_samples.txt'},
@@ -463,6 +466,8 @@ class TestChewbbacaPerGenus(unittest.TestCase):
         unsupported genera (in this case fakegenus) should be ignored.
         """
 
+        # TODO: This might change if we improve identification and then Shigella only needs to run one schema
+
         best_hit_files = ['test_chewbbaca_per_genus/sample1/best_species_hit.txt', 
                             'test_chewbbaca_per_genus/sample2/best_species_hit.txt',
                             'test_chewbbaca_per_genus/sample3/best_species_hit.txt',
@@ -473,7 +478,7 @@ class TestChewbbacaPerGenus(unittest.TestCase):
                                                         sample_sheet='test_chewbbaca_per_genus/sample_sheet.yaml',
                                                         output_dir='test_chewbbaca_per_genus/output')
         input_chewbbaca.make_file_with_samples_per_genus()
-        expected_output = {'escherichia': {'samples': ['sample4'], 
+        expected_output = {'escherichia': {'samples': ['sample4', 'sample5'], 
                                             'genus_file': 'test_chewbbaca_per_genus/output/escherichia_samples.txt'},
                             'listeria': {'samples': ['sample3'], 
                                         'genus_file': 'test_chewbbaca_per_genus/output/listeria_samples.txt'},
