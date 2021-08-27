@@ -39,6 +39,8 @@ class inputChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
             genus.append('listeria_optional')
         elif genus[0] == 'escherichia':
             genus.append('shigella')
+        elif genus[0] == 'shigella':
+            genus.append('escherichia')
         return sample_name, genus
 
     def __get_genus_per_sample(self):
