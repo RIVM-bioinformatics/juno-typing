@@ -8,7 +8,7 @@
 
 ## Pipeline information
 
-* **Author(s):**            Alejandra Hernández Segura
+* **Author(s):**            Alejandra Hernández Segura, Roxanne Wolthuis
 * **Organization:**         Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 * **Department:**           Infektieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS), Bacteriologie (BPD)
 * **Start date:**           01 - 03 - 2021
@@ -31,6 +31,7 @@ The Juno-typing pipeline will then perform the following steps:
     - _Salmonella_ serotyper by using the [SeqSero2](https://journals.asm.org/doi/10.1128/aem.01746-19?permanently=true&) tool and an _in silico_ adaptation of the PCR suggested by [Tennant et al. 2010](https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0000621).
     - _E. coli_ serotyper by using the [SerotypeFinder](https://bitbucket.org/genomicepidemiology/serotypefinder/src/master/) tool.
     - _S. pneumoniae_ serotyper by using the [Seroba](https://github.com/sanger-pathogens/seroba) tool.
+    - _Shigella_ serotyper by using the [ShigaTyper](https://github.com/CFSAN-Biostatistics/shigatyper) tool.
 
 ![](files/DAG.svg)
 
@@ -104,7 +105,7 @@ python juno_typing.py -i my_input_files -o my_results --db_dir my_db_dir --local
 
 * **log:** Log files with output and error files from each Snakemake rule/step that is performed. 
 * **audit_trail:** Information about the versions of software and databases used.
-* **output per sample:** The pipeline will create one subfolder per each step performed (identify_species, mlst7, serotype). These subfolders will in turn contain another subfolder per sample. To understand the ouptut, please refer to the manuals of each individual tool. Besides, one csv file containing the summarized results of all the samples will be produced: 'serotype/salmonella_serotype_multireport.csv', 'serotype/ecoli_serotype_multireport.csv', 'serotype/spneumoniae_serotype_multireport.csv' and "mlst7/mlst7_multireport.csv".
+* **output per sample:** The pipeline will create one subfolder per each step performed (identify_species, mlst7, serotype). These subfolders will in turn contain another subfolder per sample. To understand the output, please refer to the manuals of each individual tool. Inside the serotype folder, there will be generated a .csv file that summarizes the results of all the samples for each serotyper that has run(serotype_multireport.csv, serotype_multireport1.csv, serotype_multireport2.csv, serotype_multireport3.csv).
         
 ## Issues  
 
@@ -113,7 +114,7 @@ python juno_typing.py -i my_input_files -o my_results --db_dir my_db_dir --local
 
 ## Future ideas for this pipeline
 
-* Add a serotyper for _Shigella_.
+* -
 
 ## License
 This pipeline is licensed with an AGPL3 license. Detailed information can be found inside the 'LICENSE' file in this repository.
@@ -121,3 +122,8 @@ This pipeline is licensed with an AGPL3 license. Detailed information can be fou
 ## Contact
 * **Contact person:**       Alejandra Hernández Segura
 * **Email**                 alejandra.hernandez.segura@rivm.nl
+
+For Shigella related questions:
+* **Contact person:**       Roxanne Wolthuis
+* **Email**                 roxanne.wolthuis@rivm.nl
+

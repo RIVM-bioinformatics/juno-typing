@@ -17,6 +17,7 @@ mem_gb:
   seqsero2: 10
   serotypefinder: 10
   seroba: 10
+  shigatyper: 8
 
 # Pipeline parameters (not taken from user)
 salmonellamonophasic:
