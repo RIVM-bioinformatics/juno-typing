@@ -102,7 +102,6 @@ class SerotypeFinderMultireport(SerotyperMultireport):
         results_df.reset_index(inplace=True)
         self.multireport = results_df
 
-
 class SerobaMultireport(SerotyperMultireport):
     """Class combining results from multiple Seroba results (used for 
     S. pneumoniae)
@@ -113,6 +112,34 @@ class SerobaMultireport(SerotyperMultireport):
         results = [pd.read_csv(file, sep = '\t', header = None, names = names) for file in self.input_files]
         results_df = results[0].append(results[1:])
         results_df.to_csv(self.output_file, index = False)
+        self.multireport = results_df
+
+class ShigatyperMultireport(SerotyperMultireport):
+
+    def make_multireport(self):
+        dflist_shigatyper = []
+        dflist_command = []
+        # We combined ecoli and shigatyper, so now this code wants to run for every output file
+        # it only needs to run for the shigella output files
+        # this code needs to be changed before the pipeline can function again
+        for outfile in self.input_files:
+            dirname_splitted = str(outfile).split("/")
+
+            if "command" in str(outfile):
+                df = pd.read_csv(outfile, delimiter = "\t")
+                df.drop(columns=['sample'], inplace=True)
+                df.insert(0, "Samplename", dirname_splitted[-2])
+                dflist_command.append(df)
+
+            if "shigatyper" in str(outfile):
+                df = pd.read_csv(outfile, delimiter = ",")
+                df.insert(0, "Samplename", dirname_splitted[-2]) 
+                dflist_shigatyper.append(df)
+                    
+        final_df_shigatyper = pd.concat(dflist_shigatyper, axis=0, ignore_index=True)
+        final_df_command = pd.concat(dflist_command, axis=0, ignore_index=True)
+        results_df = pd.merge(final_df_shigatyper, final_df_command, on="Samplename")
+        results_df.to_csv(self.output_file, mode='a', index=False)
         self.multireport = results_df
 
 
@@ -131,7 +158,8 @@ class ChooseMultireport():
     def __classify_serotyper_result_files(self):
         input_files = {'seqsero2': [],
                         'serotypefinder': [],
-                        'seroba': []}
+                        'seroba': [],
+                        'shigatyper': []}
         for file_ in self.serotyper_result_files:
             if file_.endswith('final_salmonella_serotype.tsv'):
                 input_files['seqsero2'].append(file_)
@@ -139,6 +167,8 @@ class ChooseMultireport():
                 input_files['serotypefinder'].append(file_)
             elif file_.endswith('pred.tsv'):
                 input_files['seroba'].append(file_)
+            elif file_.endswith('command.txt') or file_.endswith('shigatyper.csv'):
+                input_files['shigatyper'].append(file_)
             else:
                 raise ValueError(f'The file {file_} is not recognized as a result from a supported serotyper.')
         input_files = {k:v for k, v in input_files.items() if len(v) > 0}
@@ -162,6 +192,9 @@ class ChooseMultireport():
                                                     output_file=output_file[0])
             elif serotyper_tool == 'serotypefinder':
                 multireport = SerotypeFinderMultireport(input_files=self.input_files[serotyper_tool],
+                                                        output_file=output_file[0])
+            elif serotyper_tool == 'shigatyper':
+                multireport = ShigatyperMultireport(input_files=self.input_files[serotyper_tool],
                                                         output_file=output_file[0])
             else:
                 multireport = SerobaMultireport(input_files=self.input_files[serotyper_tool],
