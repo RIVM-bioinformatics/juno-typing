@@ -12,14 +12,13 @@ def choose_serotyper(wildcards):
         if is_salmonella:
             return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
                     OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
-        elif is_ecoli:
+        elif is_ecoli or is_shigella:
             return [OUT + '/serotype/{sample}/data.json',
-                    OUT + '/serotype/{sample}/result_serotype.csv']
+                    OUT + '/serotype/{sample}/result_serotype.csv',
+                    OUT + '/serotype/{sample}/shigatyper.csv',
+                    OUT + '/serotype/{sample}/command.txt']
         elif is_strepto:
             return [OUT + '/serotype/{sample}/pred.tsv']
-        elif is_shigella:
-            #TODO fill in what to return here for shigella, depends on the tool
-            return [OUT + '/serotype/command_line/{sample}.txt']
         else:
             return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
@@ -53,7 +52,7 @@ rule salmonella_serotyper:
     benchmark:
         OUT+'/log/benchmark/serotype_salmonella/{sample}.txt'
     log:
-        OUT+'/log/serotype_salmonella/{sample}.log'
+        OUT+'/log/serotype/{sample}_salmonella.log'
     params:
         output_dir = OUT + '/serotype/{sample}/',
         min_cov = config['salmonellamonophasic']['min_cov']
@@ -89,7 +88,7 @@ rule ecoli_serotyper:
         json = OUT + '/serotype/{sample}/data.json',
         csv = OUT + '/serotype/{sample}/result_serotype.csv'
     log:
-        OUT+'/log/serotype_ecoli/{sample}.log'
+        OUT+'/log/serotype/{sample}_ecoli.log'
     conda: 
         '../../envs/serotypefinder.yaml'
     threads: config["threads"]["serotypefinder"]
@@ -121,7 +120,7 @@ rule seroba:
     output:
         OUT + "/serotype/{sample}/pred.tsv"
     log:
-        OUT+'/log/serotype_spneumoniae/{sample}.log'
+        OUT+'/log/serotype/{sample}_spneumoniae.log'
     conda:
         "../../envs/seroba.yaml"
     threads: config["threads"]["seroba"]
@@ -145,30 +144,36 @@ mv {wildcards.sample}/* $OUTPUT_DIR
 #-----------------------------------------------------------------------------#
 ### Shigella serotyper ###
 
-#TODO change name to tool being used
+
 rule shigatyper:
     input:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
         species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output:
-        #TODO give correct output, same as at the start of this file
-        #OUT + 'serotype/{sample}/test.csv'
-        OUT + '/serotype/command_line/{sample}.txt'
+        sample_out = OUT + '/serotype/{sample}/shigatyper.csv',
+        command_out = OUT + '/serotype/{sample}/command.txt'
     log:
-        OUT+'/log/serotype_shigella/{sample}.log'
+        OUT+'/log/serotype/{sample}_shigella.log'
     conda:
-        #TODO make shigella yaml file of the env, depends on tool
         "../../envs/shigatyper.yaml"
-    #TODO threads depending on the tool being used
-    #threads: config["threads"]["seroba"]
-    #TODO where are these coming from?
-    resources: mem_gb=config["mem_gb"]["seroba"]
-
+    resources: mem_gb=config["mem_gb"]["shigatyper"]
+    params:
+        output_dir = OUT + "/serotype/{sample}"
     shell:
-    #TODO add shigella pipeline command
         """
-shigatyper {input.r1} {input.r2} > {output}
+CURRENT_DIR=$(pwd)
+cd "{params.output_dir}"
+
+shigatyper {input.r1} {input.r2} > "$(basename {output.command_out})" 2> {log}
+
+for file in *.csv
+do 
+    file_stem=$(echo ${{file%\.*}})
+    if [[ {wildcards.sample} = *"$file_stem"* ]]; then
+        mv "${{file}}" "${{file/*/shigatyper.csv}}"
+    fi
+done
         """
 
 #-----------------------------------------------------------------------------#

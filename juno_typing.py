@@ -21,7 +21,7 @@ Snakemake rules (in order of execution):
 """
 
 # Dependencies
-import base_juno_pipeline
+from base_juno_pipeline import *
 import argparse
 import pandas as pd
 import pathlib
@@ -32,14 +32,16 @@ import yaml
 # Own scripts
 import bin.download_dbs
 
-class JunoTypingRun():
+class JunoTypingRun(base_juno_pipeline.PipelineStartup,
+                    base_juno_pipeline.RunSnakemake):
     """Class with the arguments and specifications that are only for the Juno-typing pipeline but inherit from PipelineStartup and RunSnakemake"""
-
+    
     def __init__(self, 
                 input_dir, 
                 output_dir, 
                 metadata = None, 
                 db_dir = "/mnt/db/juno/typing_db", 
+                update_dbs=False,
                 serotypefinder_mincov=0.6, 
                 serotypefinder_identity=0.85,
                 seroba_mincov=20, 
@@ -50,42 +52,65 @@ class JunoTypingRun():
                 unlock=False,
                 rerunincomplete=False,
                 dryrun=False,
-                update_dbs=False):
+                run_in_container=False,
+                singularity_prefix=None,
+                conda_prefix=None,
+                **kwargs):
         """Initiating Juno-typing pipeline"""
 
-        # Pipeline attributes
-        self.pipeline_info = {'pipeline_name': "Juno-typing",
-                                'pipeline_version': "0.1"}
-        self.snakefile = "Snakefile"
+        # From StartupPipeline
+        self.input_dir = pathlib.Path(input_dir).resolve()
+        self.input_type = 'both'
+        self.min_num_lines = 2 # TODO: Find ideal min num of reads/lines needed
+
+        # From RunSnakemake 
+        self.pipeline_name = 'Juno_typing'
+        self.pipeline_version = '0.2'
+        self.output_dir = pathlib.Path(output_dir).resolve()
+        self.db_dir = pathlib.Path(db_dir).resolve()
+        self.workdir = pathlib.Path(__file__).parent.resolve()
         self.sample_sheet = "config/sample_sheet.yaml"
-        self.input_dir = pathlib.Path(input_dir)
-        self.output_dir = pathlib.Path(output_dir)
+        self.user_parameters = pathlib.Path('config/user_parameters.yaml')
+        self.fixed_parameters = pathlib.Path('config/pipeline_parameters.yaml')
+        self.snakefile = 'Snakefile'
+        self.cores = cores
+        self.local = local
+        self.path_to_audit = self.output_dir.joinpath('audit_trail')
+        self.snakemake_report = str(self.path_to_audit.joinpath('juno_typing_report.html'))
+        self.queue = queue
+        self.unlock = unlock
+        self.dryrun = dryrun
+        self.rerunincomplete = rerunincomplete
+        if run_in_container:
+            self.useconda = False
+            self.usesingularity = True
+        else:
+            self.useconda = True
+            self.usesingularity = False
+        self.conda_frontend = 'mamba'
+        self.conda_prefix = conda_prefix
+        self.singularityargs = f"--bind {self.input_dir}:{self.input_dir} --bind {self.output_dir}:{self.output_dir} --bind {self.db_dir}:{self.db_dir}"
+        self.singularity_prefix = singularity_prefix
+        self.restarttimes = 0 # Set to 1 because kmerfinder sometime fails. Once it is replaced, it can be 0
+        self.latency = 60
+        self.kwargs = kwargs
+
+        # Pipeline attributes
         if metadata is not None:
             self.metadata = pathlib.Path(metadata)
         else:
             self.metadata = None
-        self.db_dir = pathlib.Path(db_dir).absolute()
         self.serotypefinder_mincov=serotypefinder_mincov
         self.serotypefinder_identity=serotypefinder_identity
         self.seroba_mincov=seroba_mincov
         self.seroba_kmersize = seroba_kmersize
         self.update_dbs = update_dbs
-        self.workdir = pathlib.Path(__file__).parent.absolute()
-        self.useconda = True
-        self.usesingularity = False
-        self.singularityargs = ""
-        self.user_parameters = pathlib.Path("config/user_parameters.yaml")
-        self.extra_software_versions = pathlib.Path('config/extra_software_versions.yaml')
-        self.output_dir = output_dir
-        self.restarttimes = 0    
-        # Checking if the input_dir comes from the Juno-assembly pipeline 
-        self.startup = self.start_pipeline()
 
-        # Parse arguments specific from the user
+        # Start pipeline
+        self.start_juno_typing_pipeline()
         self.user_params = self.write_userparameters()
-        
-        # Download databases if necessary
-        if not unlock and not dryrun:
+        self.get_run_info()
+        if not self.dryrun or self.unlock:
             downloads_juno_typing = bin.download_dbs.DownloadsJunoTyping(self.db_dir,
                                                                         update_dbs=self.update_dbs,
                                                                         kmerfinder_asked_version='3.0.2',
@@ -95,30 +120,12 @@ class JunoTypingRun():
                                                                         serotypefinder_db_asked_version='master',
                                                                         seroba_db_asked_version='master')
             self.downloads_versions = downloads_juno_typing.downloaded_versions
-
-        # Run snakemake
-        snakemake_run = base_juno_pipeline.RunSnakemake(pipeline_name = self.pipeline_info['pipeline_name'],
-                                            pipeline_version = self.pipeline_info['pipeline_version'],
-                                            sample_sheet = self.sample_sheet,
-                                            output_dir = self.output_dir,
-                                            workdir = self.workdir,
-                                            snakefile = self.snakefile,
-                                            cores = cores,
-                                            local = local,
-                                            queue = queue,
-                                            unlock = unlock,
-                                            rerunincomplete = rerunincomplete,
-                                            dryrun = dryrun,
-                                            useconda = self.useconda,
-                                            usesingularity = self.usesingularity,
-                                            singularityargs = self.singularityargs,
-                                            restarttimes = self.restarttimes)
-        if not unlock and not dryrun:
-            db_audit_file = snakemake_run.path_to_audit.joinpath('database_versions.yaml')
-            with open(db_audit_file, 'w') as file:
-                yaml.dump(self.downloads_versions, file, default_flow_style=False)
-        self.successful_run = snakemake_run.run_snakemake()
+            self.path_to_audit.mkdir(parents=True, exist_ok=True)
+            self.audit_trail = self.generate_audit_trail()
+        self.successful_run = self.run_snakemake()
         assert self.successful_run, f'Please check the log files'
+        if not self.dryrun or self.unlock:
+            self.make_snakemake_report()
 
 
     def add_metadata(self, samples_dic):
@@ -139,7 +146,7 @@ class JunoTypingRun():
             except:
                 pass
 
-    def start_pipeline(self):
+    def start_juno_typing_pipeline(self):
         """Function to start the pipeline (some steps from PipelineStartup need to be modified for the Juno-typing pipeline to accept fastq and fasta input"""
         # Taking fastq input as the Startup just to inherit all the same attributes
         # from parent class (PipelineStartup). The fasta sample sheet is created 
@@ -174,11 +181,7 @@ class JunoTypingRun():
         with open(self.user_parameters, 'w') as file:
             yaml.dump(config_params, file, default_flow_style=False)
 
-        return config_params
-    
-    
-
-        
+        return config_params     
         
 
 
@@ -293,11 +296,19 @@ if __name__ == '__main__':
         action='store_true',
         help="Re-run jobs if they are marked as incomplete (passed to snakemake)."
     )
+    parser.add_argument(
+        "--snakemake-args",
+        nargs='*',
+        default={},
+        action=helper_functions.SnakemakeKwargsAction,
+        help="Extra arguments to be passed to snakemake API (https://snakemake.readthedocs.io/en/stable/api_reference/snakemake.html)."
+    )
     args = parser.parse_args()
     JunoTypingRun(input_dir = args.input, 
                     output_dir = args.output, 
                     metadata = args.metadata,
                     db_dir = args.db_dir,
+                    update_dbs = args.update,
                     serotypefinder_mincov = args.serotypefinder_mincov,
                     serotypefinder_identity = args.serotypefinder_identity,
                     seroba_mincov = args.seroba_mincov,
@@ -308,4 +319,7 @@ if __name__ == '__main__':
                     unlock = args.unlock,
                     rerunincomplete = args.rerunincomplete,
                     dryrun = args.dryrun,
-                    update_dbs = args.update)
+                    run_in_container=False,
+                    singularity_prefix=None,
+                    conda_prefix=None,
+                    **args.snakemake_args)

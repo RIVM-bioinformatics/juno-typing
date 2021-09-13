@@ -65,18 +65,12 @@ echo -e "Something went wrong with Juno-typing pipeline. Please check the loggin
 
 onsuccess:
     shell("""
-        # Remove any file from check salmonella monophasic
-        # TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
-        find {OUT} -type f -name best_species_hit.txt -exec rm {{}} \;
-        find {OUT} -type f -empty -exec rm {{}} \;
-        find {OUT} -type d -empty -exec rm -rf {{}} \;
-        echo -e "\tGenerating Snakemake report..."
-        snakemake --config sample_sheet={sample_sheet} \
-                    --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
-                    --cores 1 --unlock
-        snakemake --config sample_sheet={sample_sheet} \
-                    --configfile config/pipeline_parameters.yaml config/user_parameters.yaml \
-                    --cores 1 --report '{OUT}/audit_trail/snakemake_report.html'
+# Remove any file from check salmonella monophasic
+# TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
+find {OUT} -type f -name best_species_hit.txt -exec rm {{}} \;
+find {OUT} -type f -empty -exec rm {{}} \;
+find {OUT} -type d -empty -exec rm -rf {{}} \;
+# Report made with wrapper
         """)
 
 
@@ -94,6 +88,7 @@ localrules:
 rule all:
     input:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
+        expand(OUT + "/identify_species/{sample}/best_species_hit.txt", sample = SAMPLES),
         OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv",
         result = OUT + '/cgmlst_multireport.csv'
