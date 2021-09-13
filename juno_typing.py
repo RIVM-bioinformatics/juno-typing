@@ -77,7 +77,7 @@ class JunoTypingRun():
         self.user_parameters = pathlib.Path("config/user_parameters.yaml")
         self.extra_software_versions = pathlib.Path('config/extra_software_versions.yaml')
         self.output_dir = output_dir
-        self.restarttimes = 1     
+        self.restarttimes = 0    
         # Checking if the input_dir comes from the Juno-assembly pipeline 
         self.startup = self.start_pipeline()
 

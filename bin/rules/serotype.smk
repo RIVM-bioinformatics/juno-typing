@@ -19,7 +19,7 @@ def choose_serotyper(wildcards):
             return [OUT + '/serotype/{sample}/pred.tsv']
         elif is_shigella:
             #TODO fill in what to return here for shigella, depends on the tool
-            return [OUT + 'serotype/command_line/{sample}.txt']
+            return [OUT + '/serotype/command_line/{sample}.txt']
         else:
             return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
@@ -154,7 +154,7 @@ rule shigatyper:
     output:
         #TODO give correct output, same as at the start of this file
         #OUT + 'serotype/{sample}/test.csv'
-        OUT + 'serotype/command_line/{sample}.txt'
+        OUT + '/serotype/command_line/{sample}.txt'
     log:
         OUT+'/log/serotype_shigella/{sample}.log'
     conda:
