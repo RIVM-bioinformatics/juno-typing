@@ -29,7 +29,7 @@ done
 echo "Input serotype:"
 echo $input_serotype &>> {log}
 
-if [[ "$input_serotype" = *[\ ]* ]]; then
+if [[ -z "${{input_serotype// }}" ]]; then
     touch {output}
 else
     python bin/serotyper_multireport.py -i ${{input_serotype}} -o {params.output_dir} &>> {log}

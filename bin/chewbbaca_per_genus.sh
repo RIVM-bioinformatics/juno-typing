@@ -1,4 +1,5 @@
 set -euo pipefail
+set -x
 
 # Input user
 input_files=$(realpath "$1")
@@ -15,7 +16,7 @@ script_path="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 echo "Deleting any previous results from old ChewBBACA runs if existing in ${output_dir}...\n"
 rm -rf "results_*"  
 
-if [ ! -d "${prepared_scheme}" ]; then
+if [ ! -f "${prepared_scheme}_summary_stats.txt" ]; then
     echo "\nPreparing scheme for running it with ChewBBACA...\n"
     chewBBACA.py PrepExternalSchema -i "${downloaded_scheme}" \
         --output-directory "${prepared_scheme}" \
