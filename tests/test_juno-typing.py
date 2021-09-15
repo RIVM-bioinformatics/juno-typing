@@ -12,40 +12,40 @@ import juno_typing
 
 
 
-@unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
-                    "Skipped in non-RIVM environments (for sake of time)")
-class TestDownloadDbs(unittest.TestCase):
-    """Testing the downloading of databases and software used by the pipeline"""
+# @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
+#                     "Skipped in non-RIVM environments (for sake of time)")
+# class TestDownloadDbs(unittest.TestCase):
+#     """Testing the downloading of databases and software used by the pipeline"""
 
-    def setUpClass():
-        pathlib.Path('fake_db').mkdir(exist_ok = True)
+#     def setUpClass():
+#         pathlib.Path('fake_db').mkdir(exist_ok = True)
 
-    def tearDownClass():
-        os.system('rm -rf fake_db')
+#     def tearDownClass():
+#         os.system('rm -rf fake_db')
 
-    def test_download_all_dbs(self):
-        """Testing all databases/software are downloaded and set up"""
+#     def test_download_all_dbs(self):
+#         """Testing all databases/software are downloaded and set up"""
 
-        path_to_db = pathlib.Path('fake_db')
-        downloads = download_dbs.DownloadsJunoTyping(path_to_db, 
-                                                    update_dbs=True,
-                                                    kmerfinder_asked_version='3.0.2',
-                                                    cge_mlst_asked_version='2.0.4',
-                                                    kmerfinder_db_asked_version='20210425',
-                                                    mlst7_db_asked_version='master',
-                                                    serotypefinder_db_asked_version='master',
-                                                    seroba_db_asked_version='master',
-                                                    seroba_kmersize=50)
-        self.assertEqual(downloads.seroba_kmersize, 50)
-        self.assertEqual(downloads.downloaded_versions['kmerfinder'], '3.0.2')
-        self.assertEqual(downloads.downloaded_versions['mlst7'], '2.0.4')
-        self.assertEqual(downloads.downloaded_versions['kmerfinder_db'], '20210425')
-        self.assertTrue(path_to_db.joinpath('kmerfinder', 'kmerfinder.py').exists())
-        self.assertTrue(path_to_db.joinpath('cge-mlst', 'mlst.py').exists())
-        self.assertTrue(path_to_db.joinpath('kmerfinder_db', 'config').exists())
-        self.assertTrue(path_to_db.joinpath('mlst7_db', 'senterica', 'senterica.length.b').exists())
-        self.assertTrue(path_to_db.joinpath('serotypefinder_db', 'H_type.seq.b').exists())
-        self.assertTrue(path_to_db.joinpath('seroba_db', 'database', 'cdhit_cluster').exists())
+#         path_to_db = pathlib.Path('fake_db')
+#         downloads = download_dbs.DownloadsJunoTyping(path_to_db, 
+#                                                     update_dbs=True,
+#                                                     kmerfinder_asked_version='3.0.2',
+#                                                     cge_mlst_asked_version='2.0.4',
+#                                                     kmerfinder_db_asked_version='20210425',
+#                                                     mlst7_db_asked_version='master',
+#                                                     serotypefinder_db_asked_version='master',
+#                                                     seroba_db_asked_version='master',
+#                                                     seroba_kmersize=50)
+#         self.assertEqual(downloads.seroba_kmersize, 50)
+#         self.assertEqual(downloads.downloaded_versions['kmerfinder'], '3.0.2')
+#         self.assertEqual(downloads.downloaded_versions['mlst7'], '2.0.4')
+#         self.assertEqual(downloads.downloaded_versions['kmerfinder_db'], '20210425')
+#         self.assertTrue(path_to_db.joinpath('kmerfinder', 'kmerfinder.py').exists())
+#         self.assertTrue(path_to_db.joinpath('cge-mlst', 'mlst.py').exists())
+#         self.assertTrue(path_to_db.joinpath('kmerfinder_db', 'config').exists())
+#         self.assertTrue(path_to_db.joinpath('mlst7_db', 'senterica', 'senterica.length.b').exists())
+#         self.assertTrue(path_to_db.joinpath('serotypefinder_db', 'H_type.seq.b').exists())
+#         self.assertTrue(path_to_db.joinpath('seroba_db', 'database', 'cdhit_cluster').exists())
 
 
 
@@ -78,11 +78,16 @@ class TestJunoTypingDryRun(unittest.TestCase):
         for folder in fake_dirs:
             pathlib.Path(folder).mkdir(exist_ok = True)
         for file_ in fake_files:
-            pathlib.Path(file_).touch(exist_ok = True)
+            with open(file_, mode='w') as metadata_file:
+                metadata_writer = csv.writer(metadata_file, 
+                                            delimiter=',', 
+                                            quotechar='"',
+                                            quoting=csv.QUOTE_MINIMAL)
+                metadata_writer.writerow(['content1'])
+                metadata_writer.writerow(['content2'])
 
         with open('fake_dir_wsamples/fake_metadata.csv', mode='w') as metadata_file:
             metadata_writer = csv.writer(metadata_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
             metadata_writer.writerow(['Sample', 'Genus', 'Species'])
             metadata_writer.writerow(['sample1', 'Salmonella', 'enterica'])
             metadata_writer.writerow(['sample2', 'Escherichia', 'coli'])
@@ -98,33 +103,21 @@ class TestJunoTypingDryRun(unittest.TestCase):
     
     def test_junotyping_dryrun(self):
         """Testing the pipeline runs properly as a dry run"""
-        raised = False
-        try:
-            juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
-                                    metadata= None,
-                                    output_dir = pathlib.Path('test_output'), 
-                                    db_dir = pathlib.Path('fake_db'),
-                                    dryrun = True)
-        except:
-            raised = True
-            raise
-        self.assertFalse(raised, 'Exception raised when running a dryrun')
+        juno_typing_run = juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
+                                                    metadata= None,
+                                                    output_dir = pathlib.Path('test_output'), 
+                                                    db_dir = pathlib.Path('fake_db'),
+                                                    dryrun = True)
+        self.assertTrue(juno_typing_run.successful_run, 'Exception raised when running a dryrun')
 
     def test_junotyping_dryrun_wMetadata(self):
         """Testing the pipeline runs properly as a dry run when providing a metadata file"""
-        raised = False
-        try:
-            juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
-                                    metadata= 'fake_dir_wsamples/fake_metadata.csv',
-                                    output_dir = pathlib.Path('test_output'), 
-                                    db_dir = pathlib.Path('fake_db'),
-                                    dryrun = True)
-        except:
-            raised = True
-            raise
-        self.assertFalse(raised, 'Exception raised when running a dryrun and providing a metadata file')
-
-
+        juno_typing_run = juno_typing.JunoTypingRun(input_dir = 'fake_dir_wsamples', 
+                                                    metadata= 'fake_dir_wsamples/fake_metadata.csv',
+                                                    output_dir = pathlib.Path('test_output'), 
+                                                    db_dir = pathlib.Path('fake_db'),
+                                                    dryrun = True)
+        self.assertTrue(juno_typing_run.successful_run, 'Exception raised when running a dryrun and providing a metadata file')
 
 @unittest.skipIf(not pathlib.Path('/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/').exists(),
                     "Skipped in non-RIVM environments (because test data is needed)")
@@ -151,9 +144,9 @@ class TestJunoTypingPipeline(unittest.TestCase):
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_git.yaml').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_pipeline.yaml').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_conda.txt').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'snakemake_report.html').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'juno_typing_report.html').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'sample_sheet.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_parameters.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'user_parameters.yaml').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'database_versions.yaml').exists())
 
     def test_junotyping_run_wMetadata(self):
@@ -171,9 +164,9 @@ class TestJunoTypingPipeline(unittest.TestCase):
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_git.yaml').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_pipeline.yaml').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_conda.txt').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'snakemake_report.html').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'juno_typing_report.html').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'sample_sheet.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_parameters.yaml').exists())
+        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'user_parameters.yaml').exists())
         self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'database_versions.yaml').exists())
 
 

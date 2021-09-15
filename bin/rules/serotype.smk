@@ -185,7 +185,7 @@ rule no_serotyper:
         assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly'],
         species = OUT + "/identify_species/{sample}/best_species_hit.txt"
     output: 
-        OUT + "/serotype/{sample}/no_serotype_necessary.txt"
+        temp(OUT + "/serotype/{sample}/no_serotype_necessary.txt")
     threads: 1
     resources: mem_gb=config["mem_gb"]["other"]
     shell:
