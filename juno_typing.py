@@ -26,7 +26,6 @@ import argparse
 import pandas as pd
 import pathlib
 import subprocess
-from sys import path
 import yaml
 
 # Own scripts
@@ -91,7 +90,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         self.conda_prefix = conda_prefix
         self.singularityargs = f"--bind {self.input_dir}:{self.input_dir} --bind {self.output_dir}:{self.output_dir} --bind {self.db_dir}:{self.db_dir}"
         self.singularity_prefix = singularity_prefix
-        self.restarttimes = 0 # Set to 1 because kmerfinder sometime fails. Once it is replaced, it can be 0
+        self.restarttimes = 1 # Set to 1 because kmerfinder sometime fails. Once it is replaced, it can be 0
         self.latency = 60
         self.kwargs = kwargs
 
@@ -111,6 +110,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         self.user_params = self.write_userparameters()
         self.get_run_info()
         if not self.dryrun or self.unlock:
+            self.path_to_audit.mkdir(parents=True, exist_ok=True)
+            self.audit_trail = self.generate_audit_trail()
             downloads_juno_typing = bin.download_dbs.DownloadsJunoTyping(self.db_dir,
                                                                         update_dbs=self.update_dbs,
                                                                         kmerfinder_asked_version='3.0.2',
@@ -120,22 +121,38 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                                                                         serotypefinder_db_asked_version='master',
                                                                         seroba_db_asked_version='master')
             self.downloads_versions = downloads_juno_typing.downloaded_versions
-            self.path_to_audit.mkdir(parents=True, exist_ok=True)
-            self.audit_trail = self.generate_audit_trail()
+            with open(self.path_to_audit.joinpath('database_versions.yaml'), 'w') as file_:
+                yaml.dump(self.downloads_versions, file_, default_flow_style=False)
+
         self.successful_run = self.run_snakemake()
         assert self.successful_run, f'Please check the log files'
         if not self.dryrun or self.unlock:
+            subprocess.run(['find', self.output_dir, '-type', 'f', '-empty', '-exec', 'rm', '{}', ';'])
+            subprocess.run(['find', self.output_dir, '-type', 'd', '-empty', '-exec', 'rm', '-rf', '{}', ';'])
             self.make_snakemake_report()
 
 
+    def __get_mlst7_species_translation_tbl(self):
+        with open("files/dictionary_correct_species.yaml") as translation_yaml:
+            self.mlst7_species_translation_tbl = yaml.safe_load(translation_yaml)
+
+    def __correct_mlst7_species(self, genus, species):
+        genus = genus.strip().lower()
+        species = species.strip().lower()
+        mlst7_species = genus[0] + species
+        try:
+            new_species = self.mlst7_species_translation_tbl[mlst7_species]
+            return new_species
+        except:
+            return mlst7_species
+
     def add_metadata(self, samples_dic):
         assert self.metadata.is_file(), f"Provided metadata file ({self.metadata}) does not exist"
-        # Load species file
+        self.__get_mlst7_species_translation_tbl()
+        # Add metadata
         species_dic = pd.read_csv(self.metadata, index_col = 0, dtype={'Sample':str})
         species_dic.index = species_dic.index.map(str)
-        species_dic['genus-abbr'] = species_dic['Genus'].apply(lambda x: x[0])
-        species_dic['species-mlst7'] = species_dic['genus-abbr'] + species_dic["Species"]
-        species_dic['species-mlst7'] = species_dic['species-mlst7'].apply(lambda x: x.lower())
+        species_dic['species-mlst7'] = species_dic.apply(lambda x: self.__correct_mlst7_species(x.Genus, x.Species), axis = 1)
         species_dic = species_dic.transpose().to_dict()
         # Update dictionary with species
         for sample_name in samples_dic :
@@ -160,8 +177,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         if self.metadata is not None:
             self.add_metadata(startup.sample_dict)
         # Write sample_sheet
-        with open(self.sample_sheet, 'w') as file:
-            yaml.dump(startup.sample_dict, file, default_flow_style=False)
+        with open(self.sample_sheet, 'w') as file_:
+            yaml.dump(startup.sample_dict, file_, default_flow_style=False)
         return startup
     
     def write_userparameters(self):
@@ -178,8 +195,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                                     'kmer_size': self.seroba_kmersize},
                         'cgmlst_db': str(self.db_dir.joinpath('cgmlst'))}
         
-        with open(self.user_parameters, 'w') as file:
-            yaml.dump(config_params, file, default_flow_style=False)
+        with open(self.user_parameters, 'w') as file_:
+            yaml.dump(config_params, file_, default_flow_style=False)
 
         return config_params     
         

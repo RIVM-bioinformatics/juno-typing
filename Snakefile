@@ -63,17 +63,6 @@ echo -e "Something went wrong with Juno-typing pipeline. Please check the loggin
     """)
 
 
-onsuccess:
-    shell("""
-# Remove any file from check salmonella monophasic
-# TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
-find {OUT} -type f -name best_species_hit.txt -exec rm {{}} \;
-find {OUT} -type f -empty -exec rm {{}} \;
-find {OUT} -type d -empty -exec rm -rf {{}} \;
-# Report made with wrapper
-        """)
-
-
 #################################################################################
 #####                       Specify final output                            #####
 #################################################################################
