@@ -19,7 +19,7 @@ do
     sample_subfolder="{params.output_dir}/${{subfolder}}"
     result_sample=$(find "${{sample_subfolder}}" \
             -type f \
-            -name "final_salmonella_serotype.tsv" \
+            -name "SeqSero_result.tsv" \
             -o -name "result_serotype.csv" \
             -o -name "command.txt" \
             -o -name "shigatyper.csv" \

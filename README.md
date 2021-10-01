@@ -69,11 +69,11 @@ conda env install -f envs/master_env.yaml
 
 ### Optional parameters
 
-* `-m --metadata` Relative or absolute path to a csv file containing at least one column with the 'Sample' name (name of the file but removing [_S##]_R1.fastq.gz), a column called 'Genus' and a column called 'Species'. If a genus + species is provided for a sample, it will overwrite the species identification performed by this pipeline when choosing the scheme for MLST and the serotyper. Example metadata file:
+* `-m --metadata` Relative or absolute path to a csv file containing at least one column with the 'sample' name (name of the file but removing [_S##]_R1.fastq.gz), a column called 'genus' and a column called 'species' (Note that the sample names are written in small letters, not a single capital letter). If a genus + species is provided for a sample, it will overwrite the species identification performed by this pipeline when choosing the scheme for MLST and the serotyper. Example metadata file:
 
-| __Sample__ | __Genus__ | __Species__ |
+| __sample__ | __genus__ | __species__ |
 | :---: | :--- | :--- |
-| sample1 | Salmonella | enterica |
+| sample1 | salmonella | enterica |
 
 *Note:* The fastq files corresponding to this sample would probably be something like sample1_S1_R1_0001.fastq.gz and sample2_S1_R1_0001.fastq.gz and the fasta file sample1.fasta.
 

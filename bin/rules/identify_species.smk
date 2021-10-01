@@ -11,8 +11,6 @@ rule identify_species:
         kmerfinder = OUT + "/identify_species/{sample}/data.json"
     log:
         OUT + "/log/identify_species/{sample}_identify_species.log"
-    benchmark:
-        OUT + "/log/benchmark/identify_species_{sample}.txt"
     threads: config["threads"]["kmerfinder"]
     resources: mem_gb=config["mem_gb"]["kmerfinder"]
     shell:

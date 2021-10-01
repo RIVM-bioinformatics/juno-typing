@@ -71,8 +71,7 @@ localrules:
     all,
     aggregate_serotypes,
     no_serotyper,
-    enlist_samples_for_cgmlst_scheme,
-    cgmlst_multireport
+    enlist_samples_for_cgmlst_scheme
 
 rule all:
     input:
@@ -80,6 +79,6 @@ rule all:
         expand(OUT + "/identify_species/{sample}/best_species_hit.txt", sample = SAMPLES),
         OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv",
-        result = OUT + '/cgmlst_multireport.csv'
+        hashed_cgmlst = OUT + '/cgmlst_multireport.csv'
 
 

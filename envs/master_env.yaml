@@ -10,12 +10,11 @@ dependencies:
   - mamba
   - git
   - pip==19.2.3
-  - pandas==1.1.0
+  - pandas==1.3.2
   - kma==1.3.12
   - seroba=1.0.2
   - biopython=1.74
   - tbb=2020.3
   - pip:
-    - numpy
-    - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.2.2#egg=base_juno_pipeline"
+    - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.2.3#egg=base_juno_pipeline"
 

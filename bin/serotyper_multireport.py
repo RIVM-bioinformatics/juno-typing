@@ -34,6 +34,8 @@ class SeqSero2Multireport(SerotyperMultireport):
 
     def extract_from_seqsero2_result(self, input):
         seqsero_report = pd.read_csv(input, sep='\t')
+        del seqsero_report['Output directory']
+        del seqsero_report['Input files']
         return seqsero_report
 
     def make_multireport(self):
@@ -161,7 +163,7 @@ class ChooseMultireport():
                         'seroba': [],
                         'shigatyper': []}
         for file_ in self.serotyper_result_files:
-            if file_.endswith('final_salmonella_serotype.tsv'):
+            if file_.endswith('SeqSero_result.tsv'):
                 input_files['seqsero2'].append(file_)
             elif file_.endswith('result_serotype.csv'):
                 input_files['serotypefinder'].append(file_)
@@ -184,6 +186,9 @@ class ChooseMultireport():
 
     def make_serotyper_multireports(self):
         self.__classify_serotyper_result_files()
+        # The name of all the multireports to make are stored in a list.
+        # Every time one is made, it is 'popped' from the list and the next one
+        # is produced. That is why the output_file argument is always output_file[0]
         output_file = self.multireport_files
         for serotyper_tool in self.input_files:
             print(f'Making serotyper multireport for {serotyper_tool}...')
