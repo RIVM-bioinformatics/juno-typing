@@ -82,38 +82,10 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             usesingularity=run_in_container,
             singularityargs=f"--bind {self.input_dir}:{self.input_dir} --bind {output_dir}:{output_dir} --bind {db_dir}:{db_dir}",
             singularity_prefix=singularity_prefix,
-            restarttimes=0,
+            restarttimes=1,
             latency_wait=60,
             name_snakemake_report=str(self.path_to_audit.joinpath('juno_typing_report.html')),
             **kwargs)
-        # self.pipeline_name = 'Juno_typing'
-        # self.pipeline_version = '0.2'
-        # self.output_dir = pathlib.Path(output_dir).resolve()
-        # self.workdir = pathlib.Path(__file__).parent.resolve()
-        # self.sample_sheet = "config/sample_sheet.yaml"
-        # self.user_parameters = pathlib.Path('config/user_parameters.yaml')
-        # self.fixed_parameters = pathlib.Path('config/pipeline_parameters.yaml')
-        # self.snakefile = 'Snakefile'
-        # self.cores = cores
-        # self.local = local
-        # self.snakemake_report = str(self.path_to_audit.joinpath('juno_typing_report.html'))
-        # self.queue = queue
-        # self.unlock = unlock
-        # self.dryrun = dryrun
-        # self.rerunincomplete = rerunincomplete
-        # if run_in_container:
-        #     self.useconda = False
-        #     self.usesingularity = True
-        # else:
-        #     self.useconda = True
-        #     self.usesingularity = False
-        # self.conda_frontend = 'mamba'
-        # self.conda_prefix = conda_prefix
-        # self.singularityargs = f"--bind {self.input_dir}:{self.input_dir} --bind {self.output_dir}:{self.output_dir} --bind {self.db_dir}:{self.db_dir}"
-        # self.singularity_prefix = singularity_prefix
-        # self.restarttimes = 1 # Set to 1 because kmerfinder sometime fails. Once it is replaced, it can be 0
-        # self.latency = 60
-        # self.kwargs = kwargs
 
         # Pipeline attributes
         self.metadata_file = metadata
@@ -149,20 +121,32 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             subprocess.run(['find', self.output_dir, '-type', 'd', '-empty', '-exec', 'rm', '-rf', '{}', ';'])
             self.make_snakemake_report()
 
-    def get_mlst7_scheme_name(self, sample_dict):
+    def __get_supported_genera_mlst7(self):
+        with open('files/supported_mlst7_species.txt') as file_:
+            supported_genera = file_.readlines()
+        supported_genera = [x.strip() for x in supported_genera]
+        return supported_genera
+
+    def get_mlst7_scheme_name(self):
+        supported_genera = self.__get_supported_genera_mlst7()
         with open("files/dictionary_correct_species.yaml") as translation_yaml:
             self.mlst7_species_translation_tbl = yaml.safe_load(translation_yaml)
-        for sample in sample_dict:
-            if sample_dict[sample]['genus'] != 'NotProvided' and sample_dict[sample]['species'] != 'NotProvided':
-                mlst7_species = sample_dict[sample]['genus'][0] + sample_dict[sample]['species']
+        for sample in self.sample_dict:
+            if self.sample_dict[sample]['genus'] != 'NotProvided' and self.sample_dict[sample]['species'] != 'NotProvided':
+                mlst7_species = self.sample_dict[sample]['genus'][0] + self.sample_dict[sample]['species']
                 try:
-                    new_species = self.mlst7_species_translation_tbl[mlst7_species]
-                    yield new_species
+                    self.sample_dict[sample]['species-mlst7'] = self.mlst7_species_translation_tbl[mlst7_species]
                 except KeyError:
-                    yield mlst7_species
+                    if mlst7_species in supported_genera:
+                        self.sample_dict[sample]['species-mlst7'] = mlst7_species
+                    else:
+                        raise ValueError(f'The species {mlst7_species} is not supported by this pipeline.')
+            else:
+                self.sample_dict[sample]['species-mlst7'] = 'NotProvided'
+            yield self.sample_dict[sample]['species-mlst7']
 
     def update_sample_dict_with_metadata(self):
-        self.get_metadata_from_juno_assembly(filepath=self.metadata_file)
+        self.get_metadata_from_csv_file(filepath=self.metadata_file, expected_colnames=['sample', 'genus', 'species'])
         # Add metadata
         for sample in self.sample_dict:
             try:
@@ -171,8 +155,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                 self.sample_dict[sample]['genus'] = 'NotProvided'
                 self.sample_dict[sample]['species'] = 'NotProvided'
         # The list does not return anything meaningful. It is just to activate
-        # the generator
-        list(self.get_mlst7_scheme_name(sample_dict = self.sample_dict))
+        # the generator. The self.sample_dict is updated by itself.
+        list(self.get_mlst7_scheme_name())
 
     def start_juno_typing_pipeline(self):
         """

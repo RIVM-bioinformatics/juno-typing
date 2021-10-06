@@ -40,7 +40,6 @@ CGMLST_DB = config["cgmlst_db"]
 #@####                              Processes                                #####
 #@################################################################################
 
-include: "bin/rules/identify_species.smk"
 include: "bin/rules/mlst7_fastq.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
