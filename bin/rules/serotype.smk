@@ -3,24 +3,36 @@
 # --------------- Choose serotyper according to genus/species ----------------#
 
 def choose_serotyper(wildcards):
-    with checkpoints.which_species.get(sample=wildcards.sample).output[0].open() as f:
-        species_res = f.read().strip()
-        is_salmonella = species_res.find("salmonella") != -1
-        is_ecoli = species_res.find("escherichia") != -1
-        is_strepto = species_res.find("streptococcus") != -1
-        is_shigella = species_res.find("shigella") != -1
-        if is_salmonella:
-            return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
+    if SAMPLES[wildcards.sample]['genus'] == 'salmonella':
+        return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
                     OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
-        elif is_ecoli or is_shigella:
-            return [OUT + '/serotype/{sample}/data.json',
-                    OUT + '/serotype/{sample}/result_serotype.csv',
-                    OUT + '/serotype/{sample}/shigatyper.csv',
-                    OUT + '/serotype/{sample}/command.txt']
-        elif is_strepto:
-            return [OUT + '/serotype/{sample}/pred.tsv']
-        else:
-            return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
+    elif SAMPLES[wildcards.sample]['genus'] == 'escherichia' or SAMPLES[wildcards.sample]['genus'] == 'shigella':
+        return [OUT + '/serotype/{sample}/data.json',
+                OUT + '/serotype/{sample}/result_serotype.csv',
+                OUT + '/serotype/{sample}/shigatyper.csv',
+                OUT + '/serotype/{sample}/command.txt']
+    elif SAMPLES[wildcards.sample]['genus'] == 'streptococcus':
+        return [OUT + '/serotype/{sample}/pred.tsv']
+    else:
+        return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
+    # with checkpoints.which_species.get(sample=wildcards.sample).output[0].open() as f:
+    #     species_res = f.read().strip()
+    #     is_salmonella = species_res.find("salmonella") != -1
+    #     is_ecoli = species_res.find("escherichia") != -1
+    #     is_strepto = species_res.find("streptococcus") != -1
+    #     is_shigella = species_res.find("shigella") != -1
+    #     if is_salmonella:
+        #     return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
+        #             OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
+        # elif is_ecoli or is_shigella:
+        #     return [OUT + '/serotype/{sample}/data.json',
+        #             OUT + '/serotype/{sample}/result_serotype.csv',
+        #             OUT + '/serotype/{sample}/shigatyper.csv',
+        #             OUT + '/serotype/{sample}/command.txt']
+        # elif is_strepto:
+        #     return [OUT + '/serotype/{sample}/pred.tsv']
+        # else:
+        #     return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
 #-----------------------------------------------------------------------------#
 # This is just a mock rule to make the multiserotypers work
@@ -41,8 +53,7 @@ rule aggregate_serotypes:
 rule salmonella_serotyper:
     input:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
-        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
-        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
+        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"]
     output:
         seqsero = OUT+'/serotype/{sample}/SeqSero_result.tsv',
         seqsero_tmp1 = temp(OUT+'/serotype/{sample}/SeqSero_result.txt'),
@@ -82,8 +93,7 @@ python bin/check_salmmonophasic.py -n {wildcards.sample} \
 
 rule ecoli_serotyper:
     input: 
-        assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly'],
-        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
+        assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
     output: 
         json = OUT + '/serotype/{sample}/data.json',
         csv = OUT + '/serotype/{sample}/result_serotype.csv'
@@ -115,8 +125,7 @@ python bin/serotypefinder/extract_alleles_serotypefinder.py {output.json} {outpu
 rule seroba:
     input:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
-        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
-        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
+        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"]
     output:
         OUT + "/serotype/{sample}/pred.tsv"
     log:
@@ -148,8 +157,7 @@ mv {wildcards.sample}/* $OUTPUT_DIR
 rule shigatyper:
     input:
         r1 = lambda wildcards: SAMPLES[wildcards.sample]["R1"],
-        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"],
-        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
+        r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"]
     output:
         sample_out = OUT + '/serotype/{sample}/shigatyper.csv',
         command_out = OUT + '/serotype/{sample}/command.txt'
@@ -182,8 +190,7 @@ done
 
 rule no_serotyper:
     input: 
-        assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly'],
-        species = OUT + "/identify_species/{sample}/best_species_hit.txt"
+        assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
     output: 
         temp(OUT + "/serotype/{sample}/no_serotype_necessary.txt")
     threads: 1

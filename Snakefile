@@ -76,7 +76,6 @@ localrules:
 rule all:
     input:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
-        expand(OUT + "/identify_species/{sample}/best_species_hit.txt", sample = SAMPLES),
         OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv",
         result = OUT + '/cgmlst_multireport.csv'

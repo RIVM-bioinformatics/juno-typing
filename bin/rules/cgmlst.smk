@@ -4,8 +4,7 @@
 
 checkpoint enlist_samples_for_cgmlst_scheme:
     input:
-        species = expand(OUT + '/identify_species/{sample}/best_species_hit.txt', sample=SAMPLES),
-        sample_sheet = sample_sheet
+        sample_sheet
     output:
         directory(OUT + '/cgmlst')
     log:
@@ -15,12 +14,13 @@ checkpoint enlist_samples_for_cgmlst_scheme:
     shell: 
         """
 mkdir -p {output}
-python bin/chewbbaca_input_files.py --sample-sheet {input.sample_sheet} \
-                                --output-dir {output} \
-                                --best-hit-kmerfinder-files {input.species} &> {log}
-if [ ! $? == 0 ]; then
-    rm -rf {output}
-    exit 1
+python bin/chewbbaca_input_files.py --sample-sheet {input} \
+                                --output-dir {output} &> {log}
+# If no file was produced (namely because none of the genera are supported)
+# then a file is produced saying that no genera were supported.
+# This is necessary to not break next steps.
+if [ -z "$(ls -A {output})" ]; then
+    echo "None of the genera of the samples in this run are supported for cgMLST" > "{output}/unsupported_genus_samples.txt"
 fi
         """
 
@@ -39,15 +39,18 @@ rule cgmlst_per_genus:
     resources: mem_gb=config['mem_gb']['chewbbaca']
     params:
         output_dir = abspath(OUT + '/cgmlst/{genus}'),
-        db_dir = CGMLST_DB,
-        genus = '{genus}'
+        db_dir = CGMLST_DB
     shell:
         """
-bash bin/chewbbaca_per_genus.sh {input} \
+if [ {wildcards.genus} == "unsupported_genus" ]; then
+    touch {output}
+else
+    bash bin/chewbbaca_per_genus.sh {input} \
                                 {threads} \
                                 {params.output_dir} \
                                 {params.db_dir} \
-                                {params.genus} &> {log}
+                                {wildcards.genus} &> {log}
+fi
         """
 
 #----------------------- Finish cgMLST rule ----------------------#

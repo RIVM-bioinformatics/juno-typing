@@ -145,6 +145,16 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                 self.sample_dict[sample]['species-mlst7'] = 'NotProvided'
             yield self.sample_dict[sample]['species-mlst7']
 
+    def get_cgmlst_scheme_name(self):
+        with open("files/dictionary_correct_cgmlst_scheme.yaml") as translation_yaml:
+            self.cgmlst_scheme_translation_tbl = yaml.safe_load(translation_yaml)
+        for sample in self.sample_dict:
+            genus = self.sample_dict[sample]['genus']
+            try:
+                self.sample_dict[sample]['cgmlst_scheme'] = self.cgmlst_scheme_translation_tbl[genus]
+            except KeyError:
+                self.sample_dict[sample]['cgmlst_scheme'] = None
+
     def update_sample_dict_with_metadata(self):
         self.get_metadata_from_csv_file(filepath=self.metadata_file, expected_colnames=['sample', 'genus', 'species'])
         # Add metadata
@@ -157,6 +167,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         # The list does not return anything meaningful. It is just to activate
         # the generator. The self.sample_dict is updated by itself.
         list(self.get_mlst7_scheme_name())
+        self.get_cgmlst_scheme_name()
 
     def start_juno_typing_pipeline(self):
         """
