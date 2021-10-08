@@ -7,6 +7,7 @@ from yaml import safe_load
 
 
 class inputChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
+<<<<<<< HEAD
     '''
     Class to produce and enlist (in a dictionary) the parameters necessary to
     run chewBBACA for different genera. The samples can be run also by calling
@@ -19,6 +20,22 @@ class inputChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
         self.supported_genera = ['campylobacter', 'escherichia', 'listeria', 
                                 'listeria_optional', 'salmonella','shigella', 
                                 'yersinia']
+=======
+    """Class to produce and enlist (in a dictionary) the parameters necessary
+    to run chewBBACA for different genera. The samples can be run also by calling
+    the runChewBBACA method
+    """
+
+    def __init__(self, 
+                best_hit_kmerfinder_files,
+                sample_sheet='config/sample_sheet.yaml',
+                output_dir='output/cgmlst/'):
+
+        self.supported_genera = ['campylobacter', 'escherichia', 'listeria', 
+                                'listeria_optional', 'salmonella','shigella', 
+                                'yersinia']
+        self.best_hit_kmerfinder_files = best_hit_kmerfinder_files
+>>>>>>> fd6c11e597ac5d4c59d345ed50438c02b1b7aff3
         self.sample_sheet = pathlib.Path(sample_sheet)
         assert self.sample_sheet.is_file(), f'The provided sample sheet {str(self.sample_sheet)} does not exist.'
         self.output_dir = pathlib.Path(output_dir)

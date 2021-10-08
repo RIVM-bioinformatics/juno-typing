@@ -15,24 +15,6 @@ def choose_serotyper(wildcards):
         return [OUT + '/serotype/{sample}/pred.tsv']
     else:
         return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
-    # with checkpoints.which_species.get(sample=wildcards.sample).output[0].open() as f:
-    #     species_res = f.read().strip()
-    #     is_salmonella = species_res.find("salmonella") != -1
-    #     is_ecoli = species_res.find("escherichia") != -1
-    #     is_strepto = species_res.find("streptococcus") != -1
-    #     is_shigella = species_res.find("shigella") != -1
-    #     if is_salmonella:
-        #     return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
-        #             OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
-        # elif is_ecoli or is_shigella:
-        #     return [OUT + '/serotype/{sample}/data.json',
-        #             OUT + '/serotype/{sample}/result_serotype.csv',
-        #             OUT + '/serotype/{sample}/shigatyper.csv',
-        #             OUT + '/serotype/{sample}/command.txt']
-        # elif is_strepto:
-        #     return [OUT + '/serotype/{sample}/pred.tsv']
-        # else:
-        #     return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
 #-----------------------------------------------------------------------------#
 # This is just a mock rule to make the multiserotypers work

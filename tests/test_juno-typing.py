@@ -127,7 +127,6 @@ class TestJunoTypingPipeline(unittest.TestCase):
     """Testing the JunoTyping class (code specific for this pipeline)"""
 
     def setUpClass():
-        os.system('sleep 2')
         os.system('rm -rf test_output')
 
     def tearDownClass():
