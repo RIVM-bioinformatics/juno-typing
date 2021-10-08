@@ -8,16 +8,6 @@ Date: 18-05-2021
 
 Documentation: https://rivm-bioinformatics.github.io/ids_bacteriology_man/juno-typing.html 
 
-Snakemake rules (in order of execution): 
-    1 identify_species  Using kmerFinder 
-    2 mlst7             7-locus MLST taking either filtered fastq files
-                        or fasta files (assemblies) as input. Both cases
-                        using the MLST software from CGE.
-    3 Serotyper         Either SerotypeFinder if the sample is E. coli,
-                        SeqSero2 if the sample is Salmonella and 
-                        Seroba if the sample is S. pneumoniae.
-    4 Multiserotyper    Reports collecting the results of each type 
-        report          of serotyper.
 """
 
 # Dependencies
@@ -104,9 +94,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             self.audit_trail = self.generate_audit_trail()
             downloads_juno_typing = bin.download_dbs.DownloadsJunoTyping(self.db_dir,
                                                                         update_dbs=self.update_dbs,
-                                                                        kmerfinder_asked_version='3.0.2',
                                                                         cge_mlst_asked_version='2.0.4',
-                                                                        kmerfinder_db_asked_version='20210425',
                                                                         mlst7_db_asked_version='master',
                                                                         serotypefinder_db_asked_version='master',
                                                                         seroba_db_asked_version='master')
@@ -186,7 +174,6 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
 
         config_params = {'input_dir': str(self.input_dir),
                         'out': str(self.output_dir),
-                        'kmerfinder_db': str(self.db_dir.joinpath('kmerfinder_db')),
                         'mlst7_db': str(self.db_dir.joinpath('mlst7_db')),
                         'seroba_db': str(self.db_dir.joinpath('seroba_db')),
                         'serotypefinder_db': str(self.db_dir.joinpath('serotypefinder_db')),

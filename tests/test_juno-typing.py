@@ -12,40 +12,35 @@ import juno_typing
 
 
 
-# @unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
-#                     "Skipped in non-RIVM environments (for sake of time)")
-# class TestDownloadDbs(unittest.TestCase):
-#     """Testing the downloading of databases and software used by the pipeline"""
+@unittest.skipIf(not pathlib.Path('/mnt/scratch_dir/hernanda').exists(),
+                    "Skipped in non-RIVM environments (for sake of time)")
+class TestDownloadDbs(unittest.TestCase):
+    """Testing the downloading of databases and software used by the pipeline"""
 
-#     def setUpClass():
-#         pathlib.Path('fake_db').mkdir(exist_ok = True)
+    def setUpClass():
+        pathlib.Path('fake_db').mkdir(exist_ok = True)
 
-#     def tearDownClass():
-#         os.system('rm -rf fake_db')
+    def tearDownClass():
+        os.system('rm -rf fake_db')
 
-#     def test_download_all_dbs(self):
-#         """Testing all databases/software are downloaded and set up"""
+    def test_download_all_dbs(self):
+        """Testing all databases/software are downloaded and set up"""
 
-#         path_to_db = pathlib.Path('fake_db')
-#         downloads = download_dbs.DownloadsJunoTyping(path_to_db, 
-#                                                     update_dbs=True,
-#                                                     kmerfinder_asked_version='3.0.2',
-#                                                     cge_mlst_asked_version='2.0.4',
-#                                                     kmerfinder_db_asked_version='20210425',
-#                                                     mlst7_db_asked_version='master',
-#                                                     serotypefinder_db_asked_version='master',
-#                                                     seroba_db_asked_version='master',
-#                                                     seroba_kmersize=50)
-#         self.assertEqual(downloads.seroba_kmersize, 50)
-#         self.assertEqual(downloads.downloaded_versions['kmerfinder'], '3.0.2')
-#         self.assertEqual(downloads.downloaded_versions['mlst7'], '2.0.4')
-#         self.assertEqual(downloads.downloaded_versions['kmerfinder_db'], '20210425')
-#         self.assertTrue(path_to_db.joinpath('kmerfinder', 'kmerfinder.py').exists())
-#         self.assertTrue(path_to_db.joinpath('cge-mlst', 'mlst.py').exists())
-#         self.assertTrue(path_to_db.joinpath('kmerfinder_db', 'config').exists())
-#         self.assertTrue(path_to_db.joinpath('mlst7_db', 'senterica', 'senterica.length.b').exists())
-#         self.assertTrue(path_to_db.joinpath('serotypefinder_db', 'H_type.seq.b').exists())
-#         self.assertTrue(path_to_db.joinpath('seroba_db', 'database', 'cdhit_cluster').exists())
+        path_to_db = pathlib.Path('fake_db')
+        path_to_bin = pathlib.Path('bin')
+        downloads = download_dbs.DownloadsJunoTyping(path_to_db, 
+                                                    update_dbs=True,
+                                                    cge_mlst_asked_version='2.0.4',
+                                                    mlst7_db_asked_version='master',
+                                                    serotypefinder_db_asked_version='master',
+                                                    seroba_db_asked_version='master',
+                                                    seroba_kmersize=50)
+        self.assertEqual(downloads.seroba_kmersize, 50)
+        self.assertEqual(downloads.downloaded_versions['mlst7'], '2.0.4')
+        self.assertTrue(path_to_bin.joinpath('cge-mlst', 'mlst.py').exists())
+        self.assertTrue(path_to_db.joinpath('mlst7_db', 'senterica', 'senterica.length.b').exists())
+        self.assertTrue(path_to_db.joinpath('serotypefinder_db', 'H_type.seq.b').exists())
+        self.assertTrue(path_to_db.joinpath('seroba_db', 'database', 'cdhit_cluster').exists())
 
 
 
@@ -58,8 +53,6 @@ class TestJunoTypingDryRun(unittest.TestCase):
                     'fake_dir_juno/clean_fastq', 
                     'fake_dir_juno/de_novo_assembly_filtered',
                     'fake_db',
-                    'fake_db/kmerfinder_db',
-                    'fake_db/kmerfinder_db/bacteria',
                     'fake_db/mlst7_db/',
                     'fake_db/mlst7_db/senterica/']
 
@@ -72,7 +65,6 @@ class TestJunoTypingDryRun(unittest.TestCase):
                     'fake_dir_juno/clean_fastq/1234_R1.fastq.gz',
                     'fake_dir_juno/clean_fastq/1234_R2.fastq.gz', 
                     'fake_dir_juno/de_novo_assembly_filtered/1234.fasta',
-                    'fake_db/kmerfinder_db/bacteria/bacteria.ATG.length.b',
                     'fake_db/mlst7_db/senterica/senterica.length.b']
                             
         for folder in fake_dirs:
