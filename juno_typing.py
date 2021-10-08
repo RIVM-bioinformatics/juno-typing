@@ -133,7 +133,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             self.mlst7_species_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
             if self.sample_dict[sample]['genus'] != 'NotProvided' and self.sample_dict[sample]['species'] != 'NotProvided':
-                mlst7_species = self.sample_dict[sample]['genus'][0] + self.sample_dict[sample]['species']
+                mlst7_species = self.sample_dict[sample]['genus'][0].strip() + self.sample_dict[sample]['species'].strip()
+                mlst7_species = mlst7_species.lower()
                 try:
                     self.sample_dict[sample]['species-mlst7'] = self.mlst7_species_translation_tbl[mlst7_species]
                 except KeyError:
@@ -149,7 +150,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         with open("files/dictionary_correct_cgmlst_scheme.yaml") as translation_yaml:
             self.cgmlst_scheme_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
-            genus = self.sample_dict[sample]['genus']
+            genus = self.sample_dict[sample]['genus'].strip().lower()
             try:
                 self.sample_dict[sample]['cgmlst_scheme'] = self.cgmlst_scheme_translation_tbl[genus]
             except KeyError:
@@ -202,6 +203,23 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         
 
 
+class StoreSpeciesArgAction(argparse.Action,
+                                JunoHelpers):
+    '''
+    Argparse Action to check that species was passed as only two words and
+    store it as a single string instead of as a list.
+    '''
+    def __call__(self, parser, namespace, values, option_string=None):
+        if not len(values) == 2:
+            raise argparse.ArgumentTypeError(
+                self.error_formatter(
+                    f'Wrong --species argument provided. The species should be provided as TWO words. For instance: --species salmonella enterica.'
+                )
+            )
+        species = ' '.join(values)
+        setattr(namespace, self.dest, species)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description = "Juno-typing pipeline. Automated pipeline for bacterial subtyping (7-locus MLST and serotyping)."
@@ -219,6 +237,17 @@ if __name__ == '__main__':
         "--metadata",
         type = pathlib.Path,
         default = None,
+        required=False,
+        metavar = "FILE",
+        help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. The genus and species provided will be used to choose the serotyper and the MLST schema."
+    )
+    parser.add_argument(
+        "-s",
+        "--species",
+        nargs = '+',
+        action=StoreSpeciesArgAction,
+        default=None,
+        required = False,
         metavar = "FILE",
         help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. The genus and species provided will be used to choose the serotyper and the MLST schema."
     )

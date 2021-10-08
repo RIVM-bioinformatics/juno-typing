@@ -33,7 +33,12 @@ class inputChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
         print(f'Getting list of all schemes needed to be run in this sample set...\n')
         self.__read_sample_sheet()
         schemes_set = set([self.samples_dict[sample]['cgmlst_scheme'] for sample in self.samples_dict])
-        self.schemes_list = [scheme for scheme in schemes_set if scheme in self.supported_genera]
+        schemes_set = [scheme for scheme in schemes_set if scheme in self.supported_genera]
+        second_schemes = [self.__get_second_scheme_name(scheme_name) for scheme_name in schemes_set]
+        schemes_list = schemes_set + second_schemes
+        schemes_list = [scheme_name for scheme_name in schemes_list if scheme_name is not None]
+        self.schemes_list = schemes_list
+
 
     def __get_second_scheme_name(self, scheme):
         '''
@@ -45,18 +50,18 @@ class inputChewBBACA(base_juno_pipeline.helper_functions.JunoHelpers):
         elif scheme == 'escherichia':
             return 'shigella'
         else:
-            return None
+            pass
         
     def __enlist_samples_per_scheme(self):
         print(f'Getting list of samples per scheme found...\n')
         self.__get_schemes_set()
-        cgmlst_scheme_dict = {}
+        cgmlst_scheme_dict = {scheme_name:{'samples': []} for scheme_name in self.schemes_list}
         for scheme in self.schemes_list:
             samples_running_scheme = [sample for sample in self.samples_dict if self.samples_dict[sample]['cgmlst_scheme'] == scheme]
-            cgmlst_scheme_dict[scheme] = {'samples': samples_running_scheme}
+            cgmlst_scheme_dict[scheme]['samples'] = cgmlst_scheme_dict[scheme]['samples'] + samples_running_scheme
             second_scheme = self.__get_second_scheme_name(scheme)
-            if second_scheme is not None:
-                cgmlst_scheme_dict[second_scheme] = {'samples': samples_running_scheme}
+            if second_scheme:
+                cgmlst_scheme_dict[second_scheme]['samples'] = cgmlst_scheme_dict[second_scheme]['samples'] + samples_running_scheme
         return cgmlst_scheme_dict
 
     def make_file_with_samples_per_scheme(self):

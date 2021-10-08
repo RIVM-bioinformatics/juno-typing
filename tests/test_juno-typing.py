@@ -88,7 +88,7 @@ class TestJunoTypingDryRun(unittest.TestCase):
 
         with open('fake_dir_wsamples/fake_metadata.csv', mode='w') as metadata_file:
             metadata_writer = csv.writer(metadata_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            metadata_writer.writerow(['Sample', 'Genus', 'Species'])
+            metadata_writer.writerow(['sample', 'genus', 'species'])
             metadata_writer.writerow(['sample1', 'Salmonella', 'enterica'])
             metadata_writer.writerow(['sample2', 'Escherichia', 'coli'])
 
@@ -119,12 +119,15 @@ class TestJunoTypingDryRun(unittest.TestCase):
                                                     dryrun = True)
         self.assertTrue(juno_typing_run.successful_run, 'Exception raised when running a dryrun and providing a metadata file')
 
+
+
 @unittest.skipIf(not pathlib.Path('/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/').exists(),
                     "Skipped in non-RIVM environments (because test data is needed)")
 class TestJunoTypingPipeline(unittest.TestCase):
     """Testing the JunoTyping class (code specific for this pipeline)"""
 
     def setUpClass():
+        os.system('sleep 2')
         os.system('rm -rf test_output')
 
     def tearDownClass():
