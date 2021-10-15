@@ -1,0 +1,83 @@
+{"mlst": {
+        "user_input": {
+        "filename": ["NA","NA"], 
+        "species": "unsupported", 
+        "organism": "unsupported", 
+        "file_format": "fastq"
+    }, 
+    "run_info": {
+        "date": "NA", 
+        "time": "NA"
+    }, 
+    "results": {
+        "sequence_type": "not_calculated", 
+        "allele_profile": {
+            "NA_1": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            }, 
+            "NA_2": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            }, 
+            "NA_3": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            }, 
+            "NA_4": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            },
+            "NA_5": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            }, 
+            "NA_6": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            },
+            "NA_7": {
+                "identity": "NA", 
+                "coverage": "NA", 
+                "allele": "NA", 
+                "allele_name": "NA", 
+                "align_len": "NA", 
+                "gaps": "NA", 
+                "sbj_len": "NA"
+            }
+        }, 
+        "nearest_sts": "", 
+        "notes": ""
+    }
+}
+}

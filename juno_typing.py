@@ -120,7 +120,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         with open("files/dictionary_correct_species.yaml") as translation_yaml:
             self.mlst7_species_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
-            if self.sample_dict[sample]['genus'] != 'NotProvided' and self.sample_dict[sample]['species'] != 'NotProvided':
+            if self.sample_dict[sample]['genus'] is not None and self.sample_dict[sample]['species'] is not None:
                 mlst7_species = self.sample_dict[sample]['genus'][0].strip() + self.sample_dict[sample]['species'].strip()
                 mlst7_species = mlst7_species.lower()
                 try:
@@ -129,9 +129,9 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                     if mlst7_species in supported_genera:
                         self.sample_dict[sample]['species-mlst7'] = mlst7_species
                     else:
-                        raise ValueError(f'The species {mlst7_species} is not supported by this pipeline.')
+                        self.sample_dict[sample]['species-mlst7'] = None
             else:
-                self.sample_dict[sample]['species-mlst7'] = 'NotProvided'
+                self.sample_dict[sample]['species-mlst7'] = None
             yield self.sample_dict[sample]['species-mlst7']
 
     def get_cgmlst_scheme_name(self):
@@ -151,8 +151,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             try:
                 self.sample_dict[sample].update(self.juno_metadata[sample])
             except (KeyError, TypeError):
-                self.sample_dict[sample]['genus'] = 'NotProvided'
-                self.sample_dict[sample]['species'] = 'NotProvided'
+                self.sample_dict[sample]['genus'] = None
+                self.sample_dict[sample]['species'] = None
         # The list does not return anything meaningful. It is just to activate
         # the generator. The self.sample_dict is updated by itself.
         list(self.get_mlst7_scheme_name())

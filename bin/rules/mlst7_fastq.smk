@@ -24,12 +24,19 @@ rule mlst7:
         mlst7_db = config["mlst7_db"]
     shell:
         """
-python bin/cge-mlst/mlst.py -i {input.r1} {input.r2} \
--o $(dirname {output.json}) \
--s {params.species} \
---database {params.mlst7_db} \
--mp kma \
--x &>> {log}
+if [ {params.species} == 'None' ]
+then
+    echo -e "The species of this sample is not supported by the MLST7 tool." > {log}
+    touch {output}
+    cp files/no_mlst7.json {output.json}
+else
+    python bin/cge-mlst/mlst.py -i {input.r1} {input.r2} \
+    -o $(dirname {output.json}) \
+    -s {params.species} \
+    --database {params.mlst7_db} \
+    -mp kma \
+    -x &>> {log}
+fi
         """
 
 

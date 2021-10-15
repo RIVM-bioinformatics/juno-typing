@@ -30,7 +30,6 @@ cdiphtheriae
 cfetus
 cfreundii
 cglabrata
-CHECK.sh
 chelveticus
 chlamydiales
 chyointestinalis
@@ -41,7 +40,6 @@ clanienae
 clari
 cliberibacter
 cmaltaromaticum
-config
 cperfringens
 cronobacter
 csepticum
@@ -64,7 +62,6 @@ hcinaedi
 hinfluenzae
 hpylori
 hsuis
-INSTALL.py
 kaerogenes
 kkingae
 koxytoca
@@ -112,7 +109,6 @@ ppentosaceus
 pputida
 psalmonis
 ranatipestifer
-rest_api.json
 rhodococcus
 sagalactiae
 saureus
@@ -144,9 +140,7 @@ taylorella
 tenacibaculum
 tpallidum
 tvaginalis
-UPDATE.py
 ureaplasma
-VALIDATION.py
 vcholerae
 vcholerae_2
 vibrio
