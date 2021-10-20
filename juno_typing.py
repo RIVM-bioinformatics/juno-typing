@@ -28,8 +28,9 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
     def __init__(self, 
                 input_dir, 
                 output_dir, 
-                metadata = None, 
-                db_dir = "/mnt/db/juno/typing_db", 
+                species=None,
+                metadata=None, 
+                db_dir="/mnt/db/juno/typing_db", 
                 update_dbs=False,
                 serotypefinder_mincov=0.6, 
                 serotypefinder_identity=0.85,
@@ -78,6 +79,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             **kwargs)
 
         # Pipeline attributes
+        self.genus, self.species = self.__get_genus_species_from_arg(species)
         self.metadata_file = metadata
         self.serotypefinder_mincov=serotypefinder_mincov
         self.serotypefinder_identity=serotypefinder_identity
@@ -114,31 +116,38 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             supported_genera = file_.readlines()
         supported_genera = [x.strip() for x in supported_genera]
         return supported_genera
+    
+    def __get_genus_species_from_arg(self, species_arg):
+        if species_arg is None:
+            return None, None
+        else:
+            arg_split = species_arg.strip().lower().split(' ')
+            return arg_split[0], arg_split[1]
 
+    def __shorten_species(self, genus, species):
+        return genus[0] + species
+
+        
     def get_mlst7_scheme_name(self):
         supported_genera = self.__get_supported_genera_mlst7()
         with open("files/dictionary_correct_species.yaml") as translation_yaml:
             self.mlst7_species_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
-            if self.sample_dict[sample]['genus'] is not None and self.sample_dict[sample]['species'] is not None:
-                mlst7_species = self.sample_dict[sample]['genus'][0].strip() + self.sample_dict[sample]['species'].strip()
-                mlst7_species = mlst7_species.lower()
-                try:
-                    self.sample_dict[sample]['species-mlst7'] = self.mlst7_species_translation_tbl[mlst7_species]
-                except KeyError:
-                    if mlst7_species in supported_genera:
-                        self.sample_dict[sample]['species-mlst7'] = mlst7_species
-                    else:
-                        self.sample_dict[sample]['species-mlst7'] = None
-            else:
-                self.sample_dict[sample]['species-mlst7'] = None
+            mlst7_species = self.__shorten_species(self.sample_dict[sample]['genus'], self.sample_dict[sample]['species'])
+            try:
+                self.sample_dict[sample]['species-mlst7'] = self.mlst7_species_translation_tbl[mlst7_species]
+            except KeyError:
+                if mlst7_species in supported_genera:
+                    self.sample_dict[sample]['species-mlst7'] = mlst7_species
+                else:
+                    self.sample_dict[sample]['species-mlst7'] = None
             yield self.sample_dict[sample]['species-mlst7']
 
     def get_cgmlst_scheme_name(self):
         with open("files/dictionary_correct_cgmlst_scheme.yaml") as translation_yaml:
             self.cgmlst_scheme_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
-            genus = self.sample_dict[sample]['genus'].strip().lower()
+            genus = self.sample_dict[sample]['genus'].strip().lower() 
             try:
                 self.sample_dict[sample]['cgmlst_scheme'] = self.cgmlst_scheme_translation_tbl[genus]
             except KeyError:
@@ -148,11 +157,14 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         self.get_metadata_from_csv_file(filepath=self.metadata_file, expected_colnames=['sample', 'genus', 'species'])
         # Add metadata
         for sample in self.sample_dict:
-            try:
-                self.sample_dict[sample].update(self.juno_metadata[sample])
-            except (KeyError, TypeError):
-                self.sample_dict[sample]['genus'] = None
-                self.sample_dict[sample]['species'] = None
+            if self.genus is not None and self.species is not None:
+                self.sample_dict[sample]['genus'] = self.genus
+                self.sample_dict[sample]['species'] = self.species
+            else:
+                try:
+                    self.sample_dict[sample].update(self.juno_metadata[sample])
+                except (KeyError, TypeError):
+                    raise ValueError(f'One of your samples is not in the metadata file ({self.metadata_file}). Please ensure that all samples are present in the metadata file or provide a --species argument.')
         # The list does not return anything meaningful. It is just to activate
         # the generator. The self.sample_dict is updated by itself.
         list(self.get_mlst7_scheme_name())
@@ -236,7 +248,7 @@ if __name__ == '__main__':
         default=None,
         required = False,
         metavar = "FILE",
-        help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. The genus and species provided will be used to choose the serotyper and the MLST schema."
+        help = "Relative or absolute path to a csv file containing at least one column with the 'sample' name (name of the file but removing [_S##]_R1.fastq.gz), a column called 'genus' and a column called 'species' (Note that the columns are in small letters). If a genus + species is provided for a sample, it will overwrite the species identification performed by this pipeline when choosing the scheme for MLST and the serotyper"
     )
     parser.add_argument(
         "-o",
@@ -337,21 +349,22 @@ if __name__ == '__main__':
         help="Extra arguments to be passed to snakemake API (https://snakemake.readthedocs.io/en/stable/api_reference/snakemake.html)."
     )
     args = parser.parse_args()
-    JunoTypingRun(input_dir = args.input, 
-                    output_dir = args.output, 
-                    metadata = args.metadata,
-                    db_dir = args.db_dir,
-                    update_dbs = args.update,
-                    serotypefinder_mincov = args.serotypefinder_mincov,
-                    serotypefinder_identity = args.serotypefinder_identity,
-                    seroba_mincov = args.seroba_mincov,
-                    seroba_kmersize = args.seroba_kmersize,
-                    cores = args.cores,
-                    local = args.local,
-                    queue = args.queue,
-                    unlock = args.unlock,
-                    rerunincomplete = args.rerunincomplete,
-                    dryrun = args.dryrun,
+    JunoTypingRun(input_dir=args.input, 
+                    output_dir=args.output, 
+                    species=args.species,
+                    metadata=args.metadata,
+                    db_dir=args.db_dir,
+                    update_dbs=args.update,
+                    serotypefinder_mincov=args.serotypefinder_mincov,
+                    serotypefinder_identity=args.serotypefinder_identity,
+                    seroba_mincov=args.seroba_mincov,
+                    seroba_kmersize=args.seroba_kmersize,
+                    cores=args.cores,
+                    local=args.local,
+                    queue=args.queue,
+                    unlock=args.unlock,
+                    rerunincomplete=args.rerunincomplete,
+                    dryrun=args.dryrun,
                     run_in_container=False,
                     singularity_prefix=None,
                     conda_prefix=None,

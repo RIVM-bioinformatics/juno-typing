@@ -4,8 +4,7 @@
 
 def choose_serotyper(wildcards):
     if SAMPLES[wildcards.sample]['genus'] == 'salmonella':
-        return [OUT+'/serotype/{sample}/SeqSero_result.tsv',
-                    OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"]
+        return [OUT+'/serotype/{sample}/SeqSero_result.tsv']
     elif SAMPLES[wildcards.sample]['genus'] == 'escherichia' or SAMPLES[wildcards.sample]['genus'] == 'shigella':
         return [OUT + '/serotype/{sample}/data.json',
                 OUT + '/serotype/{sample}/result_serotype.csv',
@@ -40,10 +39,7 @@ rule salmonella_serotyper:
         seqsero = OUT+'/serotype/{sample}/SeqSero_result.tsv',
         seqsero_tmp1 = temp(OUT+'/serotype/{sample}/SeqSero_result.txt'),
         seqsero_tmp2 = temp(OUT+'/serotype/{sample}/blasted_output.xml'),
-        seqsero_tmp3 = temp(OUT+'/serotype/{sample}/data_log.txt'),
-        final_serotype = OUT + "/serotype/{sample}/final_salmonella_serotype.tsv"
-    benchmark:
-        OUT+'/log/benchmark/serotype_salmonella/{sample}.txt'
+        seqsero_tmp3 = temp(OUT+'/serotype/{sample}/data_log.txt')
     log:
         OUT+'/log/serotype/{sample}_salmonella.log'
     params:
@@ -60,14 +56,6 @@ rule salmonella_serotyper:
 # Run seqsero2 
 # -m 'a' means microassembly mode and -t '2' refers to separated fastq files (no interleaved)
 SeqSero2_package.py -m 'a' -t '2' -i {input.r1} {input.r2} -d {params.output_dir} -p {threads} &> {log}
-python bin/check_salmmonophasic.py -n {wildcards.sample} \
-                                    -i {output.seqsero} \
-                                    -f {input.r1} \
-                                    -r {input.r2} \
-                                    -o {output.final_serotype} \
-                                    -s {params.min_cov} \
-                                    -b {params.min_cov} \
-                                    -t {threads} &>> {log}
         """
 
 #-----------------------------------------------------------------------------#
