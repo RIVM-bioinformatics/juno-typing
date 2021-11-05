@@ -119,9 +119,7 @@ class ShigatyperMultireport(SerotyperMultireport):
     def make_multireport(self):
         dflist_shigatyper = []
         dflist_command = []
-        # We combined ecoli and shigatyper, so now this code wants to run for every output file
-        # it only needs to run for the shigella output files
-        # this code needs to be changed before the pipeline can function again
+
         for outfile in self.input_files:
             dirname_splitted = str(outfile).split("/")
 
@@ -132,8 +130,12 @@ class ShigatyperMultireport(SerotyperMultireport):
                 dflist_command.append(df)
 
             if "shigatyper" in str(outfile):
-                df = pd.read_csv(outfile, delimiter = ",")
-                df.insert(0, "Samplename", dirname_splitted[-2]) 
+                df = pd.read_csv(outfile, delimiter = ",", index_col = False)
+                #drop unecessary column that is unnamed and as random numbers
+                df.drop(columns=df.columns[0], axis=1, inplace=True)
+                #Drop row if more than 2 values of the shigatyper file are empty/missing 
+                df.dropna(thresh=2, inplace=True)
+                df.insert(0, "Samplename", dirname_splitted[-2])
                 dflist_shigatyper.append(df)
                     
         final_df_shigatyper = pd.concat(dflist_shigatyper, axis=0, ignore_index=True)
@@ -141,7 +143,6 @@ class ShigatyperMultireport(SerotyperMultireport):
         results_df = pd.merge(final_df_shigatyper, final_df_command, on="Samplename")
         results_df.to_csv(self.output_file, mode='a', index=False)
         self.multireport = results_df
-
 
 class ChooseMultireport():
     """Depending on the input file(s) one or more serotype multireport(s) are 
