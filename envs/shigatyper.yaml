@@ -2,5 +2,12 @@ name: shigatyper
 channels:
   - defaults
   - bioconda
+  - conda-forge
 dependencies:
-  - shigatyper=1.0.6
+ - samtools=1.9
+ - bcftools=1.9
+ - python=3.7
+ - minimap2=2.16
+ - pandas=0.24.2
+  #This packages does not have the fixes for shigalle boydii
+  #- shigatyper=1.0.6

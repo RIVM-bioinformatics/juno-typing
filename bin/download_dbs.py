@@ -11,6 +11,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
     def __init__(self,
                     db_dir, 
                     update_dbs=False, 
+                    shigatyper_asked_version='master',
                     kmerfinder_asked_version='3.0.2',
                     cge_mlst_asked_version='2.0.4',
                     kmerfinder_db_asked_version='20210425',
@@ -22,12 +23,23 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         self.bin_dir = pathlib.Path(__file__).parent.absolute()
         self.update_dbs = update_dbs
         self.seroba_kmersize = seroba_kmersize
-        self.downloaded_versions = self.get_downloads_juno_typing(kmerfinder_asked_version=kmerfinder_asked_version,
+        self.downloaded_versions = self.get_downloads_juno_typing(shigatyper_asked_version=shigatyper_asked_version,
+                                                                    kmerfinder_asked_version=kmerfinder_asked_version,
                                                                     cge_mlst_asked_version=cge_mlst_asked_version,
                                                                     kmerfinder_db_asked_version=kmerfinder_db_asked_version,
                                                                     mlst7_db_asked_version=mlst7_db_asked_version,
                                                                     serotypefinder_db_asked_version=serotypefinder_db_asked_version,
                                                                     seroba_db_asked_version=seroba_db_asked_version)
+
+    def download_software_shigatyper(self, version):
+        """Function to download shigatyper if it is not present"""
+        shigatyper_software_dir = self.bin_dir.joinpath('shigatyper')
+        if not shigatyper_software_dir.joinpath('shigatyper/shigatyper.py').is_file():
+            print("\x1b[0;33m Downloading shigatyper software...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://github.com/wolthuisr/shigatyper.git',
+                            shigatyper_software_dir)
+        return version
 
     def download_software_kmerfinder(self, version):
         """Function to download kmerfinder if it is not present"""
@@ -139,7 +151,8 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         version = self.get_commit_git(seroba_db_dir)
         return version
 
-    def get_downloads_juno_typing(self, kmerfinder_asked_version, 
+    def get_downloads_juno_typing(self, shigatyper_asked_version, 
+                                    kmerfinder_asked_version, 
                                     cge_mlst_asked_version,
                                     kmerfinder_db_asked_version,
                                     mlst7_db_asked_version,
@@ -153,7 +166,8 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                 rm_dir.kill()
                 raise
             
-        software_version = {'kmerfinder': self.download_software_kmerfinder(version=kmerfinder_asked_version),
+        software_version = {'shigatyper': self.download_software_shigatyper(version=shigatyper_asked_version),
+                            'kmerfinder': self.download_software_kmerfinder(version=kmerfinder_asked_version),
                             'mlst7': self.download_software_mlst7(version=cge_mlst_asked_version),
                             'kmerfinder_db': self.download_db_kmerfinder(version=kmerfinder_db_asked_version),
                             'mlst7_db': self.download_db_mlst7(version=mlst7_db_asked_version),
@@ -171,6 +185,9 @@ if __name__ == '__main__':
     argument_parser.add_argument('-kv', '--kmerfinder-version', type=str, 
                         default='3.0.2',
                         help='Version to download for the kmerfinder software.')
+    argument_parser.add_argument('-stv', '--shigatyper-version', type=str, 
+                        default='master',
+                        help='Version to download for the shigatyper software.')
     argument_parser.add_argument('-mv', '--cgemlst-version', type=str, 
                         default='2.0.4',
                         help='Version to download for the MLST software from CGE.')
@@ -194,6 +211,7 @@ if __name__ == '__main__':
     args = argument_parser.parse_args()
     downloads = DownloadsJunoTyping(db_dir=args.db_dir,
                                     update_dbs=args.update_dbs, 
+                                    shigatyper_asked_version=args.shigatyper_version,
                                     kmerfinder_asked_version=args.kmerfinder_version,
                                     cge_mlst_asked_version=args.cgemlst_version,
                                     kmerfinder_db_asked_version=args.kmerfinder_db_version,

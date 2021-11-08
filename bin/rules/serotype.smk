@@ -163,9 +163,11 @@ rule shigatyper:
     shell:
         """
 CURRENT_DIR=$(pwd)
+original_dir="$PWD"
+
 cd "{params.output_dir}"
 
-shigatyper {input.r1} {input.r2} > "$(basename {output.command_out})" 2> {log}
+python3 "$original_dir"/bin/shigatyper/shigatyper/shigatyper.py {input.r1} {input.r2} > "$(basename {output.command_out})" 2> {log}
 
 for file in *.csv
 do 

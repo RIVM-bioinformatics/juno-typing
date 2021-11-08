@@ -27,6 +27,8 @@ bin/kma/
 bin/cge-mlst
 bin/kmerfinder/
 bin/kmerfinder_db/
+bin/shigatyper
+
 # Snakemake
 .snakemake/
 .vscode/
