@@ -13,7 +13,6 @@ Documentation: https://rivm-bioinformatics.github.io/ids_bacteriology_man/juno-t
 # Dependencies
 from base_juno_pipeline import *
 import argparse
-import pandas as pd
 import pathlib
 import subprocess
 import yaml
@@ -200,7 +199,29 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
 
         return config_params     
         
+    def run_juno_typing_pipeline(self):
+        self.start_juno_typing_pipeline()
+        self.user_params = self.write_userparameters()
+        self.get_run_info()
+        if not self.dryrun or self.unlock:
+            self.path_to_audit.mkdir(parents=True, exist_ok=True)
+            self.audit_trail = self.generate_audit_trail()
+            downloads_juno_typing = bin.download_dbs.DownloadsJunoTyping(self.db_dir,
+                                                                        update_dbs=self.update_dbs,
+                                                                        cge_mlst_asked_version='2.0.4',
+                                                                        mlst7_db_asked_version='master',
+                                                                        serotypefinder_db_asked_version='master',
+                                                                        seroba_db_asked_version='master')
+            self.downloads_versions = downloads_juno_typing.downloaded_versions
+            with open(self.path_to_audit.joinpath('database_versions.yaml'), 'w') as file_:
+                yaml.dump(self.downloads_versions, file_, default_flow_style=False)
 
+        self.successful_run = self.run_snakemake()
+        assert self.successful_run, f'Please check the log files'
+        if not self.dryrun or self.unlock:
+            subprocess.run(['find', self.output_dir, '-type', 'f', '-empty', '-exec', 'rm', '{}', ';'])
+            subprocess.run(['find', self.output_dir, '-type', 'd', '-empty', '-exec', 'rm', '-rf', '{}', ';'])
+            self.make_snakemake_report()
 
 class StoreSpeciesArgAction(argparse.Action,
                                 JunoHelpers):
