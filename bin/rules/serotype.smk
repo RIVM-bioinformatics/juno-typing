@@ -23,6 +23,7 @@ rule aggregate_serotypes:
         choose_serotyper
     output:
         temp(OUT+'/serotype/{sample}_done.txt')
+    message: "Checking correct serotyper ran properly for {wildcards.sample}"
     threads: 1
     resources: mem_gb=config["mem_gb"]["other"]
     shell:
@@ -40,6 +41,7 @@ rule salmonella_serotyper:
         seqsero_tmp1 = temp(OUT+'/serotype/{sample}/SeqSero_result.txt'),
         seqsero_tmp2 = temp(OUT+'/serotype/{sample}/blasted_output.xml'),
         seqsero_tmp3 = temp(OUT+'/serotype/{sample}/data_log.txt')
+    message: "Running Salmonella serotyper for {wildcards.sample}."
     log:
         OUT+'/log/serotype/{sample}_salmonella.log'
     params:
@@ -67,6 +69,7 @@ rule ecoli_serotyper:
     output: 
         json = OUT + '/serotype/{sample}/data.json',
         csv = OUT + '/serotype/{sample}/result_serotype.csv'
+    message: "Running E. coli serotyper for {wildcards.sample}."
     log:
         OUT+'/log/serotype/{sample}_ecoli.log'
     conda: 
@@ -98,6 +101,7 @@ rule seroba:
         r2 = lambda wildcards: SAMPLES[wildcards.sample]["R2"]
     output:
         OUT + "/serotype/{sample}/pred.tsv"
+    message: "Running S. pneumoniae serotyper for {wildcards.sample}."
     log:
         OUT+'/log/serotype/{sample}_spneumoniae.log'
     conda:
@@ -131,6 +135,7 @@ rule shigatyper:
     output:
         sample_out = OUT + '/serotype/{sample}/shigatyper.csv',
         command_out = OUT + '/serotype/{sample}/command.txt'
+    message: "Running Shigella serotyper for {wildcards.sample}."
     log:
         OUT+'/log/serotype/{sample}_shigella.log'
     conda:
@@ -163,6 +168,7 @@ rule no_serotyper:
         assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
     output: 
         temp(OUT + "/serotype/{sample}/no_serotype_necessary.txt")
+    message: "Skipping serotyper step for {wildcards.sample}."
     threads: 1
     resources: mem_gb=config["mem_gb"]["other"]
     shell:

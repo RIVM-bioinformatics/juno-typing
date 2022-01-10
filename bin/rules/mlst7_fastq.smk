@@ -13,6 +13,7 @@ rule mlst7:
         fasta = OUT + "/mlst7/{sample}/MLST_allele_seq.fsa",
         hits = temp(OUT + "/mlst7/{sample}/Hit_in_genome_seq.fsa"),
         tab = temp(OUT + "/mlst7/{sample}/results_tab.tsv")
+    message: "Calculating the 7 locus-MLST for {wildcards.sample}"
     conda:
         "../../envs/mlst7.yaml"
     log:

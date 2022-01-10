@@ -5,6 +5,7 @@ rule serotype_multireports:
         expand(OUT+'/serotype/{sample}_done.txt', sample = SAMPLES)
     output:
         OUT + '/serotype/serotyper_multireport.csv'
+    message: "Making multireport(s) for the serotyping results (if any)."
     threads: config["threads"]["other"]
     resources: mem_gb=config["mem_gb"]["other"]
     log:

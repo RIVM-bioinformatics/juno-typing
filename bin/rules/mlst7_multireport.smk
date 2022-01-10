@@ -5,6 +5,7 @@ rule mlst7_multireport:
         expand(OUT + "/mlst7/{sample}/data.json", sample = SAMPLES)
     output:
         OUT + "/mlst7/mlst7_multireport.csv"
+    message: "Making multireport for 7 locus-MLST results."
     log:
         OUT+'/log/mlst7/mlst7_multireport.log'
     threads: 1

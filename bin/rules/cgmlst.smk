@@ -7,6 +7,7 @@ checkpoint enlist_samples_for_cgmlst_scheme:
         sample_sheet
     output:
         directory(OUT + '/cgmlst')
+    message: "Finding which cgMLST scheme needs to be run for each sample."
     log:
         OUT + '/log/cgmlst/list_samples_per_cgmlst_scheme.log'
     threads: config['threads']['other']
@@ -31,6 +32,7 @@ rule cgmlst_per_genus:
         input_files = OUT + '/cgmlst/{genus}_samples.txt'
     output:
         chewbbaca_result = OUT + '/cgmlst/{genus}/results_alleles.tsv'
+    message: "Running cgMLST for genus {wildcards.genus}"
     conda:
         '../../envs/chewbbaca.yaml'
     log:
@@ -59,6 +61,7 @@ rule hash_cgmlst:
         OUT + '/cgmlst/{genus}/results_alleles.tsv'
     output:
         OUT + '/cgmlst/{genus}/hashed_results_alleles.csv'
+    message: "Getting hashes for the cgMLST results for genus {wildcards.genus}"
     log:
         OUT + '/log/cgmlst/hashed_chewbbaca_{genus}.log'
     threads: config['threads']['other']
@@ -90,6 +93,7 @@ rule cgmlst_multireport:
         cgmlst_output
     output:
         temp(OUT + '/cgmlst_multireport.csv')
+    message: "Creating cgMLST multireport."
     threads: config['threads']['other']
     resources: mem_gb=config['mem_gb']['other']
     shell:
