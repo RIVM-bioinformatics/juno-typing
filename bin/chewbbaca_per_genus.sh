@@ -35,4 +35,10 @@ chewBBACA.py AlleleCall --cpu ${threads} \
                 -o "." \
                 --fr
 
-find "." -type f -name "results_alleles.tsv" -exec mv {} "." \;
+find "." -type f -name "results_alleles.tsv" -exec cp {} "." \;
+
+# The newly identified alleles have the 'INF-' prefix
+# That can cause issues when calculating the distance matrix
+# because they will be seen as diferent from the alleles
+# that do not have the prefix. Therefore it is better to remove them
+sed -i -r "s/INF-([0-9]+)/\1/g" "results_alleles.tsv"
