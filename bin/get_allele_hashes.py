@@ -36,7 +36,8 @@ class Allele():
         '''
         Calculate the hash for the seq attribute of the current Allele instance
         '''
-        assert isinstance(self.seq, str), f"The allele sequence should be a string."
+        if not isinstance(self.seq, str):
+            f"The allele sequence should be a string."
         byte_seq = bytes(self.seq, 'utf-8')
         self.hash = hashlib.sha1(byte_seq).hexdigest()
 
@@ -45,7 +46,8 @@ class Allele():
         Get the ID from the header of a fasta record. The fasta record should
         be a SeqRecord made by a SeqIO.parse generator
         '''
-        assert isinstance(self.fasta_record, SeqIO.SeqRecord), f"The provided fasta_record is not a SeqRecord instance."
+        if not isinstance(self.fasta_record, SeqIO.SeqRecord):
+            f"The provided fasta_record is not a SeqRecord instance."
         self.seq = str(self.fasta_record.seq)
         self.id = self.fasta_record.name
         # The fasta files should have the allele ID in the form:
@@ -85,7 +87,8 @@ class Locus():
 
     def validate_fasta(self, fasta_file):
         if fasta_file is not None:
-            assert pathlib.Path(fasta_file).is_file(), f"The provided fasta file {self.fasta_file} does not exist."
+            if not pathlib.Path(fasta_file).is_file():
+                f"The provided fasta file {self.fasta_file} does not exist."
             with open(fasta_file, 'r') as file_:
                 fasta_record = SeqIO.parse(file_, 'fasta')
                 if not any(fasta_record):
@@ -163,7 +166,8 @@ class CgmlstResult():
                 db_dir = "/mnt/db/juno/typing_db/cgmlst/prepared_schemes",
                 threads = 2): 
         self.chewbbaca_result_file = pathlib.Path(chewbbaca_result_file)
-        assert self.chewbbaca_result_file.exists(), f"The provided file {chewbbaca_result_file} does not exist."
+        if not self.chewbbaca_result_file.exists(): 
+            f"The provided file {chewbbaca_result_file} does not exist."
         self.read_chewbbaca_result_file()
         self.db_dir = self.get_db_dir(db_dir = db_dir, scheme_name = scheme_name)
         self.threads = int(threads)
@@ -173,13 +177,18 @@ class CgmlstResult():
         self.read_chewbbaca_result_file()
 
     def read_chewbbaca_result_file(self):
-        assert self.chewbbaca_result_file.exists(), f'The provided file (chewbbaca_result_file) does not exist.'
-        self.cgmlst_result = pd.read_csv(self.chewbbaca_result_file, 
-                                        sep = "\t", index_col = "FILE")
+        if not self.chewbbaca_result_file.exists(): 
+            f'The provided file (chewbbaca_result_file) does not exist.'
+        self.cgmlst_result = pd.read_csv(
+            self.chewbbaca_result_file, 
+            sep = "\t", index_col = "FILE",
+            dtype=str
+        )
 
     def __validate_db_dir(self, db_dir):   
         db_dir = pathlib.Path(db_dir) 
-        assert db_dir.exists(), f'The directory {db_dir} does not exist.'
+        if not db_dir.exists():
+            f'The directory {db_dir} does not exist.'
         db_dir_content = [fasta_file for fasta_file in db_dir.glob('*.fasta')]
         if len(db_dir_content) > 0:
             return True
@@ -207,7 +216,8 @@ class CgmlstResult():
         locus_name = locus_name.replace('.fasta', '')
         basename_locus_fasta_file = locus_name + '.fasta'
         fasta_file_path = self.db_dir.joinpath(basename_locus_fasta_file)
-        assert fasta_file_path.exists(), f"The fasta file for the locus {locus_name} does not exist or is not in the expected location ({fasta_file_path})"
+        if not fasta_file_path.exists():
+            f"The fasta file for the locus {locus_name} does not exist or is not in the expected location ({fasta_file_path})"
         return locus_name, fasta_file_path
 
     def __remake_csv_hash_id_tbl(self, fasta_file):
@@ -219,7 +229,8 @@ class CgmlstResult():
     def __get_hash_from_hash_id_tbl(self, hash_id_tbl, id_number):
         allele_hash = hash_id_tbl.loc[hash_id_tbl['id_number'] == id_number, 'hash'].tolist()
         allele_hash = list(set(allele_hash))
-        assert len(allele_hash) <= 1, f'The id number {id_num} did not deliver a unique hash: {allele_hash}'
+        if len(allele_hash) > 1:
+            f'The id number {id_number} did not deliver a unique hash: {allele_hash}'
         return allele_hash[0]
 
     def __gen_hash_per_id_num(self, hash_id_tbl, id_numbers, fasta_file):
@@ -276,7 +287,6 @@ def main(input,
     hashed_report = chewbbaca_res.get_hashed_cgmlst_report()
     print(f'Writing report to csv file {output}.')
     hashed_report.to_csv(path_or_buf=output)
-    print(hashed_report)
 
 
 if __name__ == "__main__":

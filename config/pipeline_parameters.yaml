@@ -7,6 +7,7 @@ threads:
   seqsero2: 6
   serotypefinder: 2
   seroba: 1
+  hashing: 4
 mem_gb:
   other: 8
   cgemlst: 16
@@ -16,6 +17,7 @@ mem_gb:
   serotypefinder: 10
   seroba: 10
   shigatyper: 8
+  hashing: 4
 
 # Pipeline parameters (not taken from user)
 salmonellamonophasic:

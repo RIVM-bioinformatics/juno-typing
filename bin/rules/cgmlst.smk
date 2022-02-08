@@ -64,8 +64,8 @@ rule hash_cgmlst:
     message: "Getting hashes for the cgMLST results for genus {wildcards.genus}"
     log:
         OUT + '/log/cgmlst/hashed_chewbbaca_{genus}.log'
-    threads: config['threads']['other']
-    resources: mem_gb=config['mem_gb']['other']
+    threads: config['threads']['hashing']
+    resources: mem_gb=config['mem_gb']['hashing']
     params:
         db_dir = CGMLST_DB + '/prepared_schemes/',
         genus = '{genus}'
