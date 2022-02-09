@@ -20,8 +20,9 @@ import yaml
 # Own scripts
 import bin.download_dbs
 
-class JunoTypingRun(base_juno_pipeline.PipelineStartup,
-                    base_juno_pipeline.RunSnakemake):
+class JunoTypingRun(
+    base_juno_pipeline.PipelineStartup, base_juno_pipeline.RunSnakemake
+):
     """Class with the arguments and specifications that are only for the Juno-typing pipeline but inherit from PipelineStartup and RunSnakemake"""
     
     def __init__(self, 
@@ -36,6 +37,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                 seroba_mincov=20, 
                 seroba_kmersize=71,
                 cores=300,
+                time_limit=60,
                 local=False,
                 queue='bio',
                 unlock=False,
@@ -52,16 +54,20 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         workdir = pathlib.Path(__file__).parent.resolve()
         self.db_dir = pathlib.Path(db_dir).resolve()
         self.path_to_audit = output_dir.joinpath('audit_trail')
-        base_juno_pipeline.PipelineStartup.__init__(self,
+        base_juno_pipeline.PipelineStartup.__init__(
+            self,
             input_dir=pathlib.Path(input_dir).resolve(), 
             input_type='both',
-            min_num_lines=2) # Min for viable fasta
-        base_juno_pipeline.RunSnakemake.__init__(self,
+            min_num_lines=2
+        ) # Min for viable fasta
+        base_juno_pipeline.RunSnakemake.__init__(
+            self,
             pipeline_name='Juno_typing',
             pipeline_version='v0.2',
             output_dir=output_dir,
             workdir=workdir,
             cores=cores,
+            time_limit=time_limit,
             local=local,
             queue=queue,
             unlock=unlock,
@@ -75,7 +81,8 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             restarttimes=1,
             latency_wait=60,
             name_snakemake_report=str(self.path_to_audit.joinpath('juno_typing_report.html')),
-            **kwargs)
+            **kwargs
+        )
 
         # Pipeline attributes
         self.genus, self.species = self.__get_genus_species_from_arg(species)
@@ -199,8 +206,7 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
             subprocess.run(['find', self.output_dir, '-type', 'd', '-empty', '-exec', 'rm', '-rf', '{}', ';'])
             self.make_snakemake_report()
 
-class StoreSpeciesArgAction(argparse.Action,
-                                JunoHelpers):
+class StoreSpeciesArgAction(argparse.Action, JunoHelpers):
     '''
     Argparse Action to check that species was passed as only two words and
     store it as a single string instead of as a list.
@@ -320,6 +326,14 @@ if __name__ == '__main__':
         action='store_true',
         help="Running pipeline locally (instead of in a computer cluster). Default is running it in a cluster."
     )
+    parser.add_argument(
+        "-w",
+        "--time-limit",
+        type = int,
+        metavar = "INT",
+        default = 60,
+        help="Time limit per job in minutes (passed as -W argument to bsub). Jobs will be killed if not finished in this time."
+    )
     # Snakemake arguments
     parser.add_argument(
         "-u",
@@ -358,6 +372,7 @@ if __name__ == '__main__':
                     seroba_kmersize=args.seroba_kmersize,
                     cores=args.cores,
                     local=args.local,
+                    time_limit=args.time_limit,
                     queue=args.queue,
                     unlock=args.unlock,
                     rerunincomplete=args.rerunincomplete,

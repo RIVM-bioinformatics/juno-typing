@@ -26,6 +26,7 @@ class Allele():
         self.seq = seq
         self.id_number = id_number
         self.hash = hash
+        self.locus_name = locus_name
         self.fasta_record = fasta_record
 
     def update_seq(self, seq):
