@@ -1,4 +1,3 @@
-import base_juno_pipeline
 import csv
 import os
 import pathlib
@@ -119,11 +118,9 @@ class TestJunoTypingDryRun(unittest.TestCase):
 class TestJunoTypingPipeline(unittest.TestCase):
     """Testing the JunoTyping class (code specific for this pipeline)"""
 
-    def setUpClass():
-        os.system('rm -rf test_output')
-
     def tearDownClass():
         os.system('rm -rf test_output')
+        os.system('rm -rf test_output2')
     
     def test_junotyping_run(self):
         """Testing the pipeline runs properly with real samples"""
@@ -147,7 +144,7 @@ class TestJunoTypingPipeline(unittest.TestCase):
 
     def test_junotyping_run_wMetadata(self):
         """Testing the pipeline runs properly with real samples when providing a metadata file"""
-        output_dir = pathlib.Path('test_output')
+        output_dir = pathlib.Path('test_output2')
         pipeline_run = juno_typing.JunoTypingRun(input_dir = '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/', 
                                     db_dir = '/mnt/db/juno/typing_db',
                                     metadata= '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/metadata.csv',
