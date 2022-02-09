@@ -111,7 +111,9 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         with open("files/dictionary_correct_species.yaml") as translation_yaml:
             self.mlst7_species_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
-            mlst7_species = self.__shorten_species(self.sample_dict[sample]['genus'], self.sample_dict[sample]['species'])
+            mlst7_species = self.__shorten_species(
+                self.sample_dict[sample]['genus'], self.sample_dict[sample]['species']
+            )
             try:
                 self.sample_dict[sample]['species-mlst7'] = self.mlst7_species_translation_tbl[mlst7_species]
             except KeyError:
@@ -125,14 +127,17 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
         with open("files/dictionary_correct_cgmlst_scheme.yaml") as translation_yaml:
             self.cgmlst_scheme_translation_tbl = yaml.safe_load(translation_yaml)
         for sample in self.sample_dict:
-            genus = self.sample_dict[sample]['genus'].strip().lower() 
+            genus = self.sample_dict[sample]['genus']
             try:
                 self.sample_dict[sample]['cgmlst_scheme'] = self.cgmlst_scheme_translation_tbl[genus]
             except KeyError:
                 self.sample_dict[sample]['cgmlst_scheme'] = None
 
     def update_sample_dict_with_metadata(self):
-        self.get_metadata_from_csv_file(filepath=self.metadata_file, expected_colnames=['sample', 'genus', 'species'])
+        self.get_metadata_from_csv_file(
+            filepath=self.metadata_file, 
+            expected_colnames=['sample', 'genus', 'species']
+        )
         # Add metadata
         for sample in self.sample_dict:
             if self.genus is not None and self.species is not None:
@@ -142,7 +147,14 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
                 try:
                     self.sample_dict[sample].update(self.juno_metadata[sample])
                 except (KeyError, TypeError):
-                    raise ValueError(f'One of your samples is not in the metadata file ({self.metadata_file}). Please ensure that all samples are present in the metadata file or provide a --species argument.')
+                    raise ValueError(
+                        f'One of your samples is not in the metadata file '\
+                        f'({self.metadata_file}). Please ensure that all '\
+                        'samples are present in the metadata file or provide '\
+                        'a --species argument.'
+                    )
+                self.sample_dict[sample]['genus'] = self.sample_dict[sample]['genus'].strip().lower()
+                self.sample_dict[sample]['species'] = self.sample_dict[sample]['species'].strip().lower()
         # The list does not return anything meaningful. It is just to activate
         # the generator. The self.sample_dict is updated by itself.
         list(self.get_mlst7_scheme_name())
@@ -162,16 +174,22 @@ class JunoTypingRun(base_juno_pipeline.PipelineStartup,
     
     def write_userparameters(self):
 
-        config_params = {'input_dir': str(self.input_dir),
-                        'out': str(self.output_dir),
-                        'mlst7_db': str(self.db_dir.joinpath('mlst7_db')),
-                        'seroba_db': str(self.db_dir.joinpath('seroba_db')),
-                        'serotypefinder_db': str(self.db_dir.joinpath('serotypefinder_db')),
-                        'serotypefinder': {'min_cov': self.serotypefinder_mincov,
-                                            'identity_thresh': self.serotypefinder_identity},
-                        'seroba': {'min_cov': self.seroba_mincov,
-                                    'kmer_size': self.seroba_kmersize},
-                        'cgmlst_db': str(self.db_dir.joinpath('cgmlst'))}
+        config_params = {
+            'input_dir': str(self.input_dir),
+            'out': str(self.output_dir),
+            'mlst7_db': str(self.db_dir.joinpath('mlst7_db')),
+            'seroba_db': str(self.db_dir.joinpath('seroba_db')),
+            'serotypefinder_db': str(self.db_dir.joinpath('serotypefinder_db')),
+            'serotypefinder': {
+                'min_cov': self.serotypefinder_mincov,
+                'identity_thresh': self.serotypefinder_identity
+            },
+            'seroba': {
+                'min_cov': self.seroba_mincov,
+                'kmer_size': self.seroba_kmersize
+            },
+            'cgmlst_db': str(self.db_dir.joinpath('cgmlst'))
+        }
         
         with open(self.user_parameters, 'w') as file_:
             yaml.dump(config_params, file_, default_flow_style=False)
@@ -236,7 +254,14 @@ if __name__ == '__main__':
         default = None,
         required=False,
         metavar = "FILE",
-        help = "Relative or absolute path to the metadata csv file. If provided, it must contain at least one column with the 'Sample' name (name of the file but removing _R1.fastq.gz), a column called 'Genus' and a column called 'Species'. The genus and species provided will be used to choose the serotyper and the MLST schema."
+        help = "Relative or absolute path to the metadata csv file. If "\
+            "provided, it must contain at least one column named 'sample' "\
+            "with the name of the sample (same than file name but removing "\
+            "the suffix _R1.fastq.gz), a column called "\
+            "'genus' and a column called 'species'. The genus and species "\
+            "provided will be used to choose the serotyper and the MLST schema(s)."\
+            "If a metadata file is provided, it will overwrite the --species "\
+            "argument for the samples present in the metadata file."
     )
     parser.add_argument(
         "-s",
