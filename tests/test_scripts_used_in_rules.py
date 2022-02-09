@@ -77,10 +77,11 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
         """
 
         os.system('rm -rf test_output')
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['salmonella'],
-                                                        output_dir='test_output',
-                                                        threads=2,
-                                                        download_loci=False)
+        download_cgmlst_scheme.cgMLSTSchemes(
+            ['salmonella'],
+            output_dir='test_output',
+            threads=2, download_loci=False
+        )
         dir_with_downloaded_scheme = pathlib.Path('test_output', 'salmonella')
         self.assertFalse(dir_with_downloaded_scheme.is_dir())
         self.assertFalse(pathlib.Path('test_output').is_dir())
@@ -111,23 +112,36 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
                                                         output_dir='test_output',
                                                         threads=2,
                                                         download_loci=False)
-        expected_result = {'salmonella': \
-                            {'source': 'enterobase',
-                            'url': 'http://enterobase.warwick.ac.uk/schemes/Salmonella.cgMLSTv2/',
-                            'locus_count': 3002,
-                            'scheme_description': None},
-                        'shigella': \
-                            {'source': 'enterobase',
-                            'url': 'http://enterobase.warwick.ac.uk/schemes/Escherichia.cgMLSTv1/',
-                            'locus_count': 2513,
-                            'scheme_description': None}}
-        self.assertEqual(len(cgMLSTschemes_result.schemes), 2)
+        expected_result = {
+            'salmonella': {
+                'source': 'enterobase',
+                'url': 'http://enterobase.warwick.ac.uk/schemes/Salmonella.cgMLSTv2/',
+                'locus_count': 3002,
+                'scheme_description': None
+            },
+            'escherichia': {
+                'source': 'seqsphere',
+                'url': 'https://www.cgmlst.org/ncs/schema/8896773/locus/',
+                'locus_count': 3152,
+                'scheme_description': None
+            },
+            'shigella': {
+                'source': 'enterobase',
+                'url': 'http://enterobase.warwick.ac.uk/schemes/Escherichia.cgMLSTv1/',
+                'locus_count': 2513,
+                'scheme_description': None
+            }
+        }
+        self.assertEqual(len(cgMLSTschemes_result.schemes), len(expected_result))
         self.assertTrue('salmonella' in cgMLSTschemes_result.schemes)
         self.assertTrue('shigella' in cgMLSTschemes_result.schemes)
+        self.assertTrue('escherichia' in cgMLSTschemes_result.schemes)
         self.assertEqual(cgMLSTschemes_result.schemes, expected_result)
         dir_with_downloaded_scheme = pathlib.Path('test_output', 'salmonella')
         self.assertFalse(dir_with_downloaded_scheme.is_dir())
         dir_with_downloaded_scheme = pathlib.Path('test_output', 'shigella')
+        self.assertFalse(dir_with_downloaded_scheme.is_dir())
+        dir_with_downloaded_scheme = pathlib.Path('test_output', 'escherichia')
         self.assertFalse(dir_with_downloaded_scheme.is_dir())
 
     def test_escherichia_cgMLSTschemes(self):
@@ -135,20 +149,24 @@ class TestDownloadcgMLSTSchemes(unittest.TestCase):
         the optional enterobase one (shared with shigella)
         """
 
-        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(['escherichia'],
-                                                        output_dir='test_output',
-                                                        threads=2,
-                                                        download_loci=False)
-        expected_result = {'escherichia': \
-                            {'source': 'seqsphere',
-                            'url': 'https://www.cgmlst.org/ncs/schema/5064703/locus/',
-                            'locus_count': 2513,
-                            'scheme_description': None},
-                        'shigella': \
-                            {'source': 'enterobase',
-                            'url': 'http://enterobase.warwick.ac.uk/schemes/Escherichia.cgMLSTv1/',
-                            'locus_count': 2513,
-                            'scheme_description': None}}
+        cgMLSTschemes_result = download_cgmlst_scheme.cgMLSTSchemes(
+            ['escherichia'], output_dir='test_output',
+            threads=2, download_loci=False
+        )
+        expected_result = {
+            'escherichia': {
+                'source': 'seqsphere',
+                'url': 'https://www.cgmlst.org/ncs/schema/8896773/locus/',
+                'locus_count': 3152,
+                'scheme_description': None
+            },
+            'shigella': {
+                'source': 'enterobase',
+                'url': 'http://enterobase.warwick.ac.uk/schemes/Escherichia.cgMLSTv1/',
+                'locus_count': 2513,
+                'scheme_description': None
+            }
+        }
         self.assertEqual(len(cgMLSTschemes_result.schemes), 2)
         self.assertTrue('escherichia' in cgMLSTschemes_result.schemes)
         self.assertTrue('shigella' in cgMLSTschemes_result.schemes)
