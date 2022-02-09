@@ -127,48 +127,44 @@ class TestJunoTypingPipeline(unittest.TestCase):
     
     def test_junotyping_run(self):
         """Testing the pipeline runs properly with real samples"""
+        output_dir = pathlib.Path('test_output')
         juno_typing_run = juno_typing.JunoTypingRun(input_dir = '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/', 
                                     db_dir = '/mnt/db/juno/typing_db',
-                                    output_dir = pathlib.Path('test_output'))
+                                    output_dir = output_dir)
         self.assertTrue(juno_typing_run.successful_run, 'Exception raised when running a dryrun')
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'salmonella', 'results_alleles.tsv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'escherichia', 'results_alleles.tsv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'shigella', 'results_alleles.tsv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'salmonella', 'hashed_results_alleles.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'escherichia', 'hashed_results_alleles.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'shigella', 'hashed_results_alleles.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('serotype', 'serotyper_multireport.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('mlst7', 'mlst7_multireport.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_git.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_pipeline.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_conda.txt').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'juno_typing_report.html').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'sample_sheet.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'user_parameters.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'database_versions.yaml').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport.csv').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport1.csv').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport2.csv').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport3.csv').exists())
+        self.assertTrue(output_dir.joinpath('mlst7', 'mlst7_multireport.csv').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'log_git.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'log_pipeline.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'log_conda.txt').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'juno_typing_report.html').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'sample_sheet.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'user_parameters.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'database_versions.yaml').exists())
 
     def test_junotyping_run_wMetadata(self):
         """Testing the pipeline runs properly with real samples when providing a metadata file"""
+        output_dir = pathlib.Path('test_output')
         pipeline_run = juno_typing.JunoTypingRun(input_dir = '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/', 
                                     db_dir = '/mnt/db/juno/typing_db',
                                     metadata= '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/metadata.csv',
-                                    output_dir = pathlib.Path('test_output'))
+                                    output_dir = output_dir)
         self.assertTrue(pipeline_run.successful_run, 'Exception raised when running a dryrun')
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'salmonella', 'results_alleles.tsv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'escherichia', 'results_alleles.tsv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'shigella', 'results_alleles.tsv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'salmonella', 'hashed_results_alleles.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'escherichia', 'hashed_results_alleles.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('cgmlst', 'shigella', 'hashed_results_alleles.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('serotype', 'serotyper_multireport.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('mlst7', 'mlst7_multireport.csv').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_git.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_pipeline.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'log_conda.txt').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'juno_typing_report.html').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'sample_sheet.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'user_parameters.yaml').exists())
-        self.assertTrue(pathlib.Path('test_output').joinpath('audit_trail', 'database_versions.yaml').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport.csv').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport1.csv').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport2.csv').exists())
+        self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport3.csv').exists())
+        self.assertTrue(output_dir.joinpath('mlst7', 'mlst7_multireport.csv').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'log_git.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'log_pipeline.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'log_conda.txt').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'juno_typing_report.html').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'sample_sheet.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'user_parameters.yaml').exists())
+        self.assertTrue(output_dir.joinpath('audit_trail', 'database_versions.yaml').exists())
 
 
 if __name__ == '__main__':

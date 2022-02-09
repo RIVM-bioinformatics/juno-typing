@@ -33,7 +33,6 @@ with open(sample_sheet) as sample_sheet_file:
 
 # OUT defines output directory for most rules.
 OUT = config["out"]
-CGMLST_DB = config["cgmlst_db"]
 
 
 #@################################################################################
@@ -44,7 +43,6 @@ include: "bin/rules/mlst7_fastq.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
-include: "bin/rules/cgmlst.smk"
 
 #@################################################################################
 #@####              Finalize pipeline (error/success)                        #####
@@ -55,9 +53,6 @@ onerror:
     shell("""
 find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
 find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
-if [ -f '{OUT}/cgmlst' ]; then
-    find {OUT}/cgmlst -maxdepth 1 -type d -name "results_*" -exec rm -rf {{}} \;
-fi
 echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
     """)
 
@@ -69,14 +64,12 @@ echo -e "Something went wrong with Juno-typing pipeline. Please check the loggin
 localrules:
     all,
     aggregate_serotypes,
-    no_serotyper,
-    enlist_samples_for_cgmlst_scheme
+    no_serotyper
 
 rule all:
     input:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
         OUT+'/serotype/serotyper_multireport.csv',
-        OUT + "/mlst7/mlst7_multireport.csv",
-        hashed_cgmlst = OUT + '/cgmlst_multireport.csv'
+        OUT + "/mlst7/mlst7_multireport.csv"
 
 
