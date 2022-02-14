@@ -61,7 +61,7 @@ do
     if [ ! -z ${!key} ] ; then
         attrname=${key:12}
         attrname=${attrname/__/::}
-        echo "${attrname}: '${!key}'" >> ${OUTPUTDIR}/metadata.yml
+        echo "${attrname}: '${!key}'" >> ${output_dir}/metadata.yml
     fi
 done
 
