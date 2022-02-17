@@ -1,3 +1,5 @@
+[![C.I.](https://github.com/RIVM-bioinformatics/Juno-typing/actions/workflows/juno_typing_test.yaml/badge.svg)](https://github.com/RIVM-bioinformatics/Juno-typing/actions/workflows/juno_typing_test.yaml)
+
 <div align="center">
     <h1>Juno-typing</h1>
     <br />
