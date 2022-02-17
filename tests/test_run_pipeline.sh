@@ -4,8 +4,8 @@ export irods_runsheet_sys__runsheet__lsf_queue='bio'
 export irods_input_illumina__Flowcell='XXXX'
 export irods_input_illumina__Instrument='nextseq'
 export irods_input_illumina__Date='20220214' 
-export irods_input_illumina__Run_number='0001' 
-export irods_input_illumina__Run_Id='XXXX'
+# export irods_input_illumina__Run_number='0001' 
+# export irods_input_illumina__Run_Id='XXXX'
 export irods_input_sequencing__fake_arg='aaaa'
 
 input_dir="/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/"

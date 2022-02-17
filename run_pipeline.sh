@@ -48,6 +48,9 @@ python juno_typing.py --queue "${QUEUE}" -i "${input_dir}" -o "${output_dir}"
 result=$?
 
 # Propagate metadata
+
+set +euo pipefail 
+
 SEQ_KEYS=
 SEQ_ENV=`env | grep irods_input_sequencing`
 for SEQ_AVU in ${SEQ_ENV}
@@ -64,6 +67,8 @@ do
         echo "${attrname}: '${!key}'" >> ${output_dir}/metadata.yml
     fi
 done
+
+set -euo pipefail 
 
 exit ${result}
 # Produce svg with rules
