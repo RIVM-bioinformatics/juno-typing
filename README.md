@@ -56,7 +56,7 @@ Alternatively, you can download it manually as a zip file (you will need to unzi
 
 ```
 cd Juno-typing
-conda env install -f envs/master_env.yaml
+conda env create -f envs/master_env.yaml
 ```
 
 ## Parameters & Usage

@@ -23,6 +23,7 @@ db_test/
 fake_db/
 temp.*
 test_output/
+src/
 # Software downloaded
 bin/kma/
 bin/cge-mlst
