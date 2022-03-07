@@ -4,14 +4,6 @@ Author(s): Alejandra Hernandez-Segura, Kaitlin Weber, Edwin van der Kind and Maa
 Organization: Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 Department: Infektieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS), Bacteriologie (BPD)
 Date: 12-01-2021
-Documentation: 
-Snakemake rules (in order of execution):
-    1. CGE-MLST
-    2. Bacterial serotyping
-        - SeqSero2 for Salmonella
-        - SerotypeFinder for E. coli
-        - Seroba for S. pneumoniae
-    3. Multireports for serotyper and CGE-MLST
 """
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####

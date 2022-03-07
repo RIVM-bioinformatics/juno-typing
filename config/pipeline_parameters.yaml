@@ -17,6 +17,3 @@ mem_gb:
   seroba: 10
   shigatyper: 8
 
-# Pipeline parameters (not taken from user)
-salmonellamonophasic:
-  min_cov: 4000
