@@ -6,3 +6,4 @@ dependencies:
   - seroba=1.0.2
   - biopython=1.74
   - tbb=2020.3
+  - kmc=3.1.2rc1
