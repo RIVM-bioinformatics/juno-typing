@@ -271,7 +271,9 @@ if __name__ == '__main__':
         default=None,
         required = False,
         metavar = "FILE",
-        help = "Relative or absolute path to a csv file containing at least one column with the 'sample' name (name of the file but removing [_S##]_R1.fastq.gz), a column called 'genus' and a column called 'species' (Note that the columns are in small letters). If a genus + species is provided for a sample, it will overwrite the species identification performed by this pipeline when choosing the scheme for MLST and the serotyper"
+        help = "Species name (any species in the metadata file will overwrite"\
+            " this argument). It should be given as two words (e.g. --species "\
+            "Salmonella enterica)"
     )
     parser.add_argument(
         "-o",

@@ -121,13 +121,15 @@ class TestJunoTypingPipeline(unittest.TestCase):
     def tearDownClass():
         os.system('rm -rf test_output')
         os.system('rm -rf test_output2')
+        os.system('rm -rf test_new_conda_envs')
     
     def test_junotyping_run(self):
-        """Testing the pipeline runs properly with real samples"""
+        """Testing the pipeline runs properly with real samples and new conda envs"""
         output_dir = pathlib.Path('test_output')
         juno_typing_run = juno_typing.JunoTypingRun(input_dir = '/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/', 
                                     db_dir = '/mnt/db/juno/typing_db',
-                                    output_dir = output_dir)
+                                    output_dir = output_dir,
+                                    conda_prefix='test_new_conda_envs')
         self.assertTrue(juno_typing_run.successful_run, 'Exception raised when running a dryrun')
         self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport.csv').exists())
         self.assertTrue(output_dir.joinpath('serotype', 'serotyper_multireport1.csv').exists())

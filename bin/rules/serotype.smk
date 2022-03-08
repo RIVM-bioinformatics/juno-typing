@@ -45,8 +45,7 @@ rule salmonella_serotyper:
     log:
         OUT+'/log/serotype/{sample}_salmonella.log'
     params:
-        output_dir = OUT + '/serotype/{sample}/',
-        min_cov = config['salmonellamonophasic']['min_cov']
+        output_dir = OUT + '/serotype/{sample}/'
     threads: 
         config["threads"]["seqsero2"]
     resources: 
