@@ -1,5 +1,4 @@
 import argparse
-from ensurepip import version
 import pathlib
 import subprocess
 from base_juno_pipeline import helper_functions
