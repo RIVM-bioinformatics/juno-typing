@@ -1,7 +1,10 @@
 name: shigatyper
 channels:
-  - defaults
-  - bioconda
+- defaults
+- bioconda
+- anaconda
 dependencies:
-  - shigatyper=1.0.6
-  - libopenblas
+- gsl=2.5
+- bcftools=1.9
+- python=3.8.5
+- shigatyper=1.0.6
