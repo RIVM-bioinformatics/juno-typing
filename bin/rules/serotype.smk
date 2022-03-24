@@ -142,6 +142,7 @@ rule shigatyper:
     resources: mem_gb=config["mem_gb"]["shigatyper"]
     params:
         output_dir = OUT + "/serotype/{sample}"
+        #shiga_dire = 
     shell:
         """
 CURRENT_DIR=$(pwd)
