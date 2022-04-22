@@ -12,6 +12,9 @@ def choose_serotyper(wildcards):
                 OUT + '/serotype/{sample}/command.txt']
     elif SAMPLES[wildcards.sample]['genus'] == 'streptococcus':
         return [OUT + '/serotype/{sample}/pred.tsv']
+    elif SAMPLES[wildcards.sample]['genus'] == 'neisseria':
+        #TODO is the output folder enough
+        return [OUT + '/serotype/{sample}']
     else:
         return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
@@ -156,6 +159,33 @@ do
         mv "${{file}}" "${{file/*/shigatyper.csv}}"
     fi
 done
+        """
+
+rule characterize_neisseria_capsule:
+    input:
+        assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
+    output:
+        #TODO check if output is correct
+        output_dir = OUT + '/serotype/{sample}'
+    message: "Running characterize neisseria capsule for {wildcards.sample}."
+    log:
+        OUT+'/log/serotype/{sample}_neisseria.log'
+    conda:
+        "../../envs/characterize_neisseria_capsule.yaml"
+    resources: mem_gb=config["mem_gb"]["characterize_neisseria_capsule"]
+    threads: config["threads"]["characterize_neisseria_capsule"]
+    params:
+        output_dir = OUT + "/de_novo_assembly_filtered/"
+    shell:
+        """
+sample=$(awk -F/ '{{print $NF}}' <<< {input.assembly})
+dir_name=$(awk -F. '{{print $1}}' <<< $sample)
+final_name="{params.output_dir}$dir_name" 
+
+mkdir -p $final_name
+cp {input.assembly} "$final_name/"
+
+python3 bin/characterize_neisseria_capsule/characterize_neisseria_capsule.py -d $final_name -o {output.output_dir}
         """
 
 #-----------------------------------------------------------------------------#

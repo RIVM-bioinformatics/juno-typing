@@ -12,6 +12,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                     db_dir, 
                     update_dbs=False, 
                     cge_mlst_asked_version='2.0.4',
+                    characterize_neisseria_capsule_asked_version='master',
                     mlst7_db_asked_version='master',
                     serotypefinder_db_asked_version='master',
                     seroba_db_asked_version='master',
@@ -21,6 +22,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         self.update_dbs = update_dbs
         self.seroba_kmersize = seroba_kmersize
         self.downloaded_versions = self.get_downloads_juno_typing(cge_mlst_asked_version=cge_mlst_asked_version,
+                                                                    characterize_neisseria_capsule_asked_version = characterize_neisseria_capsule_asked_version,
                                                                     mlst7_db_asked_version=mlst7_db_asked_version,
                                                                     serotypefinder_db_asked_version=serotypefinder_db_asked_version,
                                                                     seroba_db_asked_version=seroba_db_asked_version)
@@ -34,7 +36,17 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                             'https://bitbucket.org/genomicepidemiology/kmerfinder.git',
                             kmerfinder_software_dir)
         return version
-        
+
+    def download_software_characterize_neisseria_capsule(self, version):
+        """Function to download characterize_neisseria_capsule if it is not present"""
+        characterize_neisseria_capsule_software_dir = self.bin_dir.joinpath('characterize_neisseria_capsule')
+        if not characterize_neisseria_capsule_software_dir.joinpath('characterize_neisseria_capsule.py').is_file():
+            print("\x1b[0;33m Downloading characterize_neisseria_capsule software...\n\033[0;0m")
+            self.download_git_repo(version, 
+                            'https://github.com/ntopaz/characterize_neisseria_capsule.git',
+                            characterize_neisseria_capsule_software_dir)
+        return version
+
     def download_software_mlst7(self, version):
         """Function to download MLST (CGE) if it is not present"""
         mlst7_software_dir = self.bin_dir.joinpath('cge-mlst')
@@ -63,6 +75,23 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                                     check=True,
                                     timeout = 3000)
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
+                build.kill()
+                raise
+        return version
+
+    def download_db_characterize_neisseria_capsule(self, version):
+        """Function to download neisseria database if it is not present"""
+        #this is bin dir and not db dir because we want the database to be inside of the bin neisseria folder in the bin dir
+        characterize_neisseria_capsule_db_dir = self.bin_dir.joinpath('characterize_neisseria_capsule')
+        if not characterize_neisseria_capsule_db_dir.joinpath('neisseria_capsule_DB').exists():
+            try:
+                print("starting to build from here:")
+                build = subprocess.run(['python3', 'build_neisseria_dbs.py'],
+                                    cwd = str(characterize_neisseria_capsule_db_dir),
+                                    check=True,
+                                    timeout = 3000)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
+                print("i dont reach the build")
                 build.kill()
                 raise
         return version
@@ -136,6 +165,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         return version
 
     def get_downloads_juno_typing(self, cge_mlst_asked_version,
+                                    characterize_neisseria_capsule_asked_version,
                                     mlst7_db_asked_version,
                                     serotypefinder_db_asked_version,
                                     seroba_db_asked_version):
@@ -148,6 +178,8 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                 raise
             
         software_version = {'mlst7': self.download_software_mlst7(version=cge_mlst_asked_version),
+                            'characterize_neisseria_capsule': self.download_software_characterize_neisseria_capsule(version=characterize_neisseria_capsule_asked_version),
+                            'characterize_neisseria_capsule_db': self.download_db_characterize_neisseria_capsule(version=characterize_neisseria_capsule_asked_version),
                             'mlst7_db': self.download_db_mlst7(version=mlst7_db_asked_version),
                             'serotypefinder_db': self.download_db_serotypefinder(version=serotypefinder_db_asked_version),
                             'seroba_db': self.download_db_seroba(version=seroba_db_asked_version, 
@@ -163,6 +195,9 @@ if __name__ == '__main__':
     argument_parser.add_argument('-mv', '--cgemlst-version', type=str, 
                         default='2.0.4',
                         help='Version to download for the MLST software from CGE.')
+    argument_parser.add_argument('-neis', '--neisseria-version', type=str, 
+                        default='master',
+                        help='Version to download characterize neisseria capsule.')
     argument_parser.add_argument('-mdv', '--cgemlst-db-version', type=str, 
                         default='master',
                         help='Version to download for the MLST database (CGE).')
@@ -181,6 +216,7 @@ if __name__ == '__main__':
     downloads = DownloadsJunoTyping(db_dir=args.db_dir,
                                     update_dbs=args.update_dbs, 
                                     cge_mlst_asked_version=args.cgemlst_version,
+                                    characterize_neisseria_capsule_asked_version=args.neisseria_version,
                                     mlst7_db_asked_version=args.cgemlst_db_version,
                                     serotypefinder_db_asked_version=args.serotypefinder_db_version,
                                     seroba_db_asked_version=args.seroba_db_version,
