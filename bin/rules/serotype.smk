@@ -165,7 +165,6 @@ rule characterize_neisseria_capsule:
     input:
         assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
     output:
-        #TODO check if output is correct
         output_dir = OUT + '/serotype/{sample}'
     message: "Running characterize neisseria capsule for {wildcards.sample}."
     log:
@@ -175,12 +174,13 @@ rule characterize_neisseria_capsule:
     resources: mem_gb=config["mem_gb"]["characterize_neisseria_capsule"]
     threads: config["threads"]["characterize_neisseria_capsule"]
     params:
-        output_dir = OUT + "/de_novo_assembly_filtered/"
+        fasta_dir = OUT + "/de_novo_assembly_filtered/"
+    # For this tool we need an input directory and not files, so I copied the filtered assemblies to a new directory, with a directory per sample and use that sample directory as the input  
     shell:
         """
 sample=$(awk -F/ '{{print $NF}}' <<< {input.assembly})
 dir_name=$(awk -F. '{{print $1}}' <<< $sample)
-final_name="{params.output_dir}$dir_name" 
+final_name="{params.fasta_dir}$dir_name" 
 
 mkdir -p $final_name
 cp {input.assembly} "$final_name/"
