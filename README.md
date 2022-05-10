@@ -70,7 +70,7 @@ conda env create -f envs/master_env.yaml
 
 ### Optional parameters
 
-* `-s --species` Species for ALL samples (it assumes all of them are the same species). It should be two words (e.g Salmonella enterica or Escherichia coli). If a metadata file is also provided, the `-s` argument will take precedence and be used instead. The species is used to choose the scheme for MLST7 and cgMLST and the appropriate serotyper (if any).
+* `-s --species` Species for ALL samples (it assumes all of them are the same species). It should be two words (e.g Salmonella enterica or Escherichia coli). If a metadata file is also provided, the `-s` argument will take precedence and be used instead. The species is used to choose the scheme for MLST7 and the appropriate serotyper (if any).
 * `-m --metadata` Relative or absolute path to a csv file containing at least one column with the 'sample' name (name of the file but removing [_S##]_R1.fastq.gz), a column called 'genus' and a column called 'species' (Note that the sample names are written in small letters, not a single capital letter). If none is given and the input directory contains a file called '<input_dir>/identify_species/top1_species_multireport.csv' (as obtained with the Juno-assembly pipeline) this will be used as metadata. If a species is provided for a sample, it will overwrite the metadata when choosing the scheme for MLST and the serotyper. Example metadata file:
 
 

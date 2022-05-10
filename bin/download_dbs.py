@@ -156,7 +156,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         return software_version
 
 if __name__ == '__main__':
-    argument_parser = argparse.ArgumentParser(description='Download cgMLST schemes.')
+    argument_parser = argparse.ArgumentParser(description='Download databases for the typing pipeline.')
     argument_parser.add_argument('-d', '--db-dir', type=pathlib.Path, 
                         default='db',
                         help='Database directory where the databases will be stored.')
