@@ -64,4 +64,19 @@ rule all:
         OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv"
 
+# species = SAMPLES["genus"]
+# if species == "neisseria":
+#     rule all:
+#         input:
+#             expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
+#             expand(OUT + '/serotype/{sample}', sample = SAMPLES),
+#             OUT+'/serotype/serotyper_multireport.csv',
+#             OUT + "/mlst7/mlst7_multireport.csv"
+
+# else:
+#     rule all:
+#         input:
+#             expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
+#             OUT+'/serotype/serotyper_multireport.csv',
+#             OUT + "/mlst7/mlst7_multireport.csv"
 

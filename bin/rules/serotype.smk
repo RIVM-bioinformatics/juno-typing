@@ -165,7 +165,7 @@ rule characterize_neisseria_capsule:
     input:
         assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
     output:
-        output_dir = OUT + '/serotype/{sample}'
+        output_dir = directory(OUT + '/serotype/{sample}')
     message: "Running characterize neisseria capsule for {wildcards.sample}."
     log:
         OUT+'/log/serotype/{sample}_neisseria.log'
@@ -187,7 +187,8 @@ cp {input.assembly} "$final_name/"
 
 python3 bin/characterize_neisseria_capsule/characterize_neisseria_capsule.py -d $final_name -o {output.output_dir}
         """
-
+        
+#TODO rename the file and make a multi report
 #-----------------------------------------------------------------------------#
 
 ## No serotyper necessary
