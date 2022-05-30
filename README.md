@@ -33,7 +33,8 @@ The Juno-typing pipeline will then perform the following steps:
     - _E. coli_ serotyper by using the [SerotypeFinder](https://bitbucket.org/genomicepidemiology/serotypefinder/src/master/) tool.
     - _S. pneumoniae_ serotyper by using the [Seroba](https://github.com/sanger-pathogens/seroba) tool.
     - _Shigella_ serotyper by using the [ShigaTyper](https://github.com/CFSAN-Biostatistics/shigatyper) tool.
-    
+    - _Neisseria_ serotyper by using the [Capsule Characterization Neisseria](https://github.com/ntopaz/characterize_neisseria_capsule) tool.
+
 ![](files/DAG.svg)
 
 ## Prerequisities
@@ -126,7 +127,7 @@ This pipeline is licensed with an AGPL3 license. Detailed information can be fou
 * **Contact person:**       Alejandra Hernández Segura
 * **Email**                 alejandra.hernandez.segura@rivm.nl
 
-For Shigella related questions:
+For Shigella or Neisseria related questions:
 * **Contact person:**       Roxanne Wolthuis
 * **Email**                 roxanne.wolthuis@rivm.nl
 

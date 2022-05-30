@@ -1,6 +1,7 @@
 import argparse
 from itertools import chain
 import pathlib
+from typing_extensions import final
 import pandas as pd
 import re
 from warnings import warn
@@ -144,6 +145,16 @@ class ShigatyperMultireport(SerotyperMultireport):
         results_df.to_csv(self.output_file, mode='a', index=False)
         self.multireport = results_df
 
+class NeisseriaMultireport(SerotyperMultireport):
+    def make_multireport(self):
+        df_list_neisseria = []
+        for outfile in self.input_files:
+            # Query column is read as string, this way leading zeros will not be removed from the samplenames
+            df = pd.read_csv(outfile, delimiter = "\t", dtype={"Query":"string"})
+            df_list_neisseria.append(df)
+        
+        final_df_neisseria = pd.concat(df_list_neisseria, axis=0, ignore_index=True)
+        self.multireport = final_df_neisseria
 
 class ChooseMultireport():
     """Depending on the input file(s) one or more serotype multireport(s) are 
@@ -161,7 +172,8 @@ class ChooseMultireport():
         input_files = {'seqsero2': [],
                         'serotypefinder': [],
                         'seroba': [],
-                        'shigatyper': []}
+                        'shigatyper': [],
+                        'neisseriatyper':[]}
         for file_ in self.serotyper_result_files:
             if file_.endswith('SeqSero_result.tsv'):
                 input_files['seqsero2'].append(file_)
@@ -171,6 +183,8 @@ class ChooseMultireport():
                 input_files['seroba'].append(file_)
             elif file_.endswith('command.txt') or file_.endswith('shigatyper.csv'):
                 input_files['shigatyper'].append(file_)
+            elif file_.endswith('neisseriatyper.tab'):
+                input_files['neisseriatyper'].append(file_)
             else:
                 raise ValueError(f'The file {file_} is not recognized as a result from a supported serotyper.')
         input_files = {k:v for k, v in input_files.items() if len(v) > 0}
@@ -200,6 +214,9 @@ class ChooseMultireport():
                                                         output_file=output_file[0])
             elif serotyper_tool == 'shigatyper':
                 multireport = ShigatyperMultireport(input_files=self.input_files[serotyper_tool],
+                                                        output_file=output_file[0])
+            elif serotyper_tool == 'neisseriatyper':
+                multireport = NeisseriaMultireport(input_files=self.input_files[serotyper_tool],
                                                         output_file=output_file[0])
             else:
                 multireport = SerobaMultireport(input_files=self.input_files[serotyper_tool],

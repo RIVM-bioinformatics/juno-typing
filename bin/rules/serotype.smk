@@ -160,6 +160,10 @@ do
     fi
 done
         """
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+### Neisseria serotyper ###
 
 rule characterize_neisseria_capsule:
     input:
@@ -174,7 +178,9 @@ rule characterize_neisseria_capsule:
     resources: mem_gb=config["mem_gb"]["characterize_neisseria_capsule"]
     threads: config["threads"]["characterize_neisseria_capsule"]
     params:
-        fasta_dir = OUT + "/de_novo_assembly_filtered/"
+        fasta_dir = OUT + "/de_novo_assembly_filtered/",
+        output_dir = OUT + "/serotype/{sample}/serogroup",
+        copy_to = OUT + "/serotype/{sample}"
     # For this tool we need an input directory and not files, so I copied the filtered assemblies to a new directory, with a directory per sample and use that sample directory as the input  
     shell:
         """
@@ -186,9 +192,13 @@ mkdir -p $final_name
 cp {input.assembly} "$final_name/"
 
 python3 bin/characterize_neisseria_capsule/characterize_neisseria_capsule.py -d $final_name -o {output.output_dir}
+
+cd  {params.output_dir}
+for file in *.tab
+do
+    cp "${{file}}" "{params.copy_to}/${{file/*/neisseriatyper.tab}}"
+done
         """
-        
-#TODO rename the file and make a multi report
 #-----------------------------------------------------------------------------#
 
 ## No serotyper necessary
