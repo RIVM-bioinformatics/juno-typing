@@ -29,6 +29,7 @@ bin/kma/
 bin/cge-mlst
 bin/kmerfinder/
 bin/kmerfinder_db/
+bin/characterize_neisseria_capsule
 # Snakemake
 .snakemake/
 .vscode/

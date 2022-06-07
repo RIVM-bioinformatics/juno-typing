@@ -63,5 +63,3 @@ rule all:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
         OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv"
-
-

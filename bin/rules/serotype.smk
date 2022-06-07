@@ -12,6 +12,9 @@ def choose_serotyper(wildcards):
                 OUT + '/serotype/{sample}/command.txt']
     elif SAMPLES[wildcards.sample]['genus'] == 'streptococcus':
         return [OUT + '/serotype/{sample}/pred.tsv']
+    elif SAMPLES[wildcards.sample]['genus'] == 'neisseria':
+        #TODO is the output folder enough
+        return [OUT + '/serotype/{sample}']
     else:
         return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
@@ -157,7 +160,45 @@ do
     fi
 done
         """
+#-----------------------------------------------------------------------------#
 
+#-----------------------------------------------------------------------------#
+### Neisseria serotyper ###
+
+rule characterize_neisseria_capsule:
+    input:
+        assembly = lambda wildcards: SAMPLES[wildcards.sample]['assembly']
+    output:
+        output_dir = directory(OUT + '/serotype/{sample}')
+    message: "Running characterize neisseria capsule for {wildcards.sample}."
+    log:
+        OUT+'/log/serotype/{sample}_neisseria.log'
+    conda:
+        "../../envs/characterize_neisseria_capsule.yaml"
+    resources: mem_gb=config["mem_gb"]["characterize_neisseria_capsule"]
+    threads: config["threads"]["characterize_neisseria_capsule"]
+    params:
+        fasta_dir = OUT + "/de_novo_assembly_filtered/",
+        output_dir = OUT + "/serotype/{sample}/serogroup",
+        copy_to = OUT + "/serotype/{sample}"
+    # For this tool we need an input directory and not files, so I copied the filtered assemblies to a new directory, with a directory per sample and use that sample directory as the input  
+    shell:
+        """
+sample=$(awk -F/ '{{print $NF}}' <<< {input.assembly})
+dir_name=$(awk -F. '{{print $1}}' <<< $sample)
+final_name="{params.fasta_dir}$dir_name" 
+
+mkdir -p $final_name
+cp {input.assembly} "$final_name/"
+
+python3 bin/characterize_neisseria_capsule/characterize_neisseria_capsule.py -d $final_name -o {output.output_dir}
+
+cd  {params.output_dir}
+for file in *.tab
+do
+    cp "${{file}}" "{params.copy_to}/${{file/*/neisseriatyper.tab}}"
+done
+        """
 #-----------------------------------------------------------------------------#
 
 ## No serotyper necessary
