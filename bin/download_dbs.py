@@ -82,6 +82,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
     def download_db_characterize_neisseria_capsule(self, version):
         """Function to download neisseria database if it is not present"""
         #this is bin dir and not db dir because we want the database to be inside of the bin neisseria folder in the bin dir
+        #TODO now it will always built a new db, do we want to store neisseria + db in the db folder
         characterize_neisseria_capsule_db_dir = self.bin_dir.joinpath('characterize_neisseria_capsule')
         if not characterize_neisseria_capsule_db_dir.joinpath('neisseria_capsule_DB').exists():
             try:
@@ -94,6 +95,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                 print("i dont reach the build")
                 build.kill()
                 raise
+        version = self.get_commit_git(characterize_neisseria_capsule_db_dir)
         return version
 
     def download_db_mlst7(self, version):
@@ -179,11 +181,12 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
             
         software_version = {'mlst7': self.download_software_mlst7(version=cge_mlst_asked_version),
                             'characterize_neisseria_capsule': self.download_software_characterize_neisseria_capsule(version=characterize_neisseria_capsule_asked_version),
-                            'characterize_neisseria_capsule_db': self.download_db_characterize_neisseria_capsule(version=characterize_neisseria_capsule_asked_version),
                             'mlst7_db': self.download_db_mlst7(version=mlst7_db_asked_version),
                             'serotypefinder_db': self.download_db_serotypefinder(version=serotypefinder_db_asked_version),
                             'seroba_db': self.download_db_seroba(version=seroba_db_asked_version, 
-                                                                kmersize = self.seroba_kmersize)}
+                                                                kmersize = self.seroba_kmersize),
+                            'characterize_neisseria_capsule_db': self.download_db_characterize_neisseria_capsule(version=characterize_neisseria_capsule_asked_version),
+                            }
 
         return software_version
 
