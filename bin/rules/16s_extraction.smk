@@ -1,5 +1,5 @@
 # ---------------------------- 16S extraction --------------------------------#
-
+from Bio import SeqIO
 
 rule barrnap:
     input: 
@@ -15,7 +15,7 @@ rule barrnap:
     resources: mem_gb=config["mem_gb"]["barrnap"]
     shell:
         """
-barrnap {input.assembly:q} --outseq {output:q}
+barrnap {input.assembly:q} --outseq {output:q} &> {log:q}
         """
 
 rule extract_16s_from_barrnap:
@@ -23,8 +23,7 @@ rule extract_16s_from_barrnap:
         OUT + '/16s/{sample}/barrnap_result.fasta'
     output:
         OUT + '/16s/{sample}/16S_seq.fasta'
-    resources: mem_gb=config["mem_gb"]["barrnap"]
+    resources: mem_gb=1
     run:
-        from Bio import SeqIO
-        records = SeqIO.parse(input[0], 'fasta')
-        SeqIO.write((r for r in records if r.id.startswith('16S_rRNA')), output[0], 'fasta')
+        records = Bio.SeqIO.parse(input[0], 'fasta')
+        Bio.SeqIO.write((r for r in records if r.id.startswith('16S_rRNA')), output[0], 'fasta')
