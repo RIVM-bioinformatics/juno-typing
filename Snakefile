@@ -35,6 +35,7 @@ include: "bin/rules/mlst7_fastq.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
+include: "bin/rules/16s_extraction.smk"
 
 #@################################################################################
 #@####              Finalize pipeline (error/success)                        #####
@@ -61,5 +62,6 @@ localrules:
 rule all:
     input:
         expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
+        expand(OUT + "/16s/{sample}/16S_seq.fasta", sample = SAMPLES),
         OUT+'/serotype/serotyper_multireport.csv',
         OUT + "/mlst7/mlst7_multireport.csv"
