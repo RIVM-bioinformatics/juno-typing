@@ -8,7 +8,7 @@ channels:
 dependencies:
   - snakemake==6.6.1
   - mamba
-  - libarchive # If this is not here mamba crashes on creation of rule envs. See https://github.com/mamba-org/mamba/issues/1728
+  - libarchive==3.5.2 # If this is not here mamba crashes on creation of rule envs. See https://github.com/mamba-org/mamba/issues/1728
   - git
   - pip==19.2.3
   - pandas==1.3.2
