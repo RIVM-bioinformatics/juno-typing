@@ -10,7 +10,7 @@
 
 ## Pipeline information
 
-* **Author(s):**            Alejandra Hernández Segura, Roxanne Wolthuis
+* **Author(s):**            Alejandra Hernández Segura, Roxanne Wolthuis, Karim Hajji
 * **Organization:**         Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 * **Department:**           Infektieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS), Bacteriologie (BPD)
 * **Start date:**           01 - 03 - 2021
@@ -22,7 +22,7 @@ The goal of this pipeline is to perform bacterial typing (7-locus MLST and serot
 1. Two ‘.fastq’ files (paired-end sequencing) derived from short-read sequencing. They should be already filtered and trimmed (for instance, with the Juno-pipeline).
 2. An assembly from the same sample in the form of a single ‘.fasta’ file.
 
-Importantly, the Juno-typing pipeline works directly on output generated from the [Juno-assembly pipeline](https://github.com/AleSR13/Juno_pipeline).
+Importantly, the Juno-typing pipeline works directly on output generated from the [Juno-assembly pipeline](https://github.com/RIVM-bioinformatics/Juno_pipeline).
 
 The Juno-typing pipeline will then perform the following steps:  
 
