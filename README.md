@@ -34,6 +34,7 @@ The Juno-typing pipeline will then perform the following steps:
     - _S. pneumoniae_ serotyper by using the [Seroba](https://github.com/sanger-pathogens/seroba) tool.
     - _Shigella_ serotyper by using the [ShigaTyper](https://github.com/CFSAN-Biostatistics/shigatyper) tool.
     - _Neisseria_ serotyper by using the [Capsule Characterization Neisseria](https://github.com/ntopaz/characterize_neisseria_capsule) tool.
+4. Predict rRNA sequences using [Barrnapp](https://github.com/tseemann/barrnap) and extract 16S sequences.
 
 ![](files/DAG.svg)
 
@@ -109,7 +110,7 @@ python juno_typing.py -i my_input_files -o my_results --db_dir my_db_dir --metad
 
 * **log:** Log files with output and error files from each Snakemake rule/step that is performed. 
 * **audit_trail:** Information about the versions of software and databases used.
-* **output per sample:** The pipeline will create one subfolder per each step performed (identify_species, mlst7, serotype). These subfolders will in turn contain another subfolder per sample. To understand the output, please refer to the manuals of each individual tool. Inside the serotype folder, there will be generated a .csv file that summarizes the results of all the samples for each serotyper that has run(serotype_multireport.csv, serotype_multireport1.csv, serotype_multireport2.csv, serotype_multireport3.csv).
+* **output per sample:** The pipeline will create one subfolder per each step performed (identify_species, mlst7, serotype, 16s). These subfolders will in turn contain another subfolder per sample. To understand the output, please refer to the manuals of each individual tool. Inside the serotype folder, there will be generated a .csv file that summarizes the results of all the samples for each serotyper that has run (serotype_multireport.csv, serotype_multireport1.csv, serotype_multireport2.csv, serotype_multireport3.csv).
         
 ## Issues  
 
@@ -118,16 +119,16 @@ python juno_typing.py -i my_input_files -o my_results --db_dir my_db_dir --metad
 
 ## Future ideas for this pipeline
 
-* -
+* Do 16S typing
 
 ## License
 This pipeline is licensed with an AGPL3 license. Detailed information can be found inside the 'LICENSE' file in this repository.
 
 ## Contact
-* **Contact person:**       Alejandra Hernández Segura
-* **Email**                 alejandra.hernandez.segura@rivm.nl
-
-For Shigella or Neisseria related questions:
 * **Contact person:**       Roxanne Wolthuis
 * **Email**                 roxanne.wolthuis@rivm.nl
+
+For 16S extraction related questions:
+* **Contact person:**   Karim Hajji
+* **Email**             karim.hajji@rivm.nl
 
