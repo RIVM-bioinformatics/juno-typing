@@ -1,0 +1,15 @@
+name: 16s
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+  - anaconda
+  - biocore
+dependencies:
+  - biopython==1.78
+  - barrnap==0.9
+  - bedtools==2.27
+  # # dependencies for identify species 
+  # - kraken2==2.1.2
+  # # dependencies for kraken summary report 
+  # - pandas==1.3.2 

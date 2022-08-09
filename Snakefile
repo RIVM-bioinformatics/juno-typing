@@ -16,50 +16,59 @@ from yaml import safe_load
 #####     Load samplesheet, load genus dict and define output directory     #####
 #################################################################################
 
-# Loading sample sheet as dictionary 
+# Loading sample sheet as dictionary
 # ("R1" and "R2" keys for fastq, and "assembly" for fasta)
 sample_sheet = config["sample_sheet"]
 SAMPLES = {}
 with open(sample_sheet) as sample_sheet_file:
-    SAMPLES = safe_load(sample_sheet_file) 
+    SAMPLES = safe_load(sample_sheet_file)
 
 # OUT defines output directory for most rules.
 OUT = config["out"]
 
 
-#@################################################################################
-#@####                              Processes                                #####
-#@################################################################################
+# @################################################################################
+# @####                              Processes                                #####
+# @################################################################################
+
 
 include: "bin/rules/mlst7_fastq.smk"
 include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
+include: "bin/rules/16s_extraction.smk"
 
-#@################################################################################
-#@####              Finalize pipeline (error/success)                        #####
-#@################################################################################
+
+# @################################################################################
+# @####              Finalize pipeline (error/success)                        #####
+# @################################################################################
+
 
 # TODO: eventually these files should be stored somewhere else and included in the pipeline as tmp files
 onerror:
-    shell("""
-find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
-find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
-echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
-    """)
+    shell(
+        """
+    find -maxdepth 1 -type d -empty -exec rm -rf {{}} \;
+    find -maxdepth 1 -type f -name "*.depth.txt*" -exec rm -rf {{}} \;
+    echo -e "Something went wrong with Juno-typing pipeline. Please check the logging files in {OUT}/log/"
+    """
+    )
 
 
 #################################################################################
 #####                       Specify final output                            #####
 #################################################################################
 
+
 localrules:
     all,
     aggregate_serotypes,
-    no_serotyper
+    no_serotyper,
+
 
 rule all:
     input:
-        expand(OUT + "/mlst7/{sample}/results.txt", sample = SAMPLES),
-        OUT+'/serotype/serotyper_multireport.csv',
-        OUT + "/mlst7/mlst7_multireport.csv"
+        expand(OUT + "/mlst7/{sample}/results.txt", sample=SAMPLES),
+        expand(OUT + "/16s/{sample}/16S_seq.fasta", sample=SAMPLES),
+        OUT + "/serotype/serotyper_multireport.csv",
+        OUT + "/mlst7/mlst7_multireport.csv",
