@@ -1,4 +1,4 @@
-name: juno_typing
+name: juno_typing2
 channels:
   - bioconda
   - biocore
@@ -6,8 +6,8 @@ channels:
   - anaconda
 dependencies:
   - snakemake==6.6.1
-  - mamba
-  - git
+  - mamba=0.24.0
+  - git=2.34.1
   - pip==19.2.3
   - pandas==1.3.2
   - kma==1.3.12
