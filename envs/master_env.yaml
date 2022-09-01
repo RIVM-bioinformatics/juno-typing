@@ -16,3 +16,6 @@ dependencies:
   - tbb=2020.3
   - blast=2.12.0
   - pip
+  - pip:
+    - numpy
+    - "--editable=git+https://github.com/RIVM-bioinformatics/base_juno_pipeline.git@v0.2.6#egg=base_juno"
