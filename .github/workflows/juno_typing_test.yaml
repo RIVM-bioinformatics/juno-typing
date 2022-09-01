@@ -23,7 +23,7 @@ jobs:
         with:
           mamba-version: "0.15.3"
           channels: bioconda, biocore, conda-forge, anaconda
-          channel-priority: strict
+          channel-priority: true
           environment-file: envs/master_env.yaml 
           activate-environment: juno_typing
           auto-activate-base: false
