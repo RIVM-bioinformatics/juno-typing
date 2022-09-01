@@ -17,7 +17,7 @@ rule barrnap:
         mem_gb=config["mem_gb"]["barrnap"],
     shell:
         """
-        barrnap {input.assembly:q} --outseq {output:q} &> {log:q}
+        barrnap {input.assembly:q} --outseq {output:q} 2>&1 {log:q}
         """
 
 
