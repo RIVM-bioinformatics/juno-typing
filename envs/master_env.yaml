@@ -1,19 +1,18 @@
-name: juno_typing2
+name: juno_typing
 channels:
   - bioconda
   - biocore
   - conda-forge
   - anaconda
-  - defaults
 dependencies:
-  - python>=3.8
-  - snakemake==6.6.1
-  - mamba=0.24.0
-  - git=2.34.1
-  - pandas==1.3.2
-  - kma==1.3.12
+  - python>=3.8.*
+  - snakemake>=7.14.*
+  - mamba=0.25.0
+  - git=2.37.3
+  - pandas>=1.4.*
+  - kma=1.3.12
   - seroba=1.0.2
-  - biopython=1.74
+  - biopython>=1.74
   - tbb=2020.3
   - blast=2.12.0
   - pip
