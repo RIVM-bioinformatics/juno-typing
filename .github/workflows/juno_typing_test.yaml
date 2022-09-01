@@ -21,7 +21,7 @@ jobs:
       - name: Setting up conda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          mamba-version: "0.24.0"
+          mamba-version: "0.15.3"
           channels: bioconda, biocore, conda-forge, anaconda
           channel-priority: strict
           environment-file: envs/master_env.yaml 
