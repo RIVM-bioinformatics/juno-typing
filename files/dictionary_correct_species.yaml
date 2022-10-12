@@ -1,8 +1,218 @@
-cconcisus: cconcisus
-ccurvus: cconcisus
-ccoli: cjejuni
-sdysenteriae: ecoli
-sflexneri: ecoli
-sboydii: ecoli
-ssonnei: ecoli
-sbongori: senterica
+achromobacter: achromobacter
+acinetobacter_baumannii: abaumannii_2
+acinetobacter_calcoaceticus: abaumannii_2
+aeromonas: aeromonas
+aggregatibacter_actinomycetemcomitans: aactinomycetemcomitans
+arcobacter: arcobacter
+bacillus_albus: bcereus #Red
+bacillus_anthracis: bcereus #Red
+bacillus_bingmayongensis: bcereus #Red
+bacillus_cereus: bcereus #Red
+bacillus_cytotoxicus: bcereus #Red
+bacillus_gaemokensis: bcereus #Red
+bacillus_licheniformis: blicheniformis
+bacillus_luti: bcereus #Red
+bacillus_maliponensis: bcereus #Red
+bacillus_mobilis: bcereus #Red
+bacillus_mycoides: bcereus #Red
+bacillus_nitratireducens: bcereus #Red
+bacillus_pacificus: bcereus #Red
+bacillus_paramycoides: bcereus #Red
+bacillus_paranthracis: bcereus #Red
+bacillus_proteolyticus: bcereus #Red
+bacillus_pseudomycoides: bcereus #Red
+bacillus_subtilis: bsubtilis
+bacillus_thuringiensis: bcereus #Red
+bacillus_toyonensis: bcereus #Red
+bacillus_tropicus: bcereus #Red
+bacillus_weihenstephanensis: bcereus #Red
+bacillus_wiedmannii: bcereus #Red
+bordetella: bordetella
+brucella: brucella #Red
+brucella_intermedia: bintermedia
+burkholderiacepacia: bcepacia
+burkholderiamultivorans: bcepacia
+burkholderia_aenigmatica: bcepacia
+burkholderia_ambifaria: bcepacia
+burkholderia_anthina: bcepacia
+burkholderia_arboris: bcepacia
+burkholderia_cenocepacia: bcepacia
+burkholderia_contaminans: bcepacia
+burkholderia_diffusa: bcepacia
+burkholderia_dolosa: bcepacia
+burkholderia_gladioli: bcepacia
+burkholderia_humptydooensis: bpseudomallei #Red
+burkholderia_lata: bcepacia
+burkholderia_latens: bcepacia
+burkholderia_mallei: bpseudomallei #Red
+burkholderia_metallica: bcepacia
+burkholderia_oklahomensis: bpseudomallei #Red
+burkholderia_pseudomallei: bpseudomallei #Red
+burkholderia_pseudomultivorans: bcepacia
+burkholderia_pyrrocinia: bcepacia
+burkholderia_seminalis: bcepacia
+burkholderia_stabilis: bcepacia
+burkholderia_thailandensis: bpseudomallei #Red
+burkholderia_ubonensis: bcepacia
+burkholderia_vietnamiensis: bcepacia
+campylobacter_coli: cjejuni #Black
+campylobacter_concisus: cconcisus_curvus #Black
+campylobacter_curvus: cconcisus_curvus #Black
+campylobacter_fetus: cfetus #Black
+campylobacter_helveticus: chelveticus #Black
+campylobacter_hyointestinalis: chyointestinalis #Black
+campylobacter_insulaenigrae: cinsulaenigrae #Black
+campylobacter_jejuni: cjejuni #Black
+campylobacter_lanienae: clanienae #Black
+campylobacter_lari: clari #Black
+campylobacter_sputorum: csputorum #Black
+campylobacter_upsaliensis: cupsaliensis #Black
+carnobacter_maltaromaticum: cmaltaromaticum
+citrobacter_braakii: cfreundii
+citrobacter_freundii: cfreundii
+citrobacter_youngae: cfreundii
+clostridioides_difficile: cdifficile
+clostridium_botulinum: cbotulinum #Red
+clostridium_difficile: cdifficile
+clostridium_perfringens: cperfringens
+clostridium_septicum: csepticum
+corynebacterium_diphtheriae: cdiphtheriae #Red
+cronobacter: cronobacter
+cutibacterium_acnes: pacnes
+dichelobacter_nodosus: dnodosus
+edwardsiella: edwardsiella
+enteribacter_nimipressuralis: ecloacae
+enterobacter_asburiae: ecloacae
+enterobacter_cloacae: ecloacae
+enterobacter_hormaechei: ecloacae
+enterobacter_kobei: ecloacae
+enterobacter_ludwigii: ecloacae
+enterococcus_faecalis: efaecalis
+enterococcus_faecium: efaecium
+escherichia_coli: ecoli #Black
+flavobacterium_psychrophilum: fpsychrophilum
+gallibacterium_anatis: ganatis
+glaesserella_parasuis: gparasuis
+haemophilus_influenzae: hinfluenzae
+helicobacter_cinaedi: hcinaedi
+helicobacter_pylori: hpylori
+helicobacter_suis: hsuis
+kingella_kingae: kkingae
+klebsiella_aerogenes: kaerogenes
+klebsiella_grimontii: koxytoca
+klebsiella_michiganensis: koxytoca
+klebsiella_oxytoca: koxytoca
+klebsiella_pasteurii: koxytoca
+klebsiella_pneumoniae: kpneumoniae
+klebsiella_quasipneumoniae: kpneumoniae
+klebsiella_variicola: kpneumoniae
+lactobacillus_salivarius: lsalivarius
+leptospira: leptospira_2
+listeria_monocytogenes: lmonocytogenes #Black
+macrococcus_canis: mcanis
+macrococcus_caseolyticus: mcaseolyticus
+mammaliicoccus_sciuri: msciuri
+mannheimia_haemolytica: mhaemolytica
+melissococcus_plutonius: mplutonius
+moraxella_catarrhalis: mcatarrhalis
+mycobacteria_abcessus: mabscessus
+mycobacterium_bolletii: mabscessus
+mycobacterium_massiliense: mabscessus
+mycoplasma_agalactiae: magalactiae
+mycoplasma_anserisalpingitidis: manserisalpingitidis
+mycoplasma_bovis: mbovis
+mycoplasma_flocculare: mflocculare
+mycoplasma_gallisepticum: mgallisepticum_1
+mycoplasma_hominis: mhominis
+mycoplasma_hyopneumoniae: mhyopneumoniae
+mycoplasma_hyorhinis: mhyorhinis
+mycoplasma_iowae: miowae
+mycoplasma_penumoniae: mpneumoniae
+mycoplasma_synoviae: msynoviae
+neisseria_meningitidis: neisseria
+ochrobactrum_intermedium: bintermedia
+ornithobacterium_rhinotracheale: orhinotracheale
+paenibacillus_larvae: plarvae
+pasteurella_multocida: pmultocida
+pediococcus_pentosaceus: ppentosaceus
+photobacterium_damselae: pdamselae
+porphyromonas_gingivalis: pgingivalis
+propionibacterium_acnes: pacnes
+pseudomonas_aeruginosa: paeruginosa
+pseudomonas_antarctica: pfluorescens
+pseudomonas_azotoformans: pfluorescens
+pseudomonas_cedrine: pfluorescens
+pseudomonas_constantinii: pfluorescens
+pseudomonas_extremorientalis: pfluorescens
+pseudomonas_grimontii: pfluorescens
+pseudomonas_libaniensis: pfluorescens
+pseudomonas_marginalis: pfluorescens
+pseudomonas_orientalis: pfluorescens
+pseudomonas_panacis: pfluorescens
+pseudomonas_poae: pfluorescens
+pseudomonas_putida: pputida
+pseudomonas_rhodesiae: pfluorescens
+pseudomonas_salomonii: pfluorescens
+pseudomonas_simiae: pfluorescens
+pseudomonas_synxantha: pfluorescens
+pseudomonas_tolaasii: pfluorescens
+pseudomonas_trivialis: pfluorescens
+pseudomonas_veronii: pfluorescens
+pseuomonas_fluorescens: pfluorescens
+pseuomonas_palleroniana: pfluorescens
+rhodococcus_equi: rhodococcus
+riemerella_anatipestifer: ranatipestifer
+salmonella_bongori: senterica #Black
+salmonella_enterica: senterica #Black
+shewanella_algae: shewanella
+shewanella_chilikensis: shewanella
+shewanella_indica: shewanella
+shigella_boydii: ecoli #Black
+shigella_dysenteriae: ecoli #Black
+shigella_flexneri: ecoli #Black
+shigella_sonnei: ecoli #Black
+staphylococcus_aureus: saureus
+staphylococcus_chromogenes: schromogenes
+staphylococcus_epidermidis: sepidermidis
+staphylococcus_haemolyticus: shaemolyticus
+staphylococcus_hominis: shominis
+staphylococcus_lugdunensis: slugdunensis
+staphylococcus_pseudintermedius: spseudintermedius
+stenotrophomonas_maltophilia: smaltophilia
+streptococcus_agalactiae: sagalactiae
+streptococcus_alactolyticus: sbovis
+streptococcus_bovis: sbovis
+streptococcus_canis: scanis
+streptococcus_dysagalactiae: sdysgalactiae
+streptococcus_equi: szooepidemicus
+streptococcus_equinus: sbovis
+streptococcus_gallolyticus: sgallolyticus
+streptococcus_infantarius: sbovis
+streptococcus_lutetiensis: sbovis
+streptococcus_oralis: soralis
+streptococcus_pneumoniae: spneumoniae
+streptococcus_pyogenes: spyogenes
+streptococcus_salivarius: sthermophilus
+streptococcus_suis: ssuis
+streptococcus_thermophilus: sthermophilus
+streptococcus_uberis: suberis
+streptomyces: streptomyces
+taylorella: taylorella
+tenacibaculum_: tenacibaculum
+treponema_pallidum: tpallidum
+ureaplasma_canigenitalium: ureaplasma
+ureaplasma_cati: ureaplasma
+ureaplasma_diversum: ureaplasma
+ureaplasma_felinum: ureaplasma
+ureaplasma_gallorale: ureaplasma
+ureaplasma_parvum: ureaplasma
+ureaplasma_urealyticum: ureaplasma
+vibrio: vibrio #Black
+vibrio_cholerae: vcholerae #Black
+vibrio_parahaemolyticus: vparahaemolyticus #Black
+vibrio_tapetis: vtapetis
+vibrio_vulnificus: vvulnificus
+xylella_fastidiosa: xfastidiosa
+yersinia_pestis: ypseudotuberculosis #Red
+yersinia_pseudotuberculosis: ypseudotuberculosis #Red
+yersinia_ruckeri: yruckeri

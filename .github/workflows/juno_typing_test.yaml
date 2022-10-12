@@ -12,7 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         config: 
-          - {os: macOS-latest}
           - {os: ubuntu-18.04}
           - {os: ubuntu-latest}
     name: Testing Juno_typing ${{ matrix.config.os }}
@@ -22,8 +21,8 @@ jobs:
       - name: Setting up conda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          mamba-version: "0.9.2"
-          channels: conda-forge, anaconda, bioconda, biocore, defaults
+          mamba-version: "0.15.3"
+          channels: bioconda, biocore, conda-forge, anaconda
           channel-priority: true
           environment-file: envs/master_env.yaml 
           activate-environment: juno_typing
