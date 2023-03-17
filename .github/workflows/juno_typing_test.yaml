@@ -23,6 +23,7 @@ jobs:
         with:
           cache-downloads: true
           environment-file: envs/master_env.yaml
+          channel-priority: false
       - name: Conda list
         shell: bash -l {0}
         run: conda list
