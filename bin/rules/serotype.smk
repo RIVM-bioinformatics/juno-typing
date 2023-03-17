@@ -174,13 +174,13 @@ rule shigatyper:
 
         shigatyper {input.r1} {input.r2} > "$(basename {output.command_out})" 2> {log}
 
-        for file in *.csv
-        do 
-            file_stem=$(echo ${{file%\.*}})
-            if [[ {wildcards.sample} = *"$file_stem"* ]]; then
-                mv "${{file}}" "${{file/*/shigatyper.csv}}"
-            fi
-        done
+        if [ -f {wildcards.sample}.csv ]
+        then
+            mv {wildcards.sample}.csv shigatyper.csv
+        else
+            # save header without data in expected output file
+            echo ",Hit,Number of reads,Length Covered,reference length,% covered,Number of variants,% accuracy" > shigatyper.csv
+        fi
         """
 
 
