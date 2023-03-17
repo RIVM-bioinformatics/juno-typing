@@ -1,9 +1,9 @@
 name: juno_typing
 channels:
+  - anaconda
   - bioconda
   - biocore
   - conda-forge
-  - anaconda
 dependencies:
   - python>=3.8.*
   - snakemake>=7.14.*
