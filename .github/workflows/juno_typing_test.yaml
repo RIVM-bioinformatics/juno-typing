@@ -18,15 +18,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Setting up conda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          mamba-version: "0.15.3"
-          channels: bioconda, biocore, conda-forge, anaconda
+          cache-downloads: true
+          environment-file: envs/master_env.yaml
           channel-priority: true
-          environment-file: envs/master_env.yaml 
-          activate-environment: juno_typing
-          auto-activate-base: false
       - name: Conda list
         shell: bash -l {0}
         run: conda list
