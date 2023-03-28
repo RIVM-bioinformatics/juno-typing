@@ -13,7 +13,6 @@ class SerotyperMultireport:
     """
 
     def __init__(self, input_files, output_file):
-
         self.input_files = [pathlib.Path(file_) for file_ in input_files]
         assert all(
             [file_.is_file() for file_ in self.input_files]

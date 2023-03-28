@@ -158,7 +158,6 @@ class JunoTypingRun(
             yaml.dump(self.sample_dict, file_, default_flow_style=False)
 
     def write_userparameters(self):
-
         config_params = {
             "input_dir": str(self.input_dir),
             "out": str(self.output_dir),
