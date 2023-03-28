@@ -149,6 +149,8 @@ class ShigatyperMultireport(SerotyperMultireport):
 
             if "shigatyper" in str(outfile):
                 df = pd.read_csv(outfile, delimiter=",")
+                if df.shape[0] == 0:
+                    df.loc[len(df)] = "-"
                 df.insert(0, "Samplename", dirname_splitted[-2])
                 dflist_shigatyper.append(df)
 
