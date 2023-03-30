@@ -119,11 +119,27 @@ class SerobaMultireport(SerotyperMultireport):
 
     def make_multireport(self):
         names = ["Sample", "Serotype", "Contamination"]
-        results = [
-            pd.read_csv(file, sep="\t", header=None, names=names)
-            for file in self.input_files
-        ]
-        results_df = results[0].append(results[1:])
+        results = []
+        for file in self.input_files:
+            try:
+                df = pd.read_csv(file, sep="\t", header=None, names=names)
+            except:
+                # if seroba failes to type it produces a file with the content: {sample}\tuntypable\n
+                from io import StringIO
+
+                with open(file) as f:
+                    df = pd.read_csv(
+                        StringIO(
+                            "".join(
+                                l.replace("\n", "\tuntypable\n") for l in f.readlines()
+                            )
+                        ),
+                        sep="\t",
+                        header=None,
+                        names=names,
+                    )
+            results.append(df)
+        results_df = pd.concat(results)
         results_df.to_csv(self.output_file, index=False)
         self.multireport = results_df
 
