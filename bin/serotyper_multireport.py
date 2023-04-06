@@ -44,8 +44,8 @@ class SeqSero2Multireport(SerotyperMultireport):
             self.extract_from_seqsero2_result(seqsero2_result)
             for seqsero2_result in self.input_files
         ]
-        multireport = multireport[0].append(
-            [multireport[i] for i in range(1, len(multireport))], ignore_index=True
+        multireport = pd.concat([multireport[0], 
+            [multireport[i] for i in range(1, len(multireport))]], ignore_index=True
         )
         # In file names, remove everything after the first underscore
         multireport["Sample name"] = self.sample_names
