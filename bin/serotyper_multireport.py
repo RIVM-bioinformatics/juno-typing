@@ -75,7 +75,7 @@ class SerotypeFinderMultireport(SerotyperMultireport):
     def report_o_type(self, row_df):
         row_df = row_df[["wzx", "wzy", "wzm", "wzt"]]
         # Split string in case any locus already consists of two alleles
-        reported_alleles = [str(item).split("/") for item in row_df if item is not ""]
+        reported_alleles = [str(item).split("/") for item in row_df if item != ""]
         if len(reported_alleles) == 0:
             return "Error! No O type found"
         else:
