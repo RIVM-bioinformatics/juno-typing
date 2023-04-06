@@ -15,5 +15,5 @@ rule mlst7_multireport:
         mem_gb=config["mem_gb"]["other"],
     shell:
         """
-        python bin/mslt7_multireport.py  -i {input} -o {output} &> {log}
+        python bin/mlst7_multireport.py  -i {input} -o {output} &> {log}
         """
