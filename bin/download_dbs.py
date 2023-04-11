@@ -1,10 +1,10 @@
 import argparse
 import pathlib
 import subprocess
-from base_juno_pipeline import helper_functions
+import juno_library.helper_functions as hf
 
 
-class DownloadsJunoTyping(helper_functions.GitHelpers):
+class DownloadsJunoTyping:
     """Class that performs all necessary software and database downloads for
     the Juno typing pipeline if necessary"""
 
