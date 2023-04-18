@@ -16,8 +16,10 @@ from download_dbs import DownloadsJunoTyping
 
 
 @unittest.skipIf(
-    not Path("/mnt/scratch_dir/hernanda").exists(),
-    "Skipped in non-RIVM environments (for sake of time)",
+    not Path(
+        "/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/"
+    ).exists(),
+    "Skipped in non-RIVM environments (for the sake of time)",
 )
 class TestDownloadDbs(unittest.TestCase):
     """Testing the downloading of databases and software used by the pipeline"""
@@ -167,16 +169,21 @@ class TestJunoTypingPipeline(unittest.TestCase):
 
     def test_junotyping_run(self) -> None:
         """Testing the pipeline runs properly with real samples and new conda envs"""
+
         output_dir = Path("test_output")
-        juno_typing_run = JunoTyping(
-            input_dir="/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/",
-            db_dir="/mnt/db/juno/typing_db",
-            output_dir=output_dir,
-            conda_prefix="test_new_conda_envs",
-        )
-        self.assertTrue(
-            juno_typing_run.successful_run, "Exception raised when running a dryrun"
-        )
+        argv = [
+            "-i",
+            "/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/",
+            "-o",
+            str(output_dir),
+            "--db_dir",
+            "/mnt/db/juno/typing_db",
+            "--prefix",
+            "test_new_conda_envs",
+        ]
+        juno_typing = JunoTyping(argv=argv)
+        juno_typing.run()
+
         self.assertTrue(
             output_dir.joinpath("serotype", "serotyper_multireport.csv").exists()
         )
@@ -196,7 +203,7 @@ class TestJunoTypingPipeline(unittest.TestCase):
         )
         self.assertTrue(output_dir.joinpath("audit_trail", "log_conda.txt").exists())
         self.assertTrue(
-            output_dir.joinpath("audit_trail", "juno_typing_report.html").exists()
+            output_dir.joinpath("audit_trail", "snakemake_report.html").exists()
         )
         self.assertTrue(
             output_dir.joinpath("audit_trail", "sample_sheet.yaml").exists()
@@ -211,15 +218,21 @@ class TestJunoTypingPipeline(unittest.TestCase):
     def test_junotyping_run_wMetadata(self) -> None:
         """Testing the pipeline runs properly with real samples when providing a metadata file"""
         output_dir = Path("test_output2")
-        pipeline_run = JunoTyping(
-            input_dir="/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/",
-            db_dir="/mnt/db/juno/typing_db",
-            metadata="/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/metadata.csv",
-            output_dir=output_dir,
-        )
-        self.assertTrue(
-            pipeline_run.successful_run, "Exception raised when running a dryrun"
-        )
+        argv = [
+            "-i",
+            "/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/",
+            "-o",
+            str(output_dir),
+            "--db_dir",
+            "/mnt/db/juno/typing_db",
+            "--prefix",
+            "test_new_conda_envs",
+            "--metadata",
+            "/data/BioGrid/hernanda/test_data_per_pipeline/Enteric/Juno-typing/metadata.csv",
+        ]
+        juno_typing = JunoTyping(argv=argv)
+        juno_typing.run()
+
         self.assertTrue(
             output_dir.joinpath("serotype", "serotyper_multireport.csv").exists()
         )
@@ -239,7 +252,7 @@ class TestJunoTypingPipeline(unittest.TestCase):
         )
         self.assertTrue(output_dir.joinpath("audit_trail", "log_conda.txt").exists())
         self.assertTrue(
-            output_dir.joinpath("audit_trail", "juno_typing_report.html").exists()
+            output_dir.joinpath("audit_trail", "snakemake_report.html").exists()
         )
         self.assertTrue(
             output_dir.joinpath("audit_trail", "sample_sheet.yaml").exists()

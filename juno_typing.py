@@ -112,6 +112,12 @@ class JunoTyping(Pipeline):
         )
     
     def _parse_args(self) -> argparse.Namespace:
+
+        # Remove this if containers can be used with juno-typing
+        if "--no-containers" not in self.argv:
+            self.argv.append("--no-containers")
+
+
         args = super()._parse_args()
         self.db_dir: Path = args.db_dir.resolve()
         
