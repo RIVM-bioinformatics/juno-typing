@@ -26,6 +26,7 @@ jobs:
         with:
           cache-downloads: true
           environment-file: envs/juno_typing.yaml
+          channel-priority: flexible
       - name: Conda list
         shell: bash -l {0}
         run: conda list
