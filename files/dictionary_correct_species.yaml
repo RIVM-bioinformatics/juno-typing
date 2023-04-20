@@ -56,8 +56,8 @@ burkholderia_thailandensis: bpseudomallei #Red
 burkholderia_ubonensis: bcepacia
 burkholderia_vietnamiensis: bcepacia
 campylobacter_coli: cjejuni #Black
-campylobacter_concisus: cconcisus_curvus #Black
-campylobacter_curvus: cconcisus_curvus #Black
+campylobacter_concisus: cconcisus #Black
+campylobacter_curvus: cconcisus #Black
 campylobacter_fetus: cfetus #Black
 campylobacter_helveticus: chelveticus #Black
 campylobacter_hyointestinalis: chyointestinalis #Black
