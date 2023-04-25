@@ -387,7 +387,6 @@ for db in results:
         json_results[db_name] = "No hit found"
     else:
         for contig_id, hit in results[db].items():
-
             identity = float(hit["perc_ident"])
             coverage = float(hit["perc_coverage"])
 
@@ -405,7 +404,6 @@ for db in results:
 
     # Check for overlapping hits, only report the best
     for contig_id, hit_lsts in contig_res.items():
-
         hit_lsts.sort(key=lambda x: x[0])
         hits = [hit[3] for hit in hit_lsts]
 
@@ -415,7 +413,6 @@ for db in results:
 
         # Check if more then one hit was found within the same gene
         for i in range(len(hit_lsts) - 1):
-
             # Save information from next hit
             next_start = hit_lsts[i + 1][0]
             next_end = hit_lsts[i + 1][1]

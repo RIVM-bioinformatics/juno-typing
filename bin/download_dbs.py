@@ -1,10 +1,10 @@
 import argparse
 import pathlib
 import subprocess
-from base_juno_pipeline import helper_functions
+import juno_library.helper_functions as hf
 
 
-class DownloadsJunoTyping(helper_functions.GitHelpers):
+class DownloadsJunoTyping:
     """Class that performs all necessary software and database downloads for
     the Juno typing pipeline if necessary"""
 
@@ -36,7 +36,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         kmerfinder_software_dir = self.bin_dir.joinpath("kmerfinder")
         if not kmerfinder_software_dir.joinpath("kmerfinder.py").is_file():
             print("\x1b[0;33m Downloading kmerfinder software...\n\033[0;0m")
-            self.download_git_repo(
+            hf.download_git_repo(
                 version,
                 "https://bitbucket.org/genomicepidemiology/kmerfinder.git",
                 kmerfinder_software_dir,
@@ -54,7 +54,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
             print(
                 "\x1b[0;33m Downloading characterize_neisseria_capsule software...\n\033[0;0m"
             )
-            self.download_git_repo(
+            hf.download_git_repo(
                 version,
                 "https://github.com/ntopaz/characterize_neisseria_capsule.git",
                 characterize_neisseria_capsule_software_dir,
@@ -66,7 +66,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         mlst7_software_dir = self.bin_dir.joinpath("cge-mlst")
         if not mlst7_software_dir.joinpath("mlst.py").is_file():
             print("\x1b[0;33m Downloading MLST (CGE) software...\n\033[0;0m")
-            self.download_git_repo(
+            hf.download_git_repo(
                 version,
                 "https://bitbucket.org/genomicepidemiology/mlst.git",
                 mlst7_software_dir,
@@ -78,7 +78,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         kmerfinder_db_dir = self.db_dir.joinpath("kmerfinder_db")
         if not kmerfinder_db_dir.joinpath("config").exists():
             print("\x1b[0;33m Downloading KmerFinder database...\n\033[0;0m")
-            self.download_git_repo(
+            hf.download_git_repo(
                 "master",
                 "https://bitbucket.org/genomicepidemiology/kmerfinder_db.git",
                 kmerfinder_db_dir,
@@ -123,7 +123,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                 print("i dont reach the build")
                 build.kill()
                 raise
-        version = self.get_commit_git(characterize_neisseria_capsule_db_dir)
+        version = hf.get_commit_git(characterize_neisseria_capsule_db_dir)
         return version
 
     def download_db_mlst7(self, version):
@@ -131,7 +131,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         mlst7_db_dir = self.db_dir.joinpath("mlst7_db")
         if not mlst7_db_dir.joinpath("senterica", "senterica.length.b").is_file():
             print("\x1b[0;33m Downloading 7-locus MLST (CGE) database...\n\033[0;0m")
-            self.download_git_repo(
+            hf.download_git_repo(
                 version,
                 "https://bitbucket.org/genomicepidemiology/mlst_db.git",
                 mlst7_db_dir,
@@ -146,7 +146,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
                 build.kill()
                 raise
-        version = self.get_commit_git(mlst7_db_dir)
+        version = hf.get_commit_git(mlst7_db_dir)
         return version
 
     def download_db_serotypefinder(self, version):
@@ -154,7 +154,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         serotypefinder_db_dir = self.db_dir.joinpath("serotypefinder_db")
         if not serotypefinder_db_dir.joinpath("H_type.seq.b").is_file():
             print("\x1b[0;33m Downloading SerotypeFinder database...\n\033[0;0m")
-            self.download_git_repo(
+            hf.download_git_repo(
                 version,
                 "https://bitbucket.org/genomicepidemiology/serotypefinder_db.git",
                 serotypefinder_db_dir,
@@ -169,7 +169,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
                 build.kill()
                 raise
-        version = self.get_commit_git(serotypefinder_db_dir)
+        version = hf.get_commit_git(serotypefinder_db_dir)
         return version
 
     def download_db_seroba(self, version, kmersize=71):
@@ -177,7 +177,7 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
         seroba_db_dir = self.db_dir.joinpath("seroba_db")
         if not seroba_db_dir.joinpath("database", "cdhit_cluster").is_file():
             print("\x1b[0;33m Downloading Seroba database...\n\033[0;0m")
-            self.download_git_repo(
+            hf.download_git_repo(
                 version, "https://github.com/sanger-pathogens/seroba.git", seroba_db_dir
             )
             try:
@@ -203,8 +203,8 @@ class DownloadsJunoTyping(helper_functions.GitHelpers):
                 )
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
                 build.kill()
-                raise
-        version = self.get_commit_git(seroba_db_dir)
+                raise err
+        version = hf.get_commit_git(seroba_db_dir)
         return version
 
     def get_downloads_juno_typing(
