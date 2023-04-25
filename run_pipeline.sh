@@ -11,9 +11,7 @@ output_dir="${2%/}"
 
 #----------------------------------------------#
 # Create/update necessary environments
-PATH_MAMBA_YAML="envs/mamba.yaml"
-PATH_MASTER_YAML="envs/master_env.yaml"
-MAMBA_NAME=$(head -n 1 ${PATH_MAMBA_YAML} | cut -f2 -d ' ')
+PATH_MASTER_YAML="envs/juno_typing.yaml"
 MASTER_NAME=$(head -n 1 ${PATH_MASTER_YAML} | cut -f2 -d ' ')
 
 echo -e "\nUpdating necessary environments to run the pipeline..."
@@ -23,11 +21,7 @@ echo -e "\nUpdating necessary environments to run the pipeline..."
 # are set or not
 set +euo pipefail 
 
-conda env update -f "${PATH_MAMBA_YAML}"
-source activate "${MAMBA_NAME}"
-
 mamba env update -f "${PATH_MASTER_YAML}"
-
 source activate "${MASTER_NAME}"
 
 #----------------------------------------------#
