@@ -1,8 +1,10 @@
 name: juno_typing
 channels:
-  - conda-forge
+  - defaults
   - bioconda
-  - biocore
+  - conda-forge
+  - intel
+  - anaconda
 dependencies:
   - python=3.9.*
   - mamba=1.2.*
