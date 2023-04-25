@@ -57,7 +57,7 @@ Alternatively, you can download it manually as a zip file (you will need to unzi
 
 ```
 cd juno-typing
-conda env create -f envs/master_env.yaml
+conda env create -f envs/juno_typing.yaml
 ```
 
 ## Parameters & Usage
