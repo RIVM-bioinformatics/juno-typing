@@ -10,8 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: 
-          - {os: macOS-latest}
+        config:
           - {os: ubuntu-20.04}
           - {os: ubuntu-latest}
     name: Testing Juno_typing ${{ matrix.config.os }}
