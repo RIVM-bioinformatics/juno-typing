@@ -59,7 +59,7 @@ class DownloadsJunoTyping:
                 "https://github.com/ntopaz/characterize_neisseria_capsule.git",
                 characterize_neisseria_capsule_software_dir,
             )
-        return version  
+        return version
 
     def download_software_mlst7(self, version):
         """Function to download MLST (CGE) if it is not present"""
@@ -111,9 +111,16 @@ class DownloadsJunoTyping:
             "neisseria_capsule_DB"
         ).exists():
             try:
-                print(f"Copying neisseria db from mnt/db/juno to: {characterize_neisseria_capsule_db_dir}")
+                print(
+                    f"Copying neisseria db from mnt/db/juno to: {characterize_neisseria_capsule_db_dir}"
+                )
                 build = subprocess.run(
-                    ["cp", "-R", "/mnt/db/juno/neisseria_capsule_DB", f"{characterize_neisseria_capsule_db_dir}"],
+                    [
+                        "cp",
+                        "-R",
+                        "/mnt/db/juno/neisseria_capsule_DB",
+                        f"{characterize_neisseria_capsule_db_dir}",
+                    ],
                     cwd=str(characterize_neisseria_capsule_db_dir),
                     check=True,
                     timeout=3000,
@@ -123,7 +130,6 @@ class DownloadsJunoTyping:
                 raise
         else:
             return print("Neisseria db is available, continue analysis")
-
 
     def download_db_mlst7(self, version):
         """Function to download the MLST (CGE) database if it is not present"""
