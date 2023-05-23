@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.7](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.6...v0.5.7) (2023-05-23)
+
+
+### Bug Fixes
+
+* Set channel priority to strit in run_pipeline ([a72253b](https://github.com/RIVM-bioinformatics/juno-typing/commit/a72253be6735f9afacdcdddc1bb683d7fc699c5b))
+* stop downloading neisseria database, neisseria database is now locally available ([2c0fcea](https://github.com/RIVM-bioinformatics/juno-typing/commit/2c0fcea6416129391a546ff2fac4488335c0c780))
+
 ## [0.5.6](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.5...v0.5.6) (2023-04-26)
 
 
