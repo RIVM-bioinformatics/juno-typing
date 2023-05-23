@@ -13,6 +13,7 @@ output_dir="${2%/}"
 # Create/update necessary environments
 PATH_MASTER_YAML="envs/juno_typing.yaml"
 MASTER_NAME=$(head -n 1 ${PATH_MASTER_YAML} | cut -f2 -d ' ')
+conda config --set channel_priority flexible
 
 echo -e "\nUpdating necessary environments to run the pipeline..."
 
