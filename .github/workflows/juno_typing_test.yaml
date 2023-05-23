@@ -1,5 +1,4 @@
 # Testing for pipeline python wrapper and scripts used inside rules
-# Based on: https://github.com/marketplace/actions/setup-miniconda#example-1-basic-usage
 
 name: Juno_typing test
 
@@ -11,25 +10,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: 
+        config:
           - {os: ubuntu-20.04}
           - {os: ubuntu-latest}
     name: Testing Juno_typing ${{ matrix.config.os }}
 
     steps:
       - uses: actions/checkout@v2
+      - uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.7
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
         with:
           cache-downloads: true
-          environment-file: envs/master_env.yaml
-          channel-priority: true
+          environment-file: envs/juno_typing.yaml
+          channel-priority: flexible
       - name: Conda list
         shell: bash -l {0}
         run: conda list
-      - name: Test the python wrapper using base_juno_pipeline.
+      - name: Test the python wrapper using juno_typing.
         shell: bash -l {0}
-        run: python ./tests/test_juno-typing.py
-      - name: Test the individual scripts used inside the snakemake rules.
+        run: python ./tests/test_juno_typing.py
+      - name: Test the scripts used in juno_typing.
         shell: bash -l {0}
         run: python ./tests/test_scripts_used_in_rules.py

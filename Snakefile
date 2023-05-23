@@ -26,6 +26,10 @@ with open(sample_sheet) as sample_sheet_file:
 # OUT defines output directory for most rules.
 OUT = config["out"]
 
+# For some reason these aren't integers when called from python the snakemake API
+for param in ["threads", "mem_gb"]:
+    for k in config[param]:
+        config[param][k] = int(config[param][k])
 
 # @################################################################################
 # @####                              Processes                                #####

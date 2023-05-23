@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 """
 Juno-typing pipeline
 Authors: Alejandra Hernandez-Segura
@@ -11,102 +12,160 @@ Documentation: https://rivm-bioinformatics.github.io/ids_bacteriology_man/juno-t
 """
 
 # Dependencies
-from base_juno_pipeline import *
 import argparse
-import pathlib
+from juno_library import Pipeline
+from version import __package_name__, __version__
+import argparse
 import subprocess
 import yaml
+from pathlib import Path
+from typing import Optional
+from dataclasses import dataclass
 
 # Own scripts
 import bin.download_dbs
 
+def main() -> None:    
+    juno_typing = JunoTyping()
+    juno_typing.run()
 
-class JunoTypingRun(
-    base_juno_pipeline.PipelineStartup, base_juno_pipeline.RunSnakemake
-):
-    """Class with the arguments and specifications that are only for the Juno-typing pipeline but inherit from PipelineStartup and RunSnakemake"""
+@dataclass
+class JunoTyping(Pipeline):
+    pipeline_name: str = __package_name__
+    pipeline_version: str = __version__
+    input_type: str = "both"
 
-    def __init__(
-        self,
-        input_dir,
-        output_dir,
-        species=None,
-        metadata=None,
-        db_dir="/mnt/db/juno/typing_db",
-        update_dbs=False,
-        serotypefinder_mincov=0.6,
-        serotypefinder_identity=0.85,
-        seroba_mincov=20,
-        seroba_kmersize=71,
-        cores=300,
-        local=False,
-        queue="bio",
-        unlock=False,
-        rerunincomplete=False,
-        dryrun=False,
-        run_in_container=False,
-        singularity_prefix=None,
-        conda_prefix=None,
-        **kwargs,
-    ):
-        """Initiating Juno-typing pipeline"""
+    def _add_args_to_parser(self) -> None:
+        super()._add_args_to_parser()
+        
+        self.parser.description="Juno-typing pipeline. Automated pipeline for bacterial subtyping (7-locus MLST and serotyping)."
 
-        # Get proper file paths
-        output_dir = pathlib.Path(output_dir).resolve()
-        workdir = pathlib.Path(__file__).parent.resolve()
-        self.db_dir = pathlib.Path(db_dir).resolve()
-        self.path_to_audit = output_dir.joinpath("audit_trail")
-        base_juno_pipeline.PipelineStartup.__init__(
-            self,
-            input_dir=pathlib.Path(input_dir).resolve(),
-            input_type="both",
-            min_num_lines=2,
-        )  # Min for viable fasta
-        base_juno_pipeline.RunSnakemake.__init__(
-            self,
-            pipeline_name="Juno_typing",
-            pipeline_version="v0.2",
-            output_dir=output_dir,
-            workdir=workdir,
-            cores=cores,
-            local=local,
-            queue=queue,
-            unlock=unlock,
-            rerunincomplete=rerunincomplete,
-            dryrun=dryrun,
-            useconda=not run_in_container,
-            conda_prefix=conda_prefix,
-            usesingularity=run_in_container,
-            singularityargs=f"--bind {self.input_dir}:{self.input_dir} --bind {output_dir}:{output_dir} --bind {db_dir}:{db_dir}",
-            singularity_prefix=singularity_prefix,
-            restarttimes=1,
-            latency_wait=60,
-            name_snakemake_report=str(
-                self.path_to_audit.joinpath("juno_typing_report.html")
-            ),
-            **kwargs,
+        self.add_argument(
+            "-m",
+            "--metadata",
+            type=Path,
+            default=None,
+            required=False,
+            metavar="FILE",
+            help="Relative or absolute path to the metadata csv file. If "
+            "provided, it must contain at least one column named 'sample' "
+            "with the name of the sample (same than file name but removing "
+            "the suffix _R1.fastq.gz), a column called "
+            "'genus' and a column called 'species'. The genus and species "
+            "provided will be used to choose the serotyper and the MLST schema(s)."
+            "If a metadata file is provided, it will overwrite the --species "
+            "argument for the samples present in the metadata file.",
         )
+        self.add_argument(
+            "-s",
+            "--species",
+            type=lambda s: s.strip().lower(),
+            nargs=2,
+            default=[None, None],
+            required=False,
+            metavar=("GENUS", "SPECIES"),
+            help="Species name (any species in the metadata file will overwrite"
+            " this argument). It should be given as two words (e.g. --species "
+            "Salmonella enterica)",
+        )
+        self.add_argument(
+            "-d",
+            "--db_dir",
+            type=Path,
+            required=False,
+            metavar="DIR",
+            default="/mnt/db/juno/typing_db",
+            help="Relative or absolute path to the directory that contains the databases for all the tools used in this pipeline or where they should be downloaded. Default is: /mnt/db/juno/typing_db",
+        )
+        self.add_argument(
+            "--serotypefinder_mincov",
+            type=float,
+            metavar="NUM",
+            default=0.6,
+            help="Minimum coverage to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-1. Default is 0.6.",
+        )
+        self.add_argument(
+            "--serotypefinder_identity",
+            type=float,
+            metavar="NUM",
+            default=0.85,
+            help="Identity threshold to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-1. Default is 0.85",
+        )
+        self.add_argument(
+            "--seroba_mincov",
+            type=int,
+            metavar="INT",
+            default=20,
+            help="Minimum coverage to be used for the Seroba (S. pneumoniae serotyping) tool. It accepts values from 0-100. Default is 20",
+        )
+        self.add_argument(
+            "--seroba_kmersize",
+            type=int,
+            metavar="INT",
+            default=71,
+            help="Minimum coverage to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-100. Default is 20",
+        )
+        self.add_argument(
+            "--update",
+            action="store_true",
+            help="Force database update even if they are present.",
+        )
+    
+    def _parse_args(self) -> argparse.Namespace:
 
-        # Pipeline attributes
-        self.genus, self.species = self.__get_genus_species_from_arg(species)
-        self.metadata_file = metadata
-        self.serotypefinder_mincov = serotypefinder_mincov
-        self.serotypefinder_identity = serotypefinder_identity
-        self.seroba_mincov = seroba_mincov
-        self.seroba_kmersize = seroba_kmersize
-        self.update_dbs = update_dbs
+        # Remove this if containers can be used with juno-typing
+        if "--no-containers" not in self.argv:
+            self.argv.append("--no-containers")
 
-        # Start pipeline
-        self.run_juno_typing_pipeline()
 
-    def __get_genus_species_from_arg(self, species_arg):
-        if species_arg is None:
-            return None, None
-        else:
-            arg_split = species_arg.strip().lower().split(" ")
-            return arg_split[0], arg_split[1]
+        args = super()._parse_args()
+        self.db_dir: Path = args.db_dir.resolve()
+        
+        self.genus: Optional[str]
+        self.species: Optional[str]
+        self.genus, self.species = args.species
+        self.metadata_file: Path = args.metadata
+        self.serotypefinder_mincov:float = args.serotypefinder_mincov
+        self.serotypefinder_identity:float = args.serotypefinder_identity
+        self.seroba_mincov:int = args.seroba_mincov
+        self.seroba_kmersize:int = args.seroba_kmersize
+        self.update_dbs: bool = args.update
+        return args
+        
+    def setup(self) -> None:
+        super().setup()        
+        self.update_sample_dict_with_metadata()
+        
+        if self.snakemake_args["use_singularity"]:            
+            self.snakemake_args["singularity_args"] = " ".join(
+                [
+                    self.snakemake_args["singularity_args"],
+                    f"--bind {self.db_dir}:{self.db_dir}",
+                ]
+            )
+        self.user_parameters = {
+            "input_dir": str(self.input_dir),
+            "out": str(self.output_dir),
+            "mlst7_db": str(self.db_dir.joinpath("mlst7_db")),
+            "seroba_db": str(self.db_dir.joinpath("seroba_db")),
+            "serotypefinder_db": str(self.db_dir.joinpath("serotypefinder_db")),
+            "serotypefinder": {
+                "min_cov": self.serotypefinder_mincov,
+                "identity_thresh": self.serotypefinder_identity,
+            },
+            "seroba": {
+                "min_cov": self.seroba_mincov,
+                "kmer_size": self.seroba_kmersize,
+            },
+        }
+        
+        with open(
+            Path(__file__).parent.joinpath("config/pipeline_parameters.yaml")
+        ) as f:
+            parameters_dict = yaml.safe_load(f)
+        self.snakemake_config.update(parameters_dict)
 
-    def update_sample_dict_with_metadata(self):
+    def update_sample_dict_with_metadata(self) -> None:
         self.get_metadata_from_csv_file(
             filepath=self.metadata_file,
             expected_colnames=["sample", "genus", "species"],
@@ -145,45 +204,8 @@ class JunoTypingRun(
                         "species-mlst7"
                     ] = self.mlst7_species_translation_tbl.get(genus)
 
-    def start_juno_typing_pipeline(self):
-        """
-        Function to start the pipeline (some steps from PipelineStartup need
-        to be modified for the Juno-typing pipeline to accept fastq and fasta
-        input
-        """
-        self.start_juno_pipeline()
-        self.update_sample_dict_with_metadata()
-        # Write sample_sheet
-        with open(self.sample_sheet, "w") as file_:
-            yaml.dump(self.sample_dict, file_, default_flow_style=False)
-
-    def write_userparameters(self):
-
-        config_params = {
-            "input_dir": str(self.input_dir),
-            "out": str(self.output_dir),
-            "mlst7_db": str(self.db_dir.joinpath("mlst7_db")),
-            "seroba_db": str(self.db_dir.joinpath("seroba_db")),
-            "serotypefinder_db": str(self.db_dir.joinpath("serotypefinder_db")),
-            "serotypefinder": {
-                "min_cov": self.serotypefinder_mincov,
-                "identity_thresh": self.serotypefinder_identity,
-            },
-            "seroba": {
-                "min_cov": self.seroba_mincov,
-                "kmer_size": self.seroba_kmersize,
-            },
-        }
-
-        with open(self.user_parameters, "w") as file_:
-            yaml.dump(config_params, file_, default_flow_style=False)
-
-        return config_params
-
-    def run_juno_typing_pipeline(self):
-        self.start_juno_typing_pipeline()
-        self.user_params = self.write_userparameters()
-        self.get_run_info()
+    def run(self) -> None:
+        self.setup()
         if not self.dryrun or self.unlock:
             self.path_to_audit.mkdir(parents=True, exist_ok=True)
             downloads_juno_typing = bin.download_dbs.DownloadsJunoTyping(
@@ -200,8 +222,6 @@ class JunoTypingRun(
             ) as file_:
                 yaml.dump(self.downloads_versions, file_, default_flow_style=False)
 
-        self.successful_run = self.run_snakemake()
-        assert self.successful_run, f"Please check the log files"
         if not self.dryrun or self.unlock:
             subprocess.run(
                 [
@@ -230,184 +250,8 @@ class JunoTypingRun(
                     ";",
                 ]
             )
-            self.make_snakemake_report()
-
-
-class StoreSpeciesArgAction(argparse.Action, helper_functions.JunoHelpers):
-    """
-    Argparse Action to check that species was passed as only two words and
-    store it as a single string instead of as a list.
-    """
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        if not len(values) == 2:
-            raise argparse.ArgumentTypeError(
-                self.error_formatter(
-                    f"Wrong --species argument provided. The species should be provided as TWO words. For instance: --species salmonella enterica."
-                )
-            )
-        species = " ".join(values)
-        setattr(namespace, self.dest, species)
-
+        super().run()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Juno-typing pipeline. Automated pipeline for bacterial subtyping (7-locus MLST and serotyping)."
-    )
-    parser.add_argument(
-        "-i",
-        "--input",
-        type=pathlib.Path,
-        required=True,
-        metavar="DIR",
-        help="Relative or absolute path to the input directory. It must either be the output directory of the Juno-assembly pipeline or it must contain all the raw reads (fastq) and assemblies (fasta) files for all samples to be processed.",
-    )
-    parser.add_argument(
-        "-m",
-        "--metadata",
-        type=pathlib.Path,
-        default=None,
-        required=False,
-        metavar="FILE",
-        help="Relative or absolute path to the metadata csv file. If "
-        "provided, it must contain at least one column named 'sample' "
-        "with the name of the sample (same than file name but removing "
-        "the suffix _R1.fastq.gz), a column called "
-        "'genus' and a column called 'species'. The genus and species "
-        "provided will be used to choose the serotyper and the MLST schema(s)."
-        "If a metadata file is provided, it will overwrite the --species "
-        "argument for the samples present in the metadata file.",
-    )
-    parser.add_argument(
-        "-s",
-        "--species",
-        nargs="+",
-        action=StoreSpeciesArgAction,
-        default=None,
-        required=False,
-        metavar="FILE",
-        help="Species name (any species in the metadata file will overwrite"
-        " this argument). It should be given as two words (e.g. --species "
-        "Salmonella enterica)",
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        type=pathlib.Path,
-        metavar="DIR",
-        default="output",
-        help="Relative or absolute path to the output directory. If non is given, an 'output' directory will be created in the current directory.",
-    )
-    parser.add_argument(
-        "-d",
-        "--db_dir",
-        type=pathlib.Path,
-        required=False,
-        metavar="DIR",
-        default="/mnt/db/juno/typing_db",
-        help="Relative or absolute path to the directory that contains the databases for all the tools used in this pipeline or where they should be downloaded. Default is: /mnt/db/juno/typing_db",
-    )
-    parser.add_argument(
-        "--serotypefinder_mincov",
-        type=float,
-        metavar="NUM",
-        default=0.6,
-        help="Minimum coverage to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-1. Default is 0.6.",
-    )
-    parser.add_argument(
-        "--serotypefinder_identity",
-        type=float,
-        metavar="NUM",
-        default=0.85,
-        help="Identity threshold to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-1. Default is 0.85",
-    )
-    parser.add_argument(
-        "--seroba_mincov",
-        type=int,
-        metavar="INT",
-        default=20,
-        help="Minimum coverage to be used for the Seroba (S. pneumoniae serotyping) tool. It accepts values from 0-100. Default is 20",
-    )
-    parser.add_argument(
-        "--seroba_kmersize",
-        type=int,
-        metavar="INT",
-        default=71,
-        help="Minimum coverage to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-100. Default is 20",
-    )
-    parser.add_argument(
-        "--update",
-        action="store_true",
-        help="Force database update even if they are present.",
-    )
-    parser.add_argument(
-        "-c",
-        "--cores",
-        type=int,
-        metavar="INT",
-        default=300,
-        help="Number of cores to use. Default is 300",
-    )
-    # TODO: Get from ${irods_runsheet_sys__runsheet__lsf_queue} if it exists
-    parser.add_argument(
-        "-q",
-        "--queue",
-        type=str,
-        metavar="STR",
-        default="bio",
-        help="Name of the queue that the job will be submitted to if working on a cluster.",
-    )
-    parser.add_argument(
-        "-l",
-        "--local",
-        action="store_true",
-        help="Running pipeline locally (instead of in a computer cluster). Default is running it in a cluster.",
-    )
-    # Snakemake arguments
-    parser.add_argument(
-        "-u",
-        "--unlock",
-        action="store_true",
-        help="Unlock output directory (passed to snakemake).",
-    )
-    parser.add_argument(
-        "-n",
-        "--dryrun",
-        action="store_true",
-        help="Dry run printing steps to be taken in the pipeline without actually running it (passed to snakemake).",
-    )
-    parser.add_argument(
-        "--rerunincomplete",
-        action="store_true",
-        help="Re-run jobs if they are marked as incomplete (passed to snakemake).",
-    )
-    parser.add_argument(
-        "--snakemake-args",
-        nargs="*",
-        default={},
-        action=helper_functions.SnakemakeKwargsAction,
-        help="Extra arguments to be passed to snakemake API (https://snakemake.readthedocs.io/en/stable/api_reference/snakemake.html).",
-    )
-    args = parser.parse_args()
-    JunoTypingRun(
-        input_dir=args.input,
-        output_dir=args.output,
-        species=args.species,
-        metadata=args.metadata,
-        db_dir=args.db_dir,
-        update_dbs=args.update,
-        serotypefinder_mincov=args.serotypefinder_mincov,
-        serotypefinder_identity=args.serotypefinder_identity,
-        seroba_mincov=args.seroba_mincov,
-        seroba_kmersize=args.seroba_kmersize,
-        cores=args.cores,
-        local=args.local,
-        queue=args.queue,
-        unlock=args.unlock,
-        rerunincomplete=args.rerunincomplete,
-        dryrun=args.dryrun,
-        run_in_container=False,
-        singularity_prefix=None,
-        conda_prefix=None,
-        **args.snakemake_args,
-    )
+    main()
+    

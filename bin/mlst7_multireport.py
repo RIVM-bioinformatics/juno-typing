@@ -4,6 +4,7 @@ import os
 import re
 import json
 
+
 # Extract sample
 def extract_sample_name(input):
     assert type(input) is str, "The input directory must be a string"

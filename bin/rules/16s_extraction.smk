@@ -6,6 +6,8 @@ rule barrnap:
         assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
     output:
         OUT + "/16s/{sample}/barrnap_result.fasta",
+        temp(OUT + "/16s/{sample}/temp_barrnap_input.fasta"),
+        temp(OUT + "/16s/{sample}/temp_barrnap_input.fasta.fai"),
     message:
         "Running Barrnap for {wildcards.sample}."
     log:
@@ -17,7 +19,8 @@ rule barrnap:
         mem_gb=config["mem_gb"]["barrnap"],
     shell:
         """
-        barrnap {input.assembly:q} --outseq {output:q} 2>&1 {log:q}
+        cp {input.assembly:q} {output[1]:q}
+        barrnap {output[1]:q} --outseq {output[0]:q} 2>&1 {log:q}
         """
 
 
