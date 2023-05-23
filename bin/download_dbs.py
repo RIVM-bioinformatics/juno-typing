@@ -101,10 +101,9 @@ class DownloadsJunoTyping:
                 raise
         return version
 
-    def download_db_characterize_neisseria_capsule(self, version):
-        """Function to download neisseria database if it is not present"""
-        # this is bin dir and not db dir because we want the database to be inside of the bin neisseria folder in the bin dir
-        # TODO now it will always built a new db, do we want to store neisseria + db in the db folder
+    def copy_neisseria_db(self):
+        """Function to copy the neisseria db from mnt/db/juno to the bin folder of the neisseria tool.
+        It is necessary for the tool to run the database from this location."""
         characterize_neisseria_capsule_db_dir = self.bin_dir.joinpath(
             "characterize_neisseria_capsule"
         )
@@ -112,19 +111,25 @@ class DownloadsJunoTyping:
             "neisseria_capsule_DB"
         ).exists():
             try:
-                print("starting to build from here:")
+                print(
+                    f"Copying neisseria db from mnt/db/juno to: {characterize_neisseria_capsule_db_dir}"
+                )
                 build = subprocess.run(
-                    ["python3", "build_neisseria_dbs.py"],
+                    [
+                        "cp",
+                        "-R",
+                        "/mnt/db/juno/neisseria_capsule_DB",
+                        f"{characterize_neisseria_capsule_db_dir}",
+                    ],
                     cwd=str(characterize_neisseria_capsule_db_dir),
                     check=True,
                     timeout=3000,
                 )
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-                print("i dont reach the build")
                 build.kill()
                 raise
-        version = hf.get_commit_git(characterize_neisseria_capsule_db_dir)
-        return version
+        else:
+            return print("Neisseria db is available, continue analysis")
 
     def download_db_mlst7(self, version):
         """Function to download the MLST (CGE) database if it is not present"""
@@ -236,9 +241,7 @@ class DownloadsJunoTyping:
             "seroba_db": self.download_db_seroba(
                 version=seroba_db_asked_version, kmersize=self.seroba_kmersize
             ),
-            "characterize_neisseria_capsule_db": self.download_db_characterize_neisseria_capsule(
-                version=characterize_neisseria_capsule_asked_version
-            ),
+            "characterize_neisseria_capsule_db": self.copy_neisseria_db(),
         }
 
         return software_version

@@ -25,9 +25,11 @@ from dataclasses import dataclass
 # Own scripts
 import bin.download_dbs
 
-def main() -> None:    
+
+def main() -> None:
     juno_typing = JunoTyping()
     juno_typing.run()
+
 
 @dataclass
 class JunoTyping(Pipeline):
@@ -37,8 +39,8 @@ class JunoTyping(Pipeline):
 
     def _add_args_to_parser(self) -> None:
         super()._add_args_to_parser()
-        
-        self.parser.description="Juno-typing pipeline. Automated pipeline for bacterial subtyping (7-locus MLST and serotyping)."
+
+        self.parser.description = "Juno-typing pipeline. Automated pipeline for bacterial subtyping (7-locus MLST and serotyping)."
 
         self.add_argument(
             "-m",
@@ -110,33 +112,31 @@ class JunoTyping(Pipeline):
             action="store_true",
             help="Force database update even if they are present.",
         )
-    
-    def _parse_args(self) -> argparse.Namespace:
 
+    def _parse_args(self) -> argparse.Namespace:
         # Remove this if containers can be used with juno-typing
         if "--no-containers" not in self.argv:
             self.argv.append("--no-containers")
 
-
         args = super()._parse_args()
         self.db_dir: Path = args.db_dir.resolve()
-        
+
         self.genus: Optional[str]
         self.species: Optional[str]
         self.genus, self.species = args.species
         self.metadata_file: Path = args.metadata
-        self.serotypefinder_mincov:float = args.serotypefinder_mincov
-        self.serotypefinder_identity:float = args.serotypefinder_identity
-        self.seroba_mincov:int = args.seroba_mincov
-        self.seroba_kmersize:int = args.seroba_kmersize
+        self.serotypefinder_mincov: float = args.serotypefinder_mincov
+        self.serotypefinder_identity: float = args.serotypefinder_identity
+        self.seroba_mincov: int = args.seroba_mincov
+        self.seroba_kmersize: int = args.seroba_kmersize
         self.update_dbs: bool = args.update
         return args
-        
+
     def setup(self) -> None:
-        super().setup()        
+        super().setup()
         self.update_sample_dict_with_metadata()
-        
-        if self.snakemake_args["use_singularity"]:            
+
+        if self.snakemake_args["use_singularity"]:
             self.snakemake_args["singularity_args"] = " ".join(
                 [
                     self.snakemake_args["singularity_args"],
@@ -158,7 +158,7 @@ class JunoTyping(Pipeline):
                 "kmer_size": self.seroba_kmersize,
             },
         }
-        
+
         with open(
             Path(__file__).parent.joinpath("config/pipeline_parameters.yaml")
         ) as f:
@@ -252,6 +252,6 @@ class JunoTyping(Pipeline):
             )
         super().run()
 
+
 if __name__ == "__main__":
     main()
-    
