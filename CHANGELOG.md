@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.8](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.7...v0.5.8) (2023-05-26)
+
+
+### Bug Fixes
+
+* channel order ([abef539](https://github.com/RIVM-bioinformatics/juno-typing/commit/abef53977abef671f1acb2640404a78dbd3e0878))
+
 ## [0.5.7](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.6...v0.5.7) (2023-05-23)
 
 
