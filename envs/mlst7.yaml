@@ -1,9 +1,9 @@
 name: cge-mlst
 channels:
-  - anaconda
-  - bioconda
-  - biocore
   - conda-forge
+  - bioconda
+  - anaconda
+  - biocore
   - defaults
 dependencies:
   - cgecore=1.5.5
