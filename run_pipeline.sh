@@ -10,20 +10,34 @@ input_dir="${1%/}"
 output_dir="${2%/}"
 
 #----------------------------------------------#
-# Create/update necessary environments
-PATH_MASTER_YAML="envs/juno_typing.yaml"
-MASTER_NAME=$(head -n 1 ${PATH_MASTER_YAML} | cut -f2 -d ' ')
-conda config --set channel_priority flexible
+## make sure conda works
 
-echo -e "\nUpdating necessary environments to run the pipeline..."
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/mnt/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/mnt/miniconda/etc/profile.d/conda.sh" ]; then
+        . "/mnt/miniconda/etc/profile.d/conda.sh"
+    else
+        export PATH="/mnt/miniconda/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<export -f conda
+export -f __conda_activate
+export -f __conda_reactivate
+export -f __conda_hashr
 
-# Removing strict mode because it sometimes breaks the code for 
-# activating an environment and for testing whether some variables
-# are set or not
-set +euo pipefail 
 
-mamba env update -f "${PATH_MASTER_YAML}"
-source activate "${MASTER_NAME}"
+#----------------------------------------------#
+# Create the environment
+
+# we can use the base installation of mamba to create the environment. 
+# Swapping to a parent env is not necessary anymore.
+mamba env create -f envs/master_env.yaml --name pipeline_env
+conda activate pipeline_env
 
 #----------------------------------------------#
 # Run the pipeline
