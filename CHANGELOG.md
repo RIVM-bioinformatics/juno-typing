@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.11](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.10...v0.5.11) (2023-06-28)
+
+
+### Bug Fixes
+
+* update shigatyper ([828fbe5](https://github.com/RIVM-bioinformatics/juno-typing/commit/828fbe5f70d03d83f9d488229253e6fdcc04ba0e))
+
 ## [0.5.8](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.7...v0.5.8) (2023-05-26)
 
 
