@@ -1,10 +1,10 @@
 name: serotypefinder #Only using blast (assemblies). It will not work for k-mer assembly (fastq)
 channels:
   - conda-forge
-  - defaults
   - bioconda
-  - anaconda
+  - intel
   - biocore
+  - nodefaults
 dependencies:
   - python>3.7
   - blast-plus

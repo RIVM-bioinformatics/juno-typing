@@ -3,7 +3,7 @@ channels:
   - bioconda
   - biocore
   - conda-forge
-  - defaults
+  - nodefaults
 dependencies:
   - cgecore=1.5.5
   - tabulate=0.7.7

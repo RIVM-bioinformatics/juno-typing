@@ -2,9 +2,8 @@ name: cge-mlst
 channels:
   - conda-forge
   - bioconda
-  - anaconda
-  - biocore
-  - defaults
+  - intel
+  - nodefaults
 dependencies:
   - cgecore=1.5.5
   - tabulate=0.7.7

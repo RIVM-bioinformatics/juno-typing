@@ -1,10 +1,10 @@
 name: 16s
 channels:
   - conda-forge
-  - defaults
   - bioconda
-  - anaconda
   - biocore
+  - intel
+  - nodefaults
 dependencies:
   - biopython==1.78
   - barrnap==0.9

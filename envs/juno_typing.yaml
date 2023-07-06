@@ -3,8 +3,7 @@ channels:
   - conda-forge
   - bioconda
   - intel
-  - anaconda
-  - defaults
+  - nodefaults
 dependencies:
   - python=3.9.*
   - mamba=1.2.*
