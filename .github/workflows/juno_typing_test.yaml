@@ -21,7 +21,7 @@ jobs:
         with:
           singularity-version: 3.8.7
       - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
+        uses: mamba-org/setup-micromamba@v1
         with:
           cache-downloads: true
           environment-file: envs/juno_typing.yaml
