@@ -3,8 +3,9 @@ channels:
   - bioconda
   - conda-forge
   - nodefaults
+  - intel
 dependencies:
   - seroba=1.0.2
-  - biopython=1.74
-  - tbb=2020.3
+  - biopython=1.69
   - kmc=3.1.2rc1
+  - python=3

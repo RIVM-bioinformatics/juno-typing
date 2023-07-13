@@ -2,7 +2,6 @@ name: serotypefinder #Only using blast (assemblies). It will not work for k-mer 
 channels:
   - conda-forge
   - bioconda
-  - intel
   - biocore
   - nodefaults
 dependencies:
