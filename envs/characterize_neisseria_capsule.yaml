@@ -1,9 +1,8 @@
 name: characterize_neisseria_capsule
 channels:
-- defaults
-- bioconda
-- anaconda
-- conda-forge
+  - conda-forge
+  - bioconda
+  - nodefaults
 dependencies:
 - python=3.8.5
 - urllib3 = 1.26.9

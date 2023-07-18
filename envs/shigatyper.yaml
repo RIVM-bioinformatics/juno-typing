@@ -1,11 +1,10 @@
 name: shigatyper_old
 channels:
-- defaults
 - bioconda
-- anaconda
 - conda-forge
+- nodefaults
 dependencies:
+- python=3.8.5
 - gsl=2.5
 - bcftools=1.9
-- python=3.8.5
 - shigatyper=1.0.7

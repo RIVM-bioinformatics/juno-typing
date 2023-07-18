@@ -1,7 +1,8 @@
 name: seqsero2
 channels:
   - bioconda
-  - defaults
+  - conda-forge
+  - nodefaults
 dependencies:
   - bedtools=2.17.0
   - biopython=1.73
@@ -17,4 +18,3 @@ dependencies:
   - sra-tools=2.10.0
   - seqsero2=1.1.1
   - pandas==1.1.0
-
