@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.12](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.11...v0.5.12) (2023-07-18)
+
+
+### Dependencies
+
+* remove anaconda and defaults channel and add nodefaults channel, also update dependencies in multiple envs ([ac6831c](https://github.com/RIVM-bioinformatics/juno-typing/commit/ac6831cc153f8333aa14f868b382d850c312d74e))
+* Remove anaconda channel from environments ([3447b49](https://github.com/RIVM-bioinformatics/juno-typing/commit/3447b49faa46f350d9256bf4eaa561edba278a7e))
+
 ## [0.5.11](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.10...v0.5.11) (2023-06-28)
 
 
