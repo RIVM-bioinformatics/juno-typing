@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.12...v0.6.0) (2023-11-14)
+
+
+### Features
+
+* add pertussis vaccine mlst ([c900f3a](https://github.com/RIVM-bioinformatics/juno-typing/commit/c900f3a3d58a43137fcab237884cdc247e369b3d))
+
+
+### Bug Fixes
+
+* catch attribute error if metadata is mssing ([59c6839](https://github.com/RIVM-bioinformatics/juno-typing/commit/59c6839bf339713f035915b23d05347ed012cd80))
+* conda env file name ([a2aa62d](https://github.com/RIVM-bioinformatics/juno-typing/commit/a2aa62d56b9ac39feb927aef0ece3d28a7a536dc))
+* path to bordetella db ([add37d3](https://github.com/RIVM-bioinformatics/juno-typing/commit/add37d3c485e5e20585dbd9b661d30cbd80e14c4))
+* set bordetella scheme name in object ([4b78d67](https://github.com/RIVM-bioinformatics/juno-typing/commit/4b78d6746ee24058350f706864858ab6cb5bd491))
+
 ## [0.5.12](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.11...v0.5.12) (2023-07-18)
 
 
