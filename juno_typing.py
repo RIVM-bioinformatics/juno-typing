@@ -108,6 +108,13 @@ class JunoTyping(Pipeline):
             help="Minimum coverage to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-100. Default is 20",
         )
         self.add_argument(
+            "--bordetella_vaccine_antigen_scheme_name",
+            type=str,
+            metavar="DIR",
+            default="bordetella",
+            help="Name for the directory containing the Bordetella vaccine antigen MLST scheme in --db_dir. Should contain a BLAST db with base name bordetella.fa"
+        )
+        self.add_argument(
             "--update",
             action="store_true",
             help="Force database update even if they are present.",
@@ -157,6 +164,9 @@ class JunoTyping(Pipeline):
                 "min_cov": self.seroba_mincov,
                 "kmer_size": self.seroba_kmersize,
             },
+            "bordetella_vaccine_antigen_datadir": str(self.db_dir.joinpath("bordetella_vaccine_antigen")),
+            "bordetella_vaccine_antigen_scheme": str(self.bordetella_vaccine_antigen_scheme),
+            "bordetella_vaccine_antigen_blastdb": str(self.db_dir.joinpath("bordetella_vaccine_antigen", self.bordetella_vaccine_antigen_scheme, "bordetella.fa")),
         }
 
         with open(
