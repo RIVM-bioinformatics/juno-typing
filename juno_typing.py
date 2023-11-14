@@ -136,6 +136,9 @@ class JunoTyping(Pipeline):
         self.serotypefinder_identity: float = args.serotypefinder_identity
         self.seroba_mincov: int = args.seroba_mincov
         self.seroba_kmersize: int = args.seroba_kmersize
+        self.bordetella_vaccine_antigen_scheme: str = (
+            args.bordetella_vaccine_antigen_scheme_name
+        )
         self.update_dbs: bool = args.update
         return args
 
