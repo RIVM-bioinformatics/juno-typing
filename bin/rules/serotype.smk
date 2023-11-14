@@ -21,6 +21,8 @@ def choose_serotyper(wildcards):
     elif SAMPLES[wildcards.sample]["genus"] == "neisseria":
         # TODO is the output folder enough
         return [OUT + "/serotype/{sample}"]
+    elif SAMPLES[wildcards.sample]["genus"] == "bordetella":
+        return [OUT + "/vaccine_antigen_mlst/{sample}.tsv"]
     else:
         return OUT + "/serotype/{sample}/no_serotype_necessary.txt"
 
@@ -225,6 +227,36 @@ rule characterize_neisseria_capsule:
         do
             cp "${{file}}" "{params.copy_to}/${{file/*/neisseriatyper.tab}}"
         done
+        """
+
+
+# -----------------------------------------------------------------------------#
+
+# -----------------------------------------------------------------------------#
+### Bordetella vaccine antigen MLST ###
+
+
+rule vaccine_antigen_mlst_bordetella:
+    input:
+        assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
+    output:
+        OUT + "/vaccine_antigen_mlst/{sample}.tsv",
+    message:
+        "Running vaccine antigen mlst for {wildcards.sample}."
+    log:
+        OUT + "/log/vaccine_antigen_mlst/{sample}_bordetella.log",
+    conda:
+        "../../envs/tseemann_mlst.yaml"
+    resources:
+        mem_gb=config["mem_gb"]["tseemann_mlst"],
+    threads: config["threads"]["tseemann_mlst"]
+    params:
+        datadir=config["db_dir"],
+        scheme=config["bordetella_vaccine_antigen_scheme"],
+        blastdb=config["bordetella_vaccine_antigen_blastdb"],
+    shell:
+        """
+        mlst --nopath --datadir {params.datadir} --blastdb {params.blastdb} --scheme {params.scheme} {input.assembly} > {output} 2> {log}
         """
 
 

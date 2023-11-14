@@ -13,17 +13,17 @@ Documentation: https://rivm-bioinformatics.github.io/ids_bacteriology_man/juno-t
 
 # Dependencies
 import argparse
-from juno_library import Pipeline
-from version import __package_name__, __version__
-import argparse
 import subprocess
-import yaml
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-from dataclasses import dataclass
+
+import yaml
+from juno_library import Pipeline
 
 # Own scripts
 import bin.download_dbs
+from version import __package_name__, __version__
 
 
 def main() -> None:
@@ -108,6 +108,13 @@ class JunoTyping(Pipeline):
             help="Minimum coverage to be used for the SerotypeFinder (E. coli serotyping) tool. It accepts values from 0-100. Default is 20",
         )
         self.add_argument(
+            "--bordetella_vaccine_antigen_scheme_name",
+            type=str,
+            metavar="DIR",
+            default="bordetella",
+            help="Name for the directory containing the Bordetella vaccine antigen MLST scheme in --db_dir. Should contain a BLAST db with base name bordetella.fa",
+        )
+        self.add_argument(
             "--update",
             action="store_true",
             help="Force database update even if they are present.",
@@ -129,6 +136,9 @@ class JunoTyping(Pipeline):
         self.serotypefinder_identity: float = args.serotypefinder_identity
         self.seroba_mincov: int = args.seroba_mincov
         self.seroba_kmersize: int = args.seroba_kmersize
+        self.bordetella_vaccine_antigen_scheme: str = (
+            args.bordetella_vaccine_antigen_scheme_name
+        )
         self.update_dbs: bool = args.update
         return args
 
@@ -146,6 +156,7 @@ class JunoTyping(Pipeline):
         self.user_parameters = {
             "input_dir": str(self.input_dir),
             "out": str(self.output_dir),
+            "db_dir": str(self.db_dir),
             "mlst7_db": str(self.db_dir.joinpath("mlst7_db")),
             "seroba_db": str(self.db_dir.joinpath("seroba_db")),
             "serotypefinder_db": str(self.db_dir.joinpath("serotypefinder_db")),
@@ -157,6 +168,15 @@ class JunoTyping(Pipeline):
                 "min_cov": self.seroba_mincov,
                 "kmer_size": self.seroba_kmersize,
             },
+            "bordetella_vaccine_antigen_scheme": str(
+                self.bordetella_vaccine_antigen_scheme
+            ),
+            "bordetella_vaccine_antigen_blastdb": str(
+                self.db_dir.joinpath(
+                    self.bordetella_vaccine_antigen_scheme,
+                    "bordetella.fa",
+                )
+            ),
         }
 
         with open(
@@ -178,7 +198,7 @@ class JunoTyping(Pipeline):
             else:
                 try:
                     self.sample_dict[sample].update(self.juno_metadata[sample])
-                except (KeyError, TypeError):
+                except (KeyError, TypeError, AttributeError):
                     raise ValueError(
                         f"One of your samples is not in the metadata file "
                         f"({self.metadata_file}). Please ensure that all "

@@ -8,6 +8,7 @@ threads:
   serotypefinder: 2
   seroba: 1
   characterize_neisseria_capsule: 1
+  tseemann_mlst: 1
   barrnap: 6
 mem_gb:
   other: 8
@@ -19,5 +20,6 @@ mem_gb:
   seroba: 10
   shigatyper: 8
   characterize_neisseria_capsule: 8
+  tseemann_mlst: 4
   barrnap: 8
 
