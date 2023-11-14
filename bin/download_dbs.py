@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 import subprocess
+
 import juno_library.helper_functions as hf
 
 
@@ -127,10 +128,11 @@ class DownloadsJunoTyping:
                 )
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
                 build.kill()
-                raise Exception("Error building neisseria db, this currently only works on RIVM HPC") from err
+                raise Exception(
+                    "Error building neisseria db, this currently only works on RIVM HPC"
+                ) from err
         else:
             return print("Neisseria db is available, continue analysis")
-    
 
     def download_db_mlst7(self, version):
         """Function to download the MLST (CGE) database if it is not present"""
