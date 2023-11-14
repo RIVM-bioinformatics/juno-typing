@@ -13,17 +13,17 @@ Documentation: https://rivm-bioinformatics.github.io/ids_bacteriology_man/juno-t
 
 # Dependencies
 import argparse
-from juno_library import Pipeline
-from version import __package_name__, __version__
-import argparse
 import subprocess
-import yaml
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-from dataclasses import dataclass
+
+import yaml
+from juno_library import Pipeline
 
 # Own scripts
 import bin.download_dbs
+from version import __package_name__, __version__
 
 
 def main() -> None:
@@ -112,7 +112,7 @@ class JunoTyping(Pipeline):
             type=str,
             metavar="DIR",
             default="bordetella",
-            help="Name for the directory containing the Bordetella vaccine antigen MLST scheme in --db_dir. Should contain a BLAST db with base name bordetella.fa"
+            help="Name for the directory containing the Bordetella vaccine antigen MLST scheme in --db_dir. Should contain a BLAST db with base name bordetella.fa",
         )
         self.add_argument(
             "--update",
@@ -164,9 +164,19 @@ class JunoTyping(Pipeline):
                 "min_cov": self.seroba_mincov,
                 "kmer_size": self.seroba_kmersize,
             },
-            "bordetella_vaccine_antigen_datadir": str(self.db_dir.joinpath("bordetella_vaccine_antigen")),
-            "bordetella_vaccine_antigen_scheme": str(self.bordetella_vaccine_antigen_scheme),
-            "bordetella_vaccine_antigen_blastdb": str(self.db_dir.joinpath("bordetella_vaccine_antigen", self.bordetella_vaccine_antigen_scheme, "bordetella.fa")),
+            "bordetella_vaccine_antigen_datadir": str(
+                self.db_dir.joinpath("bordetella_vaccine_antigen")
+            ),
+            "bordetella_vaccine_antigen_scheme": str(
+                self.bordetella_vaccine_antigen_scheme
+            ),
+            "bordetella_vaccine_antigen_blastdb": str(
+                self.db_dir.joinpath(
+                    "bordetella_vaccine_antigen",
+                    self.bordetella_vaccine_antigen_scheme,
+                    "bordetella.fa",
+                )
+            ),
         }
 
         with open(
