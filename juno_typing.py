@@ -201,7 +201,7 @@ class JunoTyping(Pipeline):
             else:
                 try:
                     self.sample_dict[sample].update(self.juno_metadata[sample])
-                except (KeyError, TypeError):
+                except (KeyError, TypeError, AttributeError):
                     raise ValueError(
                         f"One of your samples is not in the metadata file "
                         f"({self.metadata_file}). Please ensure that all "
