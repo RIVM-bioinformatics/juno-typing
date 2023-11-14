@@ -156,6 +156,7 @@ class JunoTyping(Pipeline):
         self.user_parameters = {
             "input_dir": str(self.input_dir),
             "out": str(self.output_dir),
+            "db_dir": str(self.db_dir),
             "mlst7_db": str(self.db_dir.joinpath("mlst7_db")),
             "seroba_db": str(self.db_dir.joinpath("seroba_db")),
             "serotypefinder_db": str(self.db_dir.joinpath("serotypefinder_db")),
@@ -167,9 +168,6 @@ class JunoTyping(Pipeline):
                 "min_cov": self.seroba_mincov,
                 "kmer_size": self.seroba_kmersize,
             },
-            "bordetella_vaccine_antigen_datadir": str(
-                self.db_dir.joinpath("bordetella_vaccine_antigen")
-            ),
             "bordetella_vaccine_antigen_scheme": str(
                 self.bordetella_vaccine_antigen_scheme
             ),

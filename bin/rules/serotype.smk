@@ -251,7 +251,7 @@ rule vaccine_antigen_mlst_bordetella:
         mem_gb=config["mem_gb"]["tseemann_mlst"],
     threads: config["threads"]["tseemann_mlst"]
     params:
-        datadir=config["bordetella_vaccine_antigen_datadir"],
+        datadir=config["db_dir"],
         scheme=config["bordetella_vaccine_antigen_scheme"],
         blastdb=config["bordetella_vaccine_antigen_blastdb"],
     shell:
