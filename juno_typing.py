@@ -173,7 +173,6 @@ class JunoTyping(Pipeline):
             ),
             "bordetella_vaccine_antigen_blastdb": str(
                 self.db_dir.joinpath(
-                    "bordetella_vaccine_antigen",
                     self.bordetella_vaccine_antigen_scheme,
                     "bordetella.fa",
                 )
