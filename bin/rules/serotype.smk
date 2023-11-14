@@ -256,7 +256,7 @@ rule vaccine_antigen_mlst_bordetella:
         blastdb=config["bordetella_vaccine_antigen_blastdb"],
     shell:
         """
-        mlst --datadir {params.datadir} --blastdb {params.blastdb} --scheme {params.scheme} {input.assembly} > {output} 2> {log}
+        mlst --nopath --datadir {params.datadir} --blastdb {params.blastdb} --scheme {params.scheme} {input.assembly} > {output} 2> {log}
         """
 
 
