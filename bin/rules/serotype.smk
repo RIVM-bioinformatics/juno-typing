@@ -174,7 +174,7 @@ rule shigatyper:
         CURRENT_DIR=$(pwd)
         cd "{params.output_dir}"
 
-        shigatyper {input.r1} {input.r2} > "$(basename {output.command_out})" 2> {log}
+        shigatyper --R1 {input.r1} --R2 {input.r2} > "$(basename {output.command_out})" 2> {log}
 
         if [ -f {wildcards.sample}.csv ]
         then
