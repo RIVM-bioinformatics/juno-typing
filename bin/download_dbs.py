@@ -181,7 +181,10 @@ class DownloadsJunoTyping:
         return version
 
     def download_db_seroba(self, version, kmersize=71):
-        """Function to download the Seroba database if it is not present"""
+        """
+        Function to download the Seroba database if it is not present
+        Building is done in a Snakemake rule
+        """
         seroba_db_dir = self.db_dir.joinpath("seroba_db")
         if not seroba_db_dir.joinpath("database", "cdhit_cluster").is_file():
             print("\x1b[0;33m Downloading Seroba database...\n\033[0;0m")
@@ -203,14 +206,7 @@ class DownloadsJunoTyping:
                     check=True,
                     timeout=60,
                 )
-                build = subprocess.run(
-                    ["seroba", "createDBs", "database", kmersize],
-                    cwd=str(seroba_db_dir),
-                    check=True,
-                    timeout=800,
-                )
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
-                build.kill()
                 raise err
         version = hf.get_commit_git(seroba_db_dir)
         return version

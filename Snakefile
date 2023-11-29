@@ -68,6 +68,7 @@ localrules:
     all,
     aggregate_serotypes,
     no_serotyper,
+    build_seroba_db,
 
 
 rule all:

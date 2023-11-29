@@ -116,10 +116,26 @@ rule ecoli_serotyper:
 ### Streptococcus pneumoniae serotyper ###
 
 
+rule build_seroba_db:
+    output:
+        temp(OUT + "/audit_trail/seroba_db_built.txt"),
+    conda:
+        "../../envs/seroba.yaml"
+    params:
+        seroba_db=config["seroba_db"],
+        kmer_size=config["seroba"]["kmer_size"],
+    shell:
+        """
+        cd {params.seroba_db}
+        seroba createDBs database {params.kmer_size}
+        """
+
+
 rule seroba:
     input:
         r1=lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2=lambda wildcards: SAMPLES[wildcards.sample]["R2"],
+        check_db=OUT + "/audit_trail/seroba_db_built.txt",
     output:
         OUT + "/serotype/{sample}/pred.tsv",
     message:
