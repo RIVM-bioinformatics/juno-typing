@@ -113,7 +113,7 @@ class DownloadsJunoTyping:
         ).exists():
             try:
                 print(
-                    f"Copying neisseria db from mnt/db/juno to: {characterize_neisseria_capsule_db_dir}"
+                    f"Copying neisseria db from /mnt/db/juno to: {characterize_neisseria_capsule_db_dir}"
                 )
                 build = subprocess.run(
                     [
