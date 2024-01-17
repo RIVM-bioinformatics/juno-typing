@@ -55,8 +55,7 @@ rule salmonella_serotyper:
     output:
         seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
         seqsero_tmp1=temp(OUT + "/serotype/{sample}/SeqSero_result.txt"),
-        seqsero_tmp2=temp(OUT + "/serotype/{sample}/blasted_output.xml"),
-        seqsero_tmp3=temp(OUT + "/serotype/{sample}/data_log.txt"),
+        seqsero_tmp2=temp(OUT + "/serotype/{sample}/data_log.txt"),
     message:
         "Running Salmonella serotyper for {wildcards.sample}."
     log:
