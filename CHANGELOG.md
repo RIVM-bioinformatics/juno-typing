@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.0...v0.6.1) (2024-01-17)
+
+
+### Bug Fixes
+
+* dont check for blast file ([00dd144](https://github.com/RIVM-bioinformatics/juno-typing/commit/00dd144e444fee61eefdb978ad60a8b9a5aa9530))
+
 ## [0.6.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.12...v0.6.0) (2023-11-14)
 
 
