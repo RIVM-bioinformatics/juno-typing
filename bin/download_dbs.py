@@ -137,7 +137,7 @@ class DownloadsJunoTyping:
     def download_db_mlst7(self, version):
         """Function to download the MLST (CGE) database if it is not present"""
         mlst7_db_dir = self.db_dir.joinpath("mlst7_db")
-        if not mlst7_db_dir.joinpath("alleles").exists():
+        if not mlst7_db_dir.joinpath("senterica", "senterica.length.b").is_file():
             print("\x1b[0;33m Downloading 7-locus MLST (CGE) database...\n\033[0;0m")
             hf.download_git_repo(
                 version,
