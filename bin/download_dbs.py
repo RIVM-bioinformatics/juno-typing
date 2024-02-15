@@ -224,13 +224,16 @@ class DownloadsJunoTyping:
         seroba_db_asked_version,
     ):
         if self.update_dbs:
-            try:
-                rm_dir = subprocess.run(
-                    ["rm", "-rf", str(self.db_dir)], check=True, timeout=60
-                )
-            except:
-                rm_dir.kill()
-                raise
+            if str(self.db_dir) == "/mnt/db/juno/typing_db":
+                raise ValueError(f"The databases on /mnt/db/juno/typing_db cannot be updated using the --update option. If you require an update, please contact the IDS-bioinformatics team.")
+            else:
+                try:
+                    rm_dir = subprocess.run(
+                        ["rm", "-rf", str(self.db_dir)], check=True, timeout=60
+                    )
+                except:
+                    rm_dir.kill()
+                    raise
 
         software_version = {
             "mlst7": self.download_software_mlst7(version=cge_mlst_asked_version),
