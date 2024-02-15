@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.2](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.1...v0.6.2) (2024-02-15)
+
+
+### Bug Fixes
+
+* disable --update on grid ([9e46912](https://github.com/RIVM-bioinformatics/juno-typing/commit/9e469124eaebefbf3ce36e1e0660fc1eb3c0eb63))
+* fix check for existing mlst db ([fc250c2](https://github.com/RIVM-bioinformatics/juno-typing/commit/fc250c2f7e8b880a1bfeb14f45d302afcfd83af3))
+* revert old check ([c2d6019](https://github.com/RIVM-bioinformatics/juno-typing/commit/c2d601928bc22f634c0f2ca90ed920e315664da2))
+
 ## [0.6.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.0...v0.6.1) (2024-01-17)
 
 
