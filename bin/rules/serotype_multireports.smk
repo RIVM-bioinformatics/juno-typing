@@ -23,7 +23,7 @@ rule serotype_multireports:
             sample_subfolder="{params.output_dir}/${{subfolder}}"
             result_sample=$(find "${{sample_subfolder}}" \
                     -type f \
-                    -name "SeqSero_result.tsv" \
+                    -name "SeqSero_result_with_context.tsv" \
                     -o -name "result_serotype.csv" \
                     -o -name "command.txt" \
                     -o -name "shigatyper.csv" \
