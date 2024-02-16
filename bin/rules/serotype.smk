@@ -79,7 +79,7 @@ rule add_context_salmonella_serotyper:
     input:
         seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
     output:
-        seqsero=OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv"
+        seqsero=OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv",
     message:
         "Adding context to salmonella serotype report for {wildcards.sample}"
     log:
@@ -99,6 +99,7 @@ rule add_context_salmonella_serotyper:
             --context {params.seqsero_context} \
             --verbose 2>&1>{log}
         """
+
 
 # -----------------------------------------------------------------------------#
 ### E. coli serotyper ###

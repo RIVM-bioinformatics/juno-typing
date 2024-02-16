@@ -15,7 +15,7 @@ def df_to_dict(df, column_name):
         Input dataframe
     column_name : str
         Column name to use as key
-    
+
     Returns
     -------
     dict
