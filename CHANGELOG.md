@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.2...v0.6.3) (2024-02-22)
+
+
+### Dependencies
+
+* fix seqsero install ([baf735b](https://github.com/RIVM-bioinformatics/juno-typing/commit/baf735b4c1f6b43b4a4acf2077302a319fadc578))
+
 ## [0.6.2](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.1...v0.6.2) (2024-02-15)
 
 
