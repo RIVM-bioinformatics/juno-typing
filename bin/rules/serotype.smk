@@ -5,7 +5,7 @@
 
 def choose_serotyper(wildcards):
     if SAMPLES[wildcards.sample]["genus"] == "salmonella":
-        return [OUT + "/serotype/{sample}/SeqSero_result.tsv"]
+        return [OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv"]
     elif (
         SAMPLES[wildcards.sample]["genus"] == "escherichia"
         or SAMPLES[wildcards.sample]["genus"] == "shigella"
@@ -72,6 +72,32 @@ rule salmonella_serotyper:
         # Run seqsero2 
         # -m 'a' means microassembly mode and -t '2' refers to separated fastq files (no interleaved)
         SeqSero2_package.py -m 'a' -t '2' -i {input.r1} {input.r2} -d {params.output_dir} -p {threads} &> {log}
+        """
+
+
+rule add_context_salmonella_serotyper:
+    input:
+        seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
+    output:
+        seqsero=OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv",
+    message:
+        "Adding context to salmonella serotype report for {wildcards.sample}"
+    log:
+        OUT + "/log/add_context_salmonella_serotyper/{sample}.log",
+    params:
+        seqsero_context=config["seqsero_context"],
+    threads: config["threads"]["other"]
+    resources:
+        mem_gb=config["mem_gb"]["other"],
+    conda:
+        "../../envs/python.yaml"
+    shell:
+        """
+        python bin/add_context_seqsero.py \
+            --input {input.seqsero} \
+            --output {output.seqsero} \
+            --context {params.seqsero_context} \
+            --verbose 2>&1>{log}
         """
 
 

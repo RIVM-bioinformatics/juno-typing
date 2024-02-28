@@ -225,7 +225,9 @@ class DownloadsJunoTyping:
     ):
         if self.update_dbs:
             if str(self.db_dir) == "/mnt/db/juno/typing_db":
-                raise ValueError(f"The databases on /mnt/db/juno/typing_db cannot be updated using the --update option. If you require an update, please contact the IDS-bioinformatics team.")
+                raise ValueError(
+                    f"The databases on /mnt/db/juno/typing_db cannot be updated using the --update option. If you require an update, please contact the IDS-bioinformatics team."
+                )
             else:
                 try:
                     rm_dir = subprocess.run(

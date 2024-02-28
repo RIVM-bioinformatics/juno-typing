@@ -205,7 +205,7 @@ class ChooseMultireport:
             "neisseriatyper": [],
         }
         for file_ in self.serotyper_result_files:
-            if file_.endswith("SeqSero_result.tsv"):
+            if file_.endswith("SeqSero_result_with_context.tsv"):
                 input_files["seqsero2"].append(file_)
             elif file_.endswith("result_serotype.csv"):
                 input_files["serotypefinder"].append(file_)
