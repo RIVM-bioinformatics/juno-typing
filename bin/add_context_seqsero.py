@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+
 import pandas as pd
 
 
@@ -74,7 +75,7 @@ def main(args):
 
     # Combine all notes
     note_str = "|".join([note for note in notes if note is not None])
-    df["Notes"] = note_str
+    df["RIVM-specific notes"] = note_str
 
     # Write to output
     logging.info(f"Writing to {args.output}")
