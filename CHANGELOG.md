@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.7.0...v0.7.1) (2024-02-29)
+
+
+### Miscellaneous Chores
+
+* release 0.7.1 ([88dbdcd](https://github.com/RIVM-bioinformatics/juno-typing/commit/88dbdcd0967ba1554bc89014e1d4890a3e7d691b))
+
 ## [0.7.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.3...v0.7.0) (2024-02-28)
 
 
