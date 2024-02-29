@@ -119,6 +119,13 @@ class JunoTyping(Pipeline):
             action="store_true",
             help="Force database update even if they are present.",
         )
+        self.add_argument(
+            "--seqsero_context",
+            type=Path,
+            metavar="FILE",
+            default="files/SeqSero2_context.tsv",
+            help="SeqSero context file which lists additional confirmation steps for O-antigen genes.",
+        )
 
     def _parse_args(self) -> argparse.Namespace:
         # Remove this if containers can be used with juno-typing
@@ -140,6 +147,7 @@ class JunoTyping(Pipeline):
             args.bordetella_vaccine_antigen_scheme_name
         )
         self.update_dbs: bool = args.update
+        self.seqsero_context: Path = args.seqsero_context
         return args
 
     def setup(self) -> None:
@@ -177,6 +185,7 @@ class JunoTyping(Pipeline):
                     "bordetella.fa",
                 )
             ),
+            "seqsero_context": str(self.seqsero_context),
         }
 
         with open(

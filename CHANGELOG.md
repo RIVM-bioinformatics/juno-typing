@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.7.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.3...v0.7.0) (2024-02-28)
+
+
+### Miscellaneous Chores
+
+* release 0.7.0 ([23155c8](https://github.com/RIVM-bioinformatics/juno-typing/commit/23155c84a4dd2be91bc6c872c615c41a7b0be102))
+
+## [0.6.3](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.2...v0.6.3) (2024-02-22)
+
+
+### Dependencies
+
+* fix seqsero install ([baf735b](https://github.com/RIVM-bioinformatics/juno-typing/commit/baf735b4c1f6b43b4a4acf2077302a319fadc578))
+
+## [0.6.2](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.1...v0.6.2) (2024-02-15)
+
+
+### Bug Fixes
+
+* disable --update on grid ([9e46912](https://github.com/RIVM-bioinformatics/juno-typing/commit/9e469124eaebefbf3ce36e1e0660fc1eb3c0eb63))
+* fix check for existing mlst db ([fc250c2](https://github.com/RIVM-bioinformatics/juno-typing/commit/fc250c2f7e8b880a1bfeb14f45d302afcfd83af3))
+* revert old check ([c2d6019](https://github.com/RIVM-bioinformatics/juno-typing/commit/c2d601928bc22f634c0f2ca90ed920e315664da2))
+
+## [0.6.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.6.0...v0.6.1) (2024-01-17)
+
+
+### Bug Fixes
+
+* dont check for blast file ([00dd144](https://github.com/RIVM-bioinformatics/juno-typing/commit/00dd144e444fee61eefdb978ad60a8b9a5aa9530))
+
 ## [0.6.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.5.12...v0.6.0) (2023-11-14)
 
 
