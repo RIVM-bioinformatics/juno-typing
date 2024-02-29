@@ -42,7 +42,6 @@ include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
 include: "bin/rules/16s_extraction.smk"
 
-
 # @################################################################################
 # @####              Finalize pipeline (error/success)                        #####
 # @################################################################################
@@ -68,6 +67,7 @@ localrules:
     all,
     aggregate_serotypes,
     no_serotyper,
+    build_seroba_db,
 
 
 rule all:
