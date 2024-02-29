@@ -42,7 +42,6 @@ include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
 include: "bin/rules/16s_extraction.smk"
 
-
 # @################################################################################
 # @####              Finalize pipeline (error/success)                        #####
 # @################################################################################
