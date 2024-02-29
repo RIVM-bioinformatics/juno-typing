@@ -4,7 +4,7 @@ channels:
 - conda-forge
 - nodefaults
 dependencies:
-- python=3.8.5
-- gsl=2.5
-- bcftools=1.9
-- shigatyper=1.0.7
+- python=3.*
+- gsl
+- bcftools=1.*
+- shigatyper=2.0.5
