@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.7.1...v0.8.0) (2024-04-12)
+
+
+### Features
+
+* add csv with extra hits ([ba95c91](https://github.com/RIVM-bioinformatics/juno-typing/commit/ba95c913cade2a7f3e191185e76896699395a6f5))
+
 ## [0.7.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.7.0...v0.7.1) (2024-02-29)
 
 
