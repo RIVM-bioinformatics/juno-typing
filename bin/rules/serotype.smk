@@ -5,7 +5,10 @@
 
 def choose_serotyper(wildcards):
     if SAMPLES[wildcards.sample]["genus"] == "salmonella":
-        return [OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv"]
+        return [
+            OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv",
+            OUT + "/serotype/{sample}/SeqSero_extra_hits.csv",
+        ]
     elif (
         SAMPLES[wildcards.sample]["genus"] == "escherichia"
         or SAMPLES[wildcards.sample]["genus"] == "shigella"
@@ -98,6 +101,43 @@ rule add_context_salmonella_serotyper:
             --output {output.seqsero} \
             --context {params.seqsero_context} \
             --verbose 2>&1>{log}
+        """
+
+
+rule convert_blastxml_to_csv:
+    input:
+        seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
+    output:
+        seqsero=OUT + "/serotype/{sample}/SeqSero_extra_hits.csv",
+    message:
+        "Converting and filtering blasted_output.xml for {wildcards.sample}"
+    log:
+        OUT + "/log/convert_blastxml_to_csv/{sample}.log",
+    params:
+        mincov=0.6,
+        minid=0.8,
+    threads: config["threads"]["other"]
+    resources:
+        mem_gb=config["mem_gb"]["other"],
+    conda:
+        "../../envs/python.yaml"
+    shell:
+        """
+# missing blasted_output.xml file does not mean the analysis failed,
+# so we need to check manually if the file exists
+
+BLAST_XML=$(dirname {input.seqsero})/blasted_output.xml
+if [ -f $BLAST_XML ]
+then
+    python bin/convert_blastxml_to_csv.py \
+    $BLAST_XML \
+    {output.seqsero} \
+    --minid {params.minid} \
+    --mincov {params.mincov} \
+    --verbose 2>&1>{log}
+else
+    touch {output.seqsero}
+fi
         """
 
 
