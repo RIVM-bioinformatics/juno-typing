@@ -200,7 +200,7 @@ rule seroba:
     input:
         r1=lambda wildcards: SAMPLES[wildcards.sample]["R1"],
         r2=lambda wildcards: SAMPLES[wildcards.sample]["R2"],
-        check_db=OUT + "/audit_trail/seroba_db_built.txt",
+        check_db=config["seroba_db"] + "/database/kmer_size.txt",
     output:
         OUT + "/serotype/{sample}/pred.tsv",
     message:
