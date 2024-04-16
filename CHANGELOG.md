@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.0...v0.8.1) (2024-04-16)
+
+
+### Bug Fixes
+
+* fix seroba db rule ([3c47dd4](https://github.com/RIVM-bioinformatics/juno-typing/commit/3c47dd444032564d0a405da7a6fd5c3f8f3e8b66))
+* set correct db check seroba ([3a83e08](https://github.com/RIVM-bioinformatics/juno-typing/commit/3a83e08aad4a2f197811cb9548c2b83f546db7c2))
+
 ## [0.8.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.7.1...v0.8.0) (2024-04-12)
 
 
