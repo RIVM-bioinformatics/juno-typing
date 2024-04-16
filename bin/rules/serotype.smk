@@ -183,7 +183,7 @@ rule ecoli_serotyper:
 
 rule build_seroba_db:
     output:
-        temp(OUT + "/audit_trail/seroba_db_built.txt"),
+        config["seroba_db"] + "/database/kmer_size.txt",
     conda:
         "../../envs/seroba.yaml"
     params:
