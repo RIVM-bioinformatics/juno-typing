@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.1...v0.8.2) (2024-05-21)
+
+
+### Bug Fixes
+
+* fix pulp version ([6fb2eac](https://github.com/RIVM-bioinformatics/juno-typing/commit/6fb2eaccd2d086c2490eb69655f679bd1af21477))
+
 ## [0.8.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.0...v0.8.1) (2024-04-16)
 
 
