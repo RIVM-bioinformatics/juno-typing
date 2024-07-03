@@ -3,7 +3,6 @@ channels:
   - bioconda
   - conda-forge
   - nodefaults
-  - intel
 dependencies:
   - seroba=1.0.2
   - biopython=1.69
