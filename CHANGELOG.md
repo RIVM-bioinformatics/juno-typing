@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.3](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.2...v0.8.3) (2024-07-03)
+
+
+### Bug Fixes
+
+* remove intel channel ([955a864](https://github.com/RIVM-bioinformatics/juno-typing/commit/955a864a032c4a9e6a6b00d180dd94a12c07e8ba))
+
 ## [0.8.2](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.1...v0.8.2) (2024-05-21)
 
 
