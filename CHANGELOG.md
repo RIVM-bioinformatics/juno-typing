@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.4](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.3...v0.8.4) (2024-09-04)
+
+
+### Bug Fixes
+
+* update c. acnes mlst scheme name ([bee5f08](https://github.com/RIVM-bioinformatics/juno-typing/commit/bee5f08105dadcdd84d494ac8ffda9fefde0d66e))
+
 ## [0.8.3](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.2...v0.8.3) (2024-07-03)
 
 
