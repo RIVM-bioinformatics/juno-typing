@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.5](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.4...v0.8.5) (2024-11-12)
+
+
+### Bug Fixes
+
+* remove biocore channel and replace blast-plus with blast ([40625dd](https://github.com/RIVM-bioinformatics/juno-typing/commit/40625dd1c904169da2c9c9eff1a350e7a43065c9))
+
 ## [0.8.4](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.3...v0.8.4) (2024-09-04)
 
 
