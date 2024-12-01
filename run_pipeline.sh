@@ -56,6 +56,8 @@ python juno_typing.py --queue "${QUEUE}" -i "${input_dir}" -o "${output_dir}"
 
 result=$?
 
+python cr_meta.py "${output_dir}"
+
 # Propagate metadata
 
 set +euo pipefail 
