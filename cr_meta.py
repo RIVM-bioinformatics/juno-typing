@@ -23,7 +23,7 @@ def main(args):
         if f[len(f)-3] != "log" and f[len(f)-3] != "audit_trail":
            #print(f[len(f)-3], f)
            avus = changetoavus({ 'analysis': f[len(f)-3], 'sample_name': f[len(f)-2], 'filename': f[len(f)-1] })
-           metadata.append( { 'path': str(filename), "type": "dataobject", 'metadata': avus })
+           metadata.append( { 'path': str(os.path.relpath(filename, args.output_dir)), "type": "dataobject", 'metadata': avus })
     with open( os.path.join( args.output_dir,'metadata.json'), 'w') as outfile:
         json.dump( {"objects": metadata}, outfile, indent=4)
 
