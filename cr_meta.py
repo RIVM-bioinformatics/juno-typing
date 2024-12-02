@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 import re
+import csv
 
 
 def changetoavus(metas):
@@ -22,7 +23,14 @@ def main(args):
         f=str(filename).split("/")
         if f[len(f)-3] != "log" and f[len(f)-3] != "audit_trail":
            #print(f[len(f)-3], f)
-           avus = changetoavus({ 'analysis': f[len(f)-3], 'sample_name': f[len(f)-2], 'filename': f[len(f)-1] })
+           if f[len(f)-1] == "SeqSero_result.tsv":
+              with open(filename) as file:
+                  tsv_file = csv.reader(file, delimiter="\t")
+                  for a in tsv_file:
+                      if a[8] != "Predicted serotype":
+                          avus = changetoavus({ 'analysis': f[len(f)-3], 'sample_name': f[len(f)-2], 'filename': f[len(f)-1], 'Predicted serotype': a[8] })
+           else:
+              avus = changetoavus({ 'analysis': f[len(f)-3], 'sample_name': f[len(f)-2], 'filename': f[len(f)-1] })
            metadata.append( { 'path': str(os.path.relpath(filename, args.output_dir)), "type": "dataobject", 'metadata': avus })
     with open( os.path.join( args.output_dir,'metadata.json'), 'w') as outfile:
         json.dump( {"objects": metadata}, outfile, indent=4)
