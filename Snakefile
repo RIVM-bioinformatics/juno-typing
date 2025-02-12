@@ -79,4 +79,4 @@ rule all:
         expand(OUT + "/16s/{sample}/16S_seq.fasta", sample=SAMPLES),
         OUT + "/serotype/serotyper_multireport.csv",
         OUT + "/mlst7/mlst7_multireport.csv",
-        OUT + "/lineage_typing/sonneityping/multireport.csv",
+        OUT + "/lineage_typing/sonneityping/multireport.tsv",
