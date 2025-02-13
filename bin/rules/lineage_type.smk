@@ -68,13 +68,17 @@ rule mykrobe_ssonnei:
         sample="{sample}",
     shell:
         """
+DIR=$(dirname {output})
+mkdir -p $DIR/tmp_{params.sample}
 mykrobe predict \
     --format json \
     --sample {params.sample} \
     --species {params.species} \
     --output {output} \
     --threads {threads} \
+    --skeleton_dir $DIR/tmp_{params.sample} \
     -i {input.r1} {input.r2}
+rm -rf $DIR/tmp_{params.sample}
         """
 
 
