@@ -44,7 +44,6 @@ include: "bin/rules/serotype_multireports.smk"
 include: "bin/rules/16s_extraction.smk"
 include: "bin/rules/lineage_type.smk"
 
-
 # @################################################################################
 # @####              Finalize pipeline (error/success)                        #####
 # @################################################################################
