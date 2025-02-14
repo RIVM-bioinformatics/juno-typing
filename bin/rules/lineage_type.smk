@@ -96,7 +96,7 @@ rule sonneityping:
         mem_gb=config["mem_gb"]["mykrobe"],
     shell:
         """
-if [[ {input} == files/empty_lineage_result.csv ]]
+if [ {input} == files/empty_lineage_result.csv ]
 then
     cp {input} {output}
 else
