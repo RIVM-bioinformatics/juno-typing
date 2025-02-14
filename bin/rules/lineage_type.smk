@@ -36,18 +36,26 @@ checkpoint parse_serotype_multireport:
         # check if prediction and ipaB are in the columns
         # if not, read in the file with .csv stripped and 1.csv added
         if ("prediction" not in df.columns) and ("ipaB" not in df.columns):
-            df = pd.read_csv(input[0].replace(".csv", "1.csv"))
+            # check if other serotype multireport exists
+            if not os.path.exists(input[0].replace(".csv", "1.csv")):
+                # create mock output yaml file
+                with open(output[0], "w") as file:
+                    yaml.dump(
+                        {"no_shigella": "no_shigella"}, file, default_flow_style=False
+                    )
+            else:
+                df = pd.read_csv(input[0].replace(".csv", "1.csv"))
 
-            # get the species/serotype prediction per sample
-        df_species = df[["Samplename", "prediction"]].copy()
+                # get the species/serotype prediction per sample
+                df_species = df[["Samplename", "prediction"]].copy()
 
-        # write to yaml
-        with open(output[0], "w") as file:
-            yaml.dump(
-                df_species.set_index("Samplename").to_dict()["prediction"],
-                file,
-                default_flow_style=False,
-            )
+                # write to yaml
+                with open(output[0], "w") as file:
+                    yaml.dump(
+                        df_species.set_index("Samplename").to_dict()["prediction"],
+                        file,
+                        default_flow_style=False,
+                    )
 
 
 rule mykrobe_ssonnei:
