@@ -70,7 +70,6 @@ localrules:
     aggregate_serotypes,
     no_serotyper,
     build_seroba_db,
-    parse_serotype_multireport,
 
 
 rule all:

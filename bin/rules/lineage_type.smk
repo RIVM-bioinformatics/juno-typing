@@ -1,11 +1,46 @@
 import yaml
+import pandas as pd
 
 
-def return_ssonnei_samples(mock_variable):
-    with open(
-        checkpoints.parse_serotype_multireport.get(**mock_variable).output[0]
-    ) as file:
-        SPECIES_PER_SAMPLE = yaml.safe_load(file)
+def return_ssonnei_samples(mock_wildcard):
+    serotype_multireport_filepath = checkpoints.serotype_multireports.get(
+        **mock_wildcard
+    ).output[0]
+
+    _iteration = 1
+
+    df = pd.read_csv(serotype_multireport_filepath)
+
+    # check if prediction and ipaB are in the columns (shigatyper multireport)
+    # if not, read in the file with .csv stripped and 1.csv added
+    # if still not, continue incrementing until a file is not found. This should only happen if different species are typed in a single analysis.
+    while ("prediction" not in df.columns) and ("ipaB" not in df.columns):
+        # check if other serotype multireport exists
+        if not os.path.exists(
+            serotype_multireport_filepath.replace(".csv", f"{_iteration}.csv")
+        ):
+            # this means all serotype multireports have been checked and none are in shigatyper format
+            # in this case, just return empty placeholder file
+            return ["files/empty_lineage_result.csv"]
+        else:
+            df = pd.read_csv(
+                serotype_multireport_filepath.replace(".csv", f"{_iteration}.csv")
+            )
+            _iteration += 1
+
+    # get a list of Samplename for the samples that have "Shigella sonnei" in the prediction
+    SSONNEI_SAMPLES = df.loc[
+        df["prediction"].str.contains("Shigella sonnei"), "Samplename"
+    ].tolist()
+    if len(SSONNEI_SAMPLES) == 0:
+        # if the multireport is shigatyper format, but no sonnei detected: also return empty placeholder file
+        return ["files/empty_lineage_result.csv"]
+    else:
+        return expand(
+            OUT + "/lineage_typing/mykrobe_ssonnei/{sample}.json",
+            sample=SSONNEI_SAMPLES,
+        )
+
     # only keep entries that have "Shigella sonnei" as the species
     SSONNEI_SAMPLES = {
         sample: species
@@ -20,42 +55,6 @@ def return_ssonnei_samples(mock_variable):
             sample=SSONNEI_SAMPLES,
         )
     return output_ssonei_mykrobe
-
-
-checkpoint parse_serotype_multireport:
-    input:
-        OUT + "/serotype/serotyper_multireport.csv",
-    output:
-        OUT + "/serotype/serotyper_multireport_outputs.yaml",
-    run:
-        import pandas as pd
-        import yaml
-
-        df = pd.read_csv(input[0])
-
-        # check if prediction and ipaB are in the columns
-        # if not, read in the file with .csv stripped and 1.csv added
-        if ("prediction" not in df.columns) and ("ipaB" not in df.columns):
-            # check if other serotype multireport exists
-            if not os.path.exists(input[0].replace(".csv", "1.csv")):
-                # create mock output yaml file
-                with open(output[0], "w") as file:
-                    yaml.dump(
-                        {"no_shigella": "no_shigella"}, file, default_flow_style=False
-                    )
-            else:
-                df = pd.read_csv(input[0].replace(".csv", "1.csv"))
-
-                # get the species/serotype prediction per sample
-                df_species = df[["Samplename", "prediction"]].copy()
-
-                # write to yaml
-                with open(output[0], "w") as file:
-                    yaml.dump(
-                        df_species.set_index("Samplename").to_dict()["prediction"],
-                        file,
-                        default_flow_style=False,
-                    )
 
 
 rule mykrobe_ssonnei:
