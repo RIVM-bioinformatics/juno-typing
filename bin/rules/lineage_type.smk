@@ -1,60 +1,69 @@
 import yaml
 import pandas as pd
+from pathlib import Path
 
 
 def return_ssonnei_samples(mock_wildcard):
-    serotype_multireport_filepath = checkpoints.serotype_multireports.get(
-        **mock_wildcard
-    ).output[0]
+    """
+    Read multireport, select samples on criteria, and return corresponding files.
 
-    _iteration = 1
+    Parameters
+    ----------
+    mock_wildcard : dict
+        Wildcard dictionary. If a multireport is the input, this is a mock wildcard.
 
-    df = pd.read_csv(serotype_multireport_filepath)
+    Returns
+    -------
+    list
+        List of expected input files.
 
-    # check if prediction and ipaB are in the columns (shigatyper multireport)
-    # if not, read in the file with .csv stripped and 1.csv added
-    # if still not, continue incrementing until a file is not found. This should only happen if different species are typed in a single analysis.
-    while ("prediction" not in df.columns) and ("ipaB" not in df.columns):
-        # check if other serotype multireport exists
-        if not os.path.exists(
-            serotype_multireport_filepath.replace(".csv", f"{_iteration}.csv")
-        ):
-            # this means all serotype multireports have been checked and none are in shigatyper format
-            # in this case, just return empty placeholder file
-            return ["files/empty_lineage_result.csv"]
-        else:
-            df = pd.read_csv(
-                serotype_multireport_filepath.replace(".csv", f"{_iteration}.csv")
-            )
-            _iteration += 1
+    Notes
+    -----
+    This function can serve as an example of how to use an input function after a snakemake
+    checkpoint based on a multireport.
 
-    # get a list of Samplename for the samples that have "Shigella sonnei" in the prediction
-    SSONNEI_SAMPLES = df.loc[
-        df["prediction"].str.contains("Shigella sonnei"), "Samplename"
-    ].tolist()
-    if len(SSONNEI_SAMPLES) == 0:
-        # if the multireport is shigatyper format, but no sonnei detected: also return empty placeholder file
-        return ["files/empty_lineage_result.csv"]
+    """
+    empty_placeholder = "files/empty_lineage_result.csv"
+    output_file = OUT + "/lineage_typing/mykrobe_ssonnei/{sample}.json"
+
+    # Step 1. Find and read multireport
+    base_path = Path(checkpoints.serotype_multireports.get(**mock_wildcard).output[0])
+
+    # start with empty df
+    df = pd.DataFrame()
+
+    # check potential multireport files (multireport.csv, multireport1.csv, multireport2.csv, etc)
+    for i in range(10):
+        file_path = (
+            base_path if i == 0 else base_path.with_name(f"{base_path.stem}{i}.csv")
+        )
+
+        if file_path.exists():
+            df = pd.read_csv(file_path)
+
+            # Check if multireport is based on Shigatyper
+            if ("prediction" in df.columns) and ("ipaB" in df.columns):
+                break
+            else:
+                # reset df to empty if the file is not shigatyper format
+                df = pd.DataFrame()
+
+    # Step 2: Extract relevant samples based on condition(s)
+    if not df.empty:
+        ssonnei_samples = df.loc[
+            df["prediction"].str.contains("Shigella sonnei", na=False), "Samplename"
+        ].tolist()
+    else:
+        ssonnei_samples = []
+
+    # Step 3: Return the relevant samples
+    if len(ssonnei_samples) == 0:
+        return [empty_placeholder]
     else:
         return expand(
-            OUT + "/lineage_typing/mykrobe_ssonnei/{sample}.json",
-            sample=SSONNEI_SAMPLES,
+            output_file,
+            sample=ssonnei_samples,
         )
-
-    # only keep entries that have "Shigella sonnei" as the species
-    SSONNEI_SAMPLES = {
-        sample: species
-        for sample, species in SPECIES_PER_SAMPLE.items()
-        if "Shigella sonnei" in species
-    }
-    if len(SSONNEI_SAMPLES) == 0:
-        output_ssonei_mykrobe = ["files/empty_lineage_result.csv"]
-    else:
-        output_ssonei_mykrobe = expand(
-            OUT + "/lineage_typing/mykrobe_ssonnei/{sample}.json",
-            sample=SSONNEI_SAMPLES,
-        )
-    return output_ssonei_mykrobe
 
 
 rule mykrobe_ssonnei:
