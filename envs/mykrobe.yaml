@@ -1,0 +1,6 @@
+channels:
+- conda-forge
+- bioconda
+dependencies:
+- mykrobe==0.13.0
+- sonneityping==20210201
