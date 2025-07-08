@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.9.0...v0.9.1) (2025-07-08)
+
+
+### Bug Fixes
+
+* Added missing placeholder file ([35f62bc](https://github.com/RIVM-bioinformatics/juno-typing/commit/35f62bcb8d34efb57772410b7f59affc3beddc40))
+
 ## [0.9.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.6...v0.9.0) (2025-03-03)
 
 
