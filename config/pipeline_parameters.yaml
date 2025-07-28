@@ -10,7 +10,6 @@ threads:
   characterize_neisseria_capsule: 1
   tseemann_mlst: 1
   barrnap: 6
-  mykrobe: 1
 mem_gb:
   other: 8
   cgemlst: 16
@@ -23,5 +22,4 @@ mem_gb:
   characterize_neisseria_capsule: 8
   tseemann_mlst: 4
   barrnap: 8
-  mykrobe: 8
 

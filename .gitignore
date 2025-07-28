@@ -7,7 +7,6 @@ tests/test_sample_sheet.yaml
 config/user_parameters.yaml
 wget-log
 *.csv
-mykrobe
 
 # Jupyter notebook tests
 *.ipynb

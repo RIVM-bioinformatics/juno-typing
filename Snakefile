@@ -5,7 +5,6 @@ Organization: Rijksinstituut voor Volksgezondheid en Milieu (RIVM)
 Department: Infektieziekteonderzoek, Diagnostiek en Laboratorium Surveillance (IDS), Bacteriologie (BPD)
 Date: 12-01-2021
 """
-
 #################################################################################
 ##### Import config file, sample_sheet and set output folder names          #####
 #################################################################################
@@ -42,7 +41,6 @@ include: "bin/rules/mlst7_multireport.smk"
 include: "bin/rules/serotype.smk"
 include: "bin/rules/serotype_multireports.smk"
 include: "bin/rules/16s_extraction.smk"
-include: "bin/rules/lineage_type.smk"
 
 # @################################################################################
 # @####              Finalize pipeline (error/success)                        #####
@@ -78,4 +76,3 @@ rule all:
         expand(OUT + "/16s/{sample}/16S_seq.fasta", sample=SAMPLES),
         OUT + "/serotype/serotyper_multireport.csv",
         OUT + "/mlst7/mlst7_multireport.csv",
-        OUT + "/lineage_typing/sonneityping/multireport.tsv",

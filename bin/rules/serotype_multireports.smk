@@ -1,7 +1,7 @@
 # ----------------------- Serotypers multireport -----------------------------#
 
 
-checkpoint serotype_multireports:
+rule serotype_multireports:
     input:
         expand(OUT + "/serotype/{sample}_done.txt", sample=SAMPLES),
     output:
