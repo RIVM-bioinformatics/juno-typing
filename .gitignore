@@ -6,7 +6,7 @@ config/variables.yaml
 tests/test_sample_sheet.yaml
 config/user_parameters.yaml
 wget-log
-test.csv
+*.csv
 mykrobe
 
 # Jupyter notebook tests
