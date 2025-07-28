@@ -1,29 +1,5 @@
 # Changelog
 
-## [0.9.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.9.0...v0.9.1) (2025-07-08)
-
-
-### Bug Fixes
-
-* Added missing placeholder file ([35f62bc](https://github.com/RIVM-bioinformatics/juno-typing/commit/35f62bcb8d34efb57772410b7f59affc3beddc40))
-
-## [0.9.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.6...v0.9.0) (2025-03-03)
-
-
-### Features
-
-* add sonneityping ([82afa52](https://github.com/RIVM-bioinformatics/juno-typing/commit/82afa521ce553d1dd8c451fbbe4fc1d335e0be7a))
-
-
-### Bug Fixes
-
-* fix bash if statement ([c87db73](https://github.com/RIVM-bioinformatics/juno-typing/commit/c87db73c208510940543f2e83bb5e684d2d36c7d))
-* fix DAG logic for non shigella typings ([3aa268c](https://github.com/RIVM-bioinformatics/juno-typing/commit/3aa268ca8b4a2c6670e7527ed8ff051b28b15317))
-* fix error when no shigella samples observed ([b2a5538](https://github.com/RIVM-bioinformatics/juno-typing/commit/b2a55389109613a6f98145958f84edddfbbae00f))
-* run checkpoint locally ([15edca0](https://github.com/RIVM-bioinformatics/juno-typing/commit/15edca0f6fe10a3e0c0cdeae85e8765d71f90c8a))
-* set sample-specific skeleton dir ([be75ef7](https://github.com/RIVM-bioinformatics/juno-typing/commit/be75ef7c35258d72e2fc9d36d0baaf1788afb28b))
-* working version locally ([e8c3b59](https://github.com/RIVM-bioinformatics/juno-typing/commit/e8c3b592b38655555c866c6a7d5449c3e3a207de))
-
 ## [0.8.4](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.3...v0.8.4) (2024-09-04)
 
 
