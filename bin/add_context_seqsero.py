@@ -66,7 +66,7 @@ def main(args):
         raise ValueError("This script only works for single sample reports")
 
     # Add context to O antigen
-    O_gene = df["O antigen prediction"].values[0]
+    O_gene = str(df["O antigen prediction"].values[0])
     notes.append(add_context(df_context, O_gene, "O antigen prediction"))
 
     # Add context to serotype
