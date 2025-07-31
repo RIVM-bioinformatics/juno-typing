@@ -1,38 +1,9 @@
 Column	Value	Context	Source
-Predicted serotype	Virginia	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Muenchen	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Yovokome	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Manhattan	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Bardo	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Newport	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Ferruch	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Kottbus	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Bargny	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Takoradi	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Haardt	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Blockley	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Pakistan	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Litchfield	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Hindmarsh	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Bovismorbificans	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Brikama	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Goldcoast	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Albany	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Duesseldorf	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Paris	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Mapo	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Istanbul	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Hadar	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Chomedey	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	Glostrup	Phenotypic confirmation of O6 antigen required	
-Predicted serotype	4,[5],12:i:-	Confirm with PCR according to SOP IDS_BAC_M321	Validation report
 Predicted serotype	Miami	Confirm with growth on Simmons citrate (should be +)	Validation report
 Predicted serotype	Sendai	Confirm with growth on Simmons citrate (should be -)	Validation report
-Predicted serotype	Typhimurium	Confirm with PCR according to SOP IDS_BAC_M321	Validation report
-Predicted serotype	Senftenberg	Phenotypic confirmation required	https://doi.org/10.1128%2FAEM.02265-19
-Predicted serotype	Dessau	Phenotypic confirmation required	https://doi.org/10.1128%2FAEM.02265-19
-Predicted serotype	Indiana	Phenotypic confirmation required	https://doi.org/10.1128%2FAEM.02265-19
-Predicted serotype	4,12:z:1,7	Phenotypic confirmation required	https://doi.org/10.1128%2FAEM.02265-19
+Predicted serotype	I 4,[5],12:i:-	Possible monophasic Typhimurium, please confirm	 
+Predicted serotype	I 4:b:-	Biochemical confirmation with d-tartrate and Dulcitol to rule out paratyphi-B and Schleissheim	 
+Predicted serotype	Hasserek	Biochemical confirmation to discriminate hasserek/fulica	
+Predicted serotype	Fulica	Biochemical confirmation to discriminate hasserek/fulica	
 O antigen prediction	6,14	Confirm with O24/O25 antisera	Validation report
-O antigen prediction	3,10	Phenotypic confirmation required	
-O antigen prediction	1,3,19	Phenotypic confirmation required	
+O antigen prediction	8	Check with White-Kauffmann-LeMinor scheme if O6 agglutination is needed	 
