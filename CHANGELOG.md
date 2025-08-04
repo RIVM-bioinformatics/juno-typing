@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.8.7](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.6...v0.8.7) (2025-08-04)
+
+### Bug fixes
+
+* Convert O_gene into a str ([02209e7](https://github.com/RIVM-bioinformatics/juno-typing/commit/02209e74cac3c9585648f286209eeea341c70135))
+* Update juno library to v2.2.2 ([bae06c0](https://github.com/RIVM-bioinformatics/juno-typing/commit/bae06c018448f644154990fed1f85f0d8ddf18ad))
+* Update SeqSero context notes ([244936f](https://github.com/RIVM-bioinformatics/juno-typing/commit/244936fc5002b30720b9e0bee390fef083645232))
+
+## [0.8.6](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.5...v0.8.6) (2024-11-29)
+
+
+### Bug fixes
+
+* fix pyopenssl error ([c153043](https://github.com/RIVM-bioinformatics/juno-typing/commit/c15304386a5fef6ba7f83fa263affcb605bf43c6))
+
+
+## [0.8.5](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.4...v0.8.5) (2024-11-12)
+
+
+### Bug fixes
+
+* remove biocore channel and replace blast-plus with blast ([40625dd](https://github.com/RIVM-bioinformatics/juno-typing/commit/40625dd1c904169da2c9c9eff1a350e7a43065c9))
+
 ## [0.8.4](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.3...v0.8.4) (2024-09-04)
 
 
