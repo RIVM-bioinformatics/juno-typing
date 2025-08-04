@@ -10,16 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          # Full git history to make sure release-please can access the latest release tag
-          fetch-depth: 0
-          fetch-tags: true
-          
-      - name: Release with release-please
-        uses: GoogleCloudPlatform/release-please-action@v3
+      - uses: GoogleCloudPlatform/release-please-action@v3
         id: release
         with:
           release-type: python
-          package-name: juno_assembly
+          package-name: juno_typing
+          token: ${{ secrets.RELEASE_TOKEN }}
