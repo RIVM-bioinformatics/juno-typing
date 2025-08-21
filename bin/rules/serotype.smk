@@ -8,6 +8,10 @@ def choose_serotyper(wildcards):
         return [
             OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv",
             OUT + "/serotype/{sample}/SeqSero_extra_hits.csv",
+            OUT + "/serotype/{sample}/sistr_result.csv",
+            OUT + "/serotype/{sample}/sistr_novel_alleles.fasta",
+            OUT + "/serotype/{sample}/sistr_allele_sequences.json",
+            OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv"
         ]
     elif (
         SAMPLES[wildcards.sample]["genus"] == "escherichia"
@@ -62,7 +66,7 @@ rule salmonella_serotyper:
     message:
         "Running Salmonella serotyper for {wildcards.sample}."
     log:
-        OUT + "/log/serotype/{sample}_salmonella.log",
+        OUT + "/log/serotype/{sample}_salmonella_seqsero2.log",
     params:
         output_dir=OUT + "/serotype/{sample}/",
     threads: config["threads"]["seqsero2"]
@@ -101,6 +105,37 @@ rule add_context_salmonella_serotyper:
             --output {output.seqsero} \
             --context {params.seqsero_context} \
             --verbose 2>&1>{log}
+        """
+
+
+rule salmonella_serotyping_sistr:
+    input:
+        assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"]
+    output:
+        sistr=OUT + "/serotype/{sample}/sistr_result.csv",
+        novel_alleles=OUT + "/serotype/{sample}/sistr_novel_alleles.fasta",
+        allele_seq=OUT + "/serotype/{sample}/sistr_allele_sequences.json",
+        cgmlst_prof=OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv",
+
+    message:
+        "Running additional Salmonella serotyper SISTR for {wildcards.sample}"
+    log:
+        OUT + "/log/serotype/{sample}_salmonella_sistr.log"
+    threads: config["threads"]["sistr"]
+    resources:
+        mem_gb=config["mem_gb"]["sistr"]
+    conda:
+        "../../envs/sistr.yaml"
+    shell:
+        """
+        # Run sistr
+        sistr --qc -vvv -f csv \
+            -i {input.assembly} {wildcards.sample} \
+            -n {output.novel_alleles} \
+            -a {output.allele_seq} \
+            -p {output.cgmlst_prof} \
+            -o {output.sistr} \
+            -t {threads} &>{log}
         """
 
 

@@ -4,12 +4,13 @@ threads:
   chewbbaca_preparation: 8
   chewbbaca: 10
   cgemlst: 1
-  seqsero2: 6
+  seqsero2: 4
   serotypefinder: 2
   seroba: 1
   characterize_neisseria_capsule: 1
   tseemann_mlst: 1
   barrnap: 6
+  sistr: 6
 mem_gb:
   other: 8
   cgemlst: 16
@@ -22,4 +23,5 @@ mem_gb:
   characterize_neisseria_capsule: 8
   tseemann_mlst: 4
   barrnap: 8
+  sistr: 10
 

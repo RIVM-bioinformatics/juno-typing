@@ -1,7 +1,7 @@
 Column	Value	Context	Source
 Predicted serotype	Miami	Confirm with growth on Simmons citrate (should be +)	Validation report
 Predicted serotype	Sendai	Confirm with growth on Simmons citrate (should be -)	Validation report
-Predicted serotype	I 4,[5],12:i:-	Possible monophasic Typhimurium, please confirm	 
+Predicted serotype	I 4,[5],12:i:-	Possible monophasic Typhimurium, please check sistr results	 
 Predicted serotype	I 4:b:-	Biochemical confirmation with d-tartrate and Dulcitol to rule out paratyphi-B and Schleissheim	 
 Predicted serotype	Hasserek	Biochemical confirmation to discriminate hasserek/fulica	
 Predicted serotype	Fulica	Biochemical confirmation to discriminate hasserek/fulica	

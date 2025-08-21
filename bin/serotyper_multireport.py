@@ -48,6 +48,27 @@ class SeqSero2Multireport(SerotyperMultireport):
         multireport["Sample name"] = self.sample_names
         self.multireport = multireport
 
+class SISTRMultireport(SerotyperMultireport):
+    """Class combining results from multiple SISTR results (used for 
+    Salmonella)
+    """
+
+    def extract_from_sistr_result(self, input):
+        sistr_report = pd.read_csv(input, sep=",")
+        return sistr_report
+
+    def make_multireport(self):
+        multireport = [
+            self.extract_from_sistr_result(sistr_result)
+            for sistr_result in self.input_files
+        ]
+        multireport = pd.concat(multireport)
+
+        # insert sample size column as first column since pandas cannot
+        # parse the antigenic code as first column 
+        multireport.insert(0, "Sample name", self.sample_names)
+        multireport = multireport.drop(columns=["genome", "fasta_filepath"])
+        self.multireport = multireport
 
 class SerotypeFinderMultireport(SerotyperMultireport):
     """Class combining results from multiple SerotypeFinder results (used for
@@ -199,6 +220,7 @@ class ChooseMultireport:
     def __classify_serotyper_result_files(self):
         input_files = {
             "seqsero2": [],
+            "sistr": [], 
             "serotypefinder": [],
             "seroba": [],
             "shigatyper": [],
@@ -207,6 +229,8 @@ class ChooseMultireport:
         for file_ in self.serotyper_result_files:
             if file_.endswith("SeqSero_result_with_context.tsv"):
                 input_files["seqsero2"].append(file_)
+            elif file_.endswith("sistr_result.csv"):
+                input_files["sistr"].append(file_)
             elif file_.endswith("result_serotype.csv"):
                 input_files["serotypefinder"].append(file_)
             elif file_.endswith("pred.tsv"):
@@ -245,6 +269,11 @@ class ChooseMultireport:
             print(f"Making serotyper multireport for {serotyper_tool}...")
             if serotyper_tool == "seqsero2":
                 multireport = SeqSero2Multireport(
+                    input_files=self.input_files[serotyper_tool],
+                    output_file=output_file[0],
+                )
+            elif serotyper_tool == "sistr":
+                multireport = SISTRMultireport(
                     input_files=self.input_files[serotyper_tool],
                     output_file=output_file[0],
                 )
