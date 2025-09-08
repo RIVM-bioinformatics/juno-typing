@@ -66,8 +66,10 @@ class SISTRMultireport(SerotyperMultireport):
 
         # insert sample size column as first column since pandas cannot
         # parse the antigenic code as first column 
-        multireport.insert(0, "Sample name", self.sample_names)
-        multireport = multireport.drop(columns=["genome", "fasta_filepath"])
+        multireport.insert(0, "Samplename", self.sample_names)
+        multireport = multireport["Samplename", "serovar", "serovar_cgmlst", "serovar_antigen", "qc_status", "qc_messages", "serogroup", 
+                                "antigenic_formula", "cgmlst_ST", "cgmlst_distance", "cgmlst_found_loci", "cgmlst_genome_match",
+                                "cgmlst_matching_alleles", "cgmlst_subspecies"]
         self.multireport = multireport
 
 class SerotypeFinderMultireport(SerotyperMultireport):
