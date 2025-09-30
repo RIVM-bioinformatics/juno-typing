@@ -25,6 +25,7 @@ rule serotype_multireports:
                     -type f \
                     -name "SeqSero_result_with_context.tsv" \
                     -o -name "result_serotype.csv" \
+                    -o -name "sistr_result.csv" \
                     -o -name "command.txt" \
                     -o -name "shigatyper.csv" \
                     -o -name "neisseriatyper.tab" \
