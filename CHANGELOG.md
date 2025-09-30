@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.7...v0.9.0) (2025-09-30)
+
+
+### Features
+
+* Add SISTR as an additional serotyper for salmonella ([cdb3a00](https://github.com/RIVM-bioinformatics/juno-typing/commit/cdb3a00d2a7df3731d60689136f35a708c0de6b4))
+
+
+### Bug Fixes
+
+* change multireport formatting for sistr ([20de25e](https://github.com/RIVM-bioinformatics/juno-typing/commit/20de25e2c6d6283140d31516c5b23d7ed677c376))
+* column formatting error ([4680847](https://github.com/RIVM-bioinformatics/juno-typing/commit/4680847545513370b407e867065f8c50772b4e8e))
+* update release_please ([4c16cf7](https://github.com/RIVM-bioinformatics/juno-typing/commit/4c16cf799ed6340dbe69e59ab16a970939d37455))
+
 ## [0.8.7](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.6...v0.8.7) (2025-08-04)
 
 ### Bug fixes
