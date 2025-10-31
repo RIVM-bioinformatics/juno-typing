@@ -81,6 +81,30 @@ rule salmonella_serotyper:
         SeqSero2_package.py -m 'a' -t '2' -i {input.r1} {input.r2} -d {params.output_dir} -p {threads} &> {log}
         """
 
+rule salmonella_serotyper_nanopore:
+    input:
+        fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+    output:
+        seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
+        seqsero_tmp1=temp(OUT + "/serotype/{sample}/SeqSero_result.txt"),
+        seqsero_tmp2=temp(OUT + "/serotype/{sample}/data_log.txt"),
+    message:
+        "Running Salmonella serotyper for {wildcards.sample}."
+    log:
+        OUT + "/log/serotype/{sample}_salmonella_seqsero2.log",
+    params:
+        output_dir=OUT + "/serotype/{sample}/",
+    threads: config["threads"]["seqsero2"]
+    resources:
+        mem_gb=config["mem_gb"]["seqsero2"],
+    conda:
+        "../../envs/seqsero.yaml"
+    shell:
+        """
+        # Run seqsero2 
+        # -m 'a' means microassembly mode and -t '3' refers to single-reads
+        SeqSero2_package.py -m 'a' -t '3' -i {input.fastq} -d {params.output_dir} -p {threads} &> {log}
+        """
 
 rule add_context_salmonella_serotyper:
     input:
@@ -291,6 +315,38 @@ rule shigatyper:
         cd "{params.output_dir}"
 
         shigatyper --R1 {input.r1} --R2 {input.r2} | grep -E -A 1 '^sample' > "$(basename {output.command_out})" 2> {log}
+
+        if [ -f {wildcards.sample}.csv ]
+        then
+            mv {wildcards.sample}.csv shigatyper.csv
+        else
+            # save header without data in expected output file
+            echo ",Hit,Number of reads,Length Covered,reference length,% covered,Number of variants,% accuracy" > shigatyper.csv
+        fi
+        """
+
+rule shigatyper_nanopore:
+    input:
+        fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+    output:
+        sample_out=OUT + "/serotype/{sample}/shigatyper.csv",
+        command_out=OUT + "/serotype/{sample}/command.txt",
+    message:
+        "Running Shigella serotyper for {wildcards.sample}."
+    log:
+        OUT + "/log/serotype/{sample}_shigella.log",
+    conda:
+        "../../envs/shigatyper.yaml"
+    resources:
+        mem_gb=config["mem_gb"]["shigatyper"],
+    params:
+        output_dir=OUT + "/serotype/{sample}",
+    shell:
+        """
+        CURRENT_DIR=$(pwd)
+        cd "{params.output_dir}"
+
+        shigatyper --SE {input.fastq} --ont | grep -E -A 1 '^sample' > "$(basename {output.command_out})" 2> {log}
 
         if [ -f {wildcards.sample}.csv ]
         then

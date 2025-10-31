@@ -23,6 +23,10 @@ SAMPLES = {}
 with open(sample_sheet) as sample_sheet_file:
     SAMPLES = safe_load(sample_sheet_file)
 
+#testing accepting illumina or nanopore inputs
+illumina_samples = [s for s in SAMPLES if "R1" in SAMPLES[s] and "R2" in SAMPLES[s]]
+nanopore_samples = [s for s in SAMPLES if "nanopore_input" in SAMPLES[s]]
+
 # OUT defines output directory for most rules.
 OUT = config["out"]
 
@@ -72,7 +76,9 @@ localrules:
 
 rule all:
     input:
-        expand(OUT + "/mlst7/{sample}/results.txt", sample=SAMPLES),
+        expand(OUT + "/mlst7/{sample}/data.json", sample=illumina_samples),
+        expand(OUT + "/mlst7/{sample}/data.json", sample=nanopore_samples),
+        # expand(OUT + "/mlst7/{sample}/results.txt", sample=SAMPLES),
         expand(OUT + "/16s/{sample}/16S_seq.fasta", sample=SAMPLES),
         OUT + "/serotype/serotyper_multireport.csv",
         OUT + "/mlst7/mlst7_multireport.csv",
