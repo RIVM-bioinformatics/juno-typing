@@ -24,8 +24,11 @@ with open(sample_sheet) as sample_sheet_file:
     SAMPLES = safe_load(sample_sheet_file)
 
 #testing accepting illumina or nanopore inputs
-illumina_samples = [s for s in SAMPLES if "R1" in SAMPLES[s] and "R2" in SAMPLES[s]]
-nanopore_samples = [s for s in SAMPLES if "nanopore_input" in SAMPLES[s]]
+# illumina_samples = [s for s in SAMPLES if "R1" in SAMPLES[s] and "R2" in SAMPLES[s]]
+# nanopore_samples = [s for s in SAMPLES if "nanopore_input" in SAMPLES[s]]
+
+illumina_samples = [s for s in SAMPLES if SAMPLES[s].get("sequencing_tech") == "illumina"]
+nanopore_samples = [s for s in SAMPLES if SAMPLES[s].get("sequencing_tech") == "nanopore" ]
 
 # OUT defines output directory for most rules.
 OUT = config["out"]

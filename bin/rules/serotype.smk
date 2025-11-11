@@ -84,10 +84,11 @@ rule salmonella_serotyper:
 rule salmonella_serotyper_nanopore:
     input:
         fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+        # assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
     output:
         seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
         seqsero_tmp1=temp(OUT + "/serotype/{sample}/SeqSero_result.txt"),
-        seqsero_tmp2=temp(OUT + "/serotype/{sample}/data_log.txt"),
+        seqsero_tmp2=temp(OUT + "/serotype/{sample}/SeqSero_log.txt"),
     message:
         "Running Salmonella serotyper for {wildcards.sample}."
     log:
@@ -102,8 +103,8 @@ rule salmonella_serotyper_nanopore:
     shell:
         """
         # Run seqsero2 
-        # -m 'a' means microassembly mode and -t '3' refers to single-reads
-        SeqSero2_package.py -m 'a' -t '3' -i {input.fastq} -d {params.output_dir} -p {threads} &> {log}
+        # -m 'k' means raw reads and genome assembly k-mer mode and -t '4' refers to genome assembly input
+        SeqSero2_package.py -m 'k' -t '5' -i {input.fastq} -d {params.output_dir} -p {threads} &> {log}
         """
 
 rule add_context_salmonella_serotyper:
@@ -379,7 +380,8 @@ rule characterize_neisseria_capsule:
         mem_gb=config["mem_gb"]["characterize_neisseria_capsule"],
     threads: config["threads"]["characterize_neisseria_capsule"]
     params:
-        fasta_dir=OUT + "/de_novo_assembly_filtered/",
+        # fasta_dir=OUT + "/de_novo_assembly_filtered/",
+        fasta_dir=OUT + "/assembly/", #changed to generic name
         output_dir=OUT + "/serotype/{sample}/serogroup",
         copy_to=OUT + "/serotype/{sample}",
     # For this tool we need an input directory and not files, so I copied the filtered assemblies to a new directory, with a directory per sample and use that sample directory as the input
