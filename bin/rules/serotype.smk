@@ -103,7 +103,8 @@ rule salmonella_serotyper_nanopore:
     shell:
         """
         # Run seqsero2 
-        # -m 'k' means raw reads and genome assembly k-mer mode and -t '4' refers to genome assembly input
+        # -m 'k' means raw reads and genome assembly k-mer mode and -t '5' refers to nanopore input
+
         SeqSero2_package.py -m 'k' -t '5' -i {input.fastq} -d {params.output_dir} -p {threads} &> {log}
         """
 
@@ -154,6 +155,7 @@ rule salmonella_serotyping_sistr:
     shell:
         """
         # Run sistr
+        sleep 30
         sistr --qc -vvv -f csv \
             -i {input.assembly} {wildcards.sample} \
             -n {output.novel_alleles} \
