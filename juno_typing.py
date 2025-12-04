@@ -126,6 +126,13 @@ class JunoTyping(Pipeline):
             default="files/SeqSero2_context.tsv",
             help="SeqSero context file which lists additional confirmation steps for O-antigen genes.",
         )
+        self.add_argument(
+        "--latency-wait",
+        type=int,
+        default=60,
+        metavar="SECONDS",
+        help="Seconds to wait for files to appear (for NFS/cluster filesystems). Default is 60.",
+        )
 
     def _parse_args(self) -> argparse.Namespace:
         # Remove this if containers can be used with juno-typing
@@ -148,6 +155,7 @@ class JunoTyping(Pipeline):
         )
         self.update_dbs: bool = args.update
         self.seqsero_context: Path = args.seqsero_context
+        self.latency_wait: int = args.latency_wait
         return args
 
     def setup(self) -> None:
@@ -279,6 +287,7 @@ class JunoTyping(Pipeline):
                     ";",
                 ]
             )
+        self.snakemake_args["latency_wait"] = self.latency_wait
         super().run()
 
 
