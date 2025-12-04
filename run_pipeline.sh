@@ -52,7 +52,7 @@ fi
 
 set -euo pipefail
 
-python juno_typing.py --queue "${QUEUE}" -i "${input_dir}" -o "${output_dir}" --sequencing_tech "nanopore"
+python juno_typing.py --queue "${QUEUE}" -i "${input_dir}" -o "${output_dir}" --sequencing-tech "nanopore"
 
 result=$?
 
