@@ -129,7 +129,7 @@ class JunoTyping(Pipeline):
         self.add_argument(
         "--latency-wait",
         type=int,
-        default=60,
+        default=120,
         metavar="SECONDS",
         help="Seconds to wait for files to appear (for NFS/cluster filesystems). Default is 60.",
         )

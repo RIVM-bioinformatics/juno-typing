@@ -162,7 +162,9 @@ rule salmonella_serotyping_sistr:
             -a {output.allele_seq} \
             -p {output.cgmlst_prof} \
             -o {output.sistr} \
+            --keep-tmp \
             -t {threads} &>{log}
+        sync
         """
 
 
