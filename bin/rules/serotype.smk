@@ -347,9 +347,6 @@ rule shigatyper:
 rule characterize_neisseria_capsule:
     input:
         assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
-    # TODO remove the two lines below
-    # wildcard_constraints:
-        # sample="[^/]+",  # ? regex: only allow values without a "/" in the sample wildcard, this is needed due to the deviating output path of pacini output (which has its own subdir to avoid race conditions)
     output:
         output_dir=directory(OUT + "/serotype/{sample}"),
     message:
