@@ -19,11 +19,13 @@ class DownloadsJunoTyping:
         serotypefinder_db_asked_version="master",
         seroba_db_asked_version="master",
         seroba_kmersize=71,
+        neisseria_db_source="/mnt/db/juno/neisseria_capsule_DB",
     ):
         self.db_dir = pathlib.Path(db_dir)
         self.bin_dir = pathlib.Path(__file__).parent.absolute()
         self.update_dbs = update_dbs
         self.seroba_kmersize = seroba_kmersize
+        self.neisseria_db_source = pathlib.Path(neisseria_db_source)
         self.downloaded_versions = self.get_downloads_juno_typing(
             cge_mlst_asked_version=cge_mlst_asked_version,
             characterize_neisseria_capsule_asked_version=characterize_neisseria_capsule_asked_version,
@@ -103,24 +105,27 @@ class DownloadsJunoTyping:
         return version
 
     def copy_neisseria_db(self):
-        """Function to copy the neisseria db from mnt/db/juno to the bin folder of the neisseria tool.
-        It is necessary for the tool to run the database from this location."""
+        """Copy the neisseria capsule DB into the characterize_neisseria_capsule bin folder."""
         characterize_neisseria_capsule_db_dir = self.bin_dir.joinpath(
             "characterize_neisseria_capsule"
         )
-        if not characterize_neisseria_capsule_db_dir.joinpath(
-            "neisseria_capsule_DB"
-        ).exists():
+        destination = characterize_neisseria_capsule_db_dir.joinpath("neisseria_capsule_DB")
+        if not destination.exists():
+            if not self.neisseria_db_source.exists():
+                raise FileNotFoundError(
+                    f"Neisseria capsule DB source not found at {self.neisseria_db_source}. "
+                    "Pass --neisseria_db_source to override the default."
+                )
             try:
                 print(
-                    f"Copying neisseria db from /mnt/db/juno to: {characterize_neisseria_capsule_db_dir}"
+                    f"Copying neisseria db from {self.neisseria_db_source} to: {destination}"
                 )
                 build = subprocess.run(
                     [
                         "cp",
                         "-R",
-                        "/mnt/db/juno/neisseria_capsule_DB",
-                        f"{characterize_neisseria_capsule_db_dir}",
+                        str(self.neisseria_db_source),
+                        str(destination),
                     ],
                     cwd=str(characterize_neisseria_capsule_db_dir),
                     check=True,
@@ -129,7 +134,7 @@ class DownloadsJunoTyping:
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as err:
                 build.kill()
                 raise Exception(
-                    "Error building neisseria db, this currently only works on RIVM HPC"
+                    f"Error copying neisseria db from {self.neisseria_db_source}"
                 ) from err
         else:
             return print("Neisseria db is available, continue analysis")
@@ -303,6 +308,12 @@ if __name__ == "__main__":
         default=71,
         help="Kmer size to be used to build Seroba's database.",
     )
+    argument_parser.add_argument(
+        "--neisseria-db-source",
+        type=pathlib.Path,
+        default=pathlib.Path("/mnt/db/juno/neisseria_capsule_DB"),
+        help="Source path for the neisseria_capsule_DB.",
+    )
     argument_parser.add_argument("--update", dest="update_dbs", action="store_true")
     args = argument_parser.parse_args()
     downloads = DownloadsJunoTyping(
@@ -314,5 +325,6 @@ if __name__ == "__main__":
         serotypefinder_db_asked_version=args.serotypefinder_db_version,
         seroba_db_asked_version=args.seroba_db_version,
         seroba_kmersize=args.seroba_kmer_size,
+        neisseria_db_source=args.neisseria_db_source,
     )
     print(downloads.downloaded_versions)
