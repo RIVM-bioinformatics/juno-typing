@@ -1,0 +1,9 @@
+name: pacini-typing
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pacini_typing=3.1.0
+  - pip:
+      - cgecore==2.0.1 # ? required by PointFinder.py

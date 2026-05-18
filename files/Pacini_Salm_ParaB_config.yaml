@@ -1,0 +1,30 @@
+%YAML 1.2
+---
+metadata:
+  filename: "Salm_ParaB_STM3357-gene_silenced.fasta"
+  id: "Salm_ParaB_STM3357-gene_silenced"
+  type: "Salmonella Paratyphi B vs Java serovar: STM3357 gene silenced pattern"
+  description:
+    "Genetic pattern run config file for Salmonella Paratyphi B vs Java
+    serovar: STM3357 gene silenced pattern"
+  date_created: "2026-04-20"
+  pointfinder_script_path: <PLACEHOLDER_04>
+
+database:
+  name: "Salm_ParaB_STM3357-gene_silenced"
+  path: "databases/Salmonella_Paratyphi_B_vs_Java_serovar"
+  target_genes_file: <PLACEHOLDER_01>
+  target_snps_file: <PLACEHOLDER_02>
+  path_snps: <PLACEHOLDER_03>
+  species: "Salmonella_ParaB"
+
+global_settings:
+  perc_ident: 80
+  perc_cov: 80
+
+pattern:
+  - gene: "Salm_ParaB_STM3357-gene_silenced"
+  - SNP: "Salm_ParaB_STM3357-gene_silenced"
+    ref: "ATA"
+    alt: "M"
+    pos: 84

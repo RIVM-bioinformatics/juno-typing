@@ -209,6 +209,16 @@ class NeisseriaMultireport(SerotyperMultireport):
         self.multireport = final_df_neisseria
 
 
+class PaciniMultireport(SerotyperMultireport):
+    def make_multireport(self):
+        results = []
+        for sample_name, file_ in zip(self.sample_names, self.input_files):
+            df = pd.read_csv(file_)
+            df.insert(0, "Samplename", sample_name)
+            results.append(df)
+        self.multireport = pd.concat(results, axis=0, ignore_index=True)
+
+
 class ChooseMultireport:
     """Depending on the input file(s) one or more serotype multireport(s) are
     created
@@ -227,6 +237,7 @@ class ChooseMultireport:
             "seroba": [],
             "shigatyper": [],
             "neisseriatyper": [],
+            "pacini": [],
         }
         for file_ in self.serotyper_result_files:
             if file_.endswith("SeqSero_result_with_context.tsv"):
@@ -241,6 +252,8 @@ class ChooseMultireport:
                 input_files["shigatyper"].append(file_)
             elif file_.endswith("neisseriatyper.tab"):
                 input_files["neisseriatyper"].append(file_)
+            elif file_.endswith("_report.csv"):
+                input_files["pacini"].append(file_)
             else:
                 raise ValueError(
                     f"The file {file_} is not recognized as a result from a supported serotyper."
@@ -291,6 +304,11 @@ class ChooseMultireport:
                 )
             elif serotyper_tool == "neisseriatyper":
                 multireport = NeisseriaMultireport(
+                    input_files=self.input_files[serotyper_tool],
+                    output_file=output_file[0],
+                )
+            elif serotyper_tool == "pacini":
+                multireport = PaciniMultireport(
                     input_files=self.input_files[serotyper_tool],
                     output_file=output_file[0],
                 )

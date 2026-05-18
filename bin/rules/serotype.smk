@@ -11,7 +11,8 @@ def choose_serotyper(wildcards):
             OUT + "/serotype/{sample}/sistr_result.csv",
             OUT + "/serotype/{sample}/sistr_novel_alleles.fasta",
             OUT + "/serotype/{sample}/sistr_allele_sequences.json",
-            OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv"
+            OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv",
+            OUT + "/serotype/pacini/{sample}/{sample}_report.csv",
         ]
     elif (
         SAMPLES[wildcards.sample]["genus"] == "escherichia"
@@ -79,6 +80,41 @@ rule salmonella_serotyper:
         # Run seqsero2 
         # -m 'a' means microassembly mode and -t '2' refers to separated fastq files (no interleaved)
         SeqSero2_package.py -m 'a' -t '2' -i {input.r1} {input.r2} -d {params.output_dir} -p {threads} &> {log}
+        """
+
+
+# ? This was added specifically to improve the differentiation of ParaB (paratyphoid fever) and ParaB var java (self-limiting GE)
+# ? See ZenyaFlow 4105 and the internal validation report for more details
+rule pacini_serotyper_salmonella_para_B:
+    input:
+        assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
+    output:
+        output_dir=directory(OUT + "/serotype/pacini/{sample}"),
+        results_file=OUT + "/serotype/pacini/{sample}/{sample}_report.csv",  # ? this is implicitly created
+        snp_db=directory(OUT + "/serotype/pacini/{sample}/Salm_ParaB_STM3357-gene_silenced_SNPs_db"),
+        config=OUT + "/serotype/pacini/{sample}/Pacini_Salm_ParaB_config.yaml", # ? We need to make a config file per sample
+    message:
+        "Running Pacini to differentiate Salmonella Paratyphi B serovars for {wildcards.sample}."
+    log:
+        OUT + "/log/serotype/{sample}_salmonella_pacini.log",
+    conda:
+        "../../envs/pacini.yaml"
+    threads: config["threads"]["pacini"]
+    resources:
+        mem_gb=config["mem_gb"]["pacini"],
+    params:  # ? Pacini's reliance on a config.yaml requires using sed to make a config per sample
+        config=abspath("files/Pacini_Salm_ParaB_config.yaml"),  # ? implicitly defines the Pacini ref fasta: files/Salm_ParaB_STM3357-gene_silenced.fasta | NB., this also implicitly downloads the PointFinder.py script to '~/pacini_typing/PointFinder.py', I don't know if that works with functional accounts, but this needed to happen to make Pacini work
+        target_genes_file=abspath("files/Salm_ParaB_STM3357-gene_silenced.fasta"),
+        target_snps_file=abspath("files/Salm_ParaB_STM3357-gene_silenced.fasta"),
+        pointfinder_exec=OUT + "/serotype/PointFinder.py"  # ? Pacini relies on the PointFinder.py script being in a specific location
+    shell:
+        """
+        sed 's|^  target_genes_file: <PLACEHOLDER_01>|  target_genes_file: "{params.target_genes_file}"|' {params.config} > {output.config} 2> {log}
+        sed -i 's|^  target_snps_file: <PLACEHOLDER_02>|  target_snps_file: "{params.target_snps_file}"|' {output.config} &>> {log}
+        sed -i 's|^  path_snps: <PLACEHOLDER_03>|  path_snps: "{output.snp_db}"|' {output.config} &>> {log}
+        sed -i 's|^  pointfinder_script_path: <PLACEHOLDER_04>|  pointfinder_script_path: "{params.pointfinder_exec}"|' {output.config} &>> {log}
+
+        pacini_typing --input {input.assembly} --config {output.config} -m SNPs -o {output.output_dir} &>> {log}
         """
 
 
@@ -311,6 +347,9 @@ rule shigatyper:
 rule characterize_neisseria_capsule:
     input:
         assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
+    # TODO remove the two lines below
+    # wildcard_constraints:
+        # sample="[^/]+",  # ? regex: only allow values without a "/" in the sample wildcard, this is needed due to the deviating output path of pacini output (which has its own subdir to avoid race conditions)
     output:
         output_dir=directory(OUT + "/serotype/{sample}"),
     message:
