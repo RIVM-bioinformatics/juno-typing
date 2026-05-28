@@ -8,6 +8,23 @@ set -euo pipefail
 # User parameters
 input_dir="${1%/}"
 output_dir="${2%/}"
+PROJECT_NAME="${irods_input_projectID}"
+
+
+#----------Check project to determine sequencing technology----------------#
+case $PROJECT_NAME in
+
+  adhoc|gasadhoc|bacid|rogas|svgasuit|dsshig|svshig|salm|svsalent|svsaltyp|vdl_salm|svlismon|vdl_list|svstec|vdl_ecoli|vdl_stec|campy|vdl_campy)
+    SEQ_TECH="illumina"
+    ;;
+  salm_ont)
+    SEQ_TECH="nanopore"
+    ;;
+  *)
+    echo "ERROR: Unknown project name '${PROJECT_NAME}', cannot determine sequencing technology." >&2
+    exit 1
+    ;;
+esac
 
 #----------------------------------------------#
 ## make sure conda works
@@ -52,7 +69,7 @@ fi
 
 set -euo pipefail
 
-python juno_typing.py --queue "${QUEUE}" -i "${input_dir}" -o "${output_dir}" --sequencing-tech "nanopore"
+python juno_typing.py --queue "${QUEUE}" -i "${input_dir}" -o "${output_dir}" --sequencing-tech "${SEQ_TECH}"
 
 result=$?
 

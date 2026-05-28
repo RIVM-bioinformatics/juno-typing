@@ -5,14 +5,21 @@
 
 def choose_serotyper(wildcards):
     if SAMPLES[wildcards.sample]["genus"] == "salmonella":
-        return [
+        tech = SAMPLES[wildcards.sample].get("sequencing_tech")
+        if tech is None:
+            # infer from available keys
+            tech = "nanopore" if "nanopore_input" in SAMPLES[wildcards.sample] else "illumina"
+            # print(technology inferred for sample {wildcards.sample}: {tech})
+        salmonella_outputs = [
             OUT + "/serotype/{sample}/SeqSero_result_with_context.tsv",
             OUT + "/serotype/{sample}/SeqSero_extra_hits.csv",
             OUT + "/serotype/{sample}/sistr_result.csv",
-            OUT + "/serotype/{sample}/sistr_novel_alleles.fasta",
             OUT + "/serotype/{sample}/sistr_allele_sequences.json",
-            OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv"
+            OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv",
         ]
+        if tech == "illumina":
+            salmonella_outputs.append(OUT + "/serotype/{sample}/sistr_novel_alleles.fasta")
+        return salmonella_outputs
     elif (
         SAMPLES[wildcards.sample]["genus"] == "escherichia"
         or SAMPLES[wildcards.sample]["genus"] == "shigella"
@@ -135,6 +142,8 @@ rule add_context_salmonella_serotyper:
 
 
 rule salmonella_serotyping_sistr:
+    wildcard_constraints:
+        sample="|".join(illumina_samples) if illumina_samples else "NOMATCH",
     input:
         assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"]
     output:
@@ -142,7 +151,6 @@ rule salmonella_serotyping_sistr:
         novel_alleles=OUT + "/serotype/{sample}/sistr_novel_alleles.fasta",
         allele_seq=OUT + "/serotype/{sample}/sistr_allele_sequences.json",
         cgmlst_prof=OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv",
-
     message:
         "Running additional Salmonella serotyper SISTR for {wildcards.sample}"
     log:
@@ -162,11 +170,41 @@ rule salmonella_serotyping_sistr:
             -a {output.allele_seq} \
             -p {output.cgmlst_prof} \
             -o {output.sistr} \
-            --keep-tmp \
             -t {threads} &>{log}
+        sleep 10
         sync
         """
 
+rule salmonella_serotyping_sistr_nanopore:
+    wildcard_constraints:
+        sample="|".join(nanopore_samples) if nanopore_samples else "NOMATCH",
+    input:
+        assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"]
+    output:
+        sistr=OUT + "/serotype/{sample}/sistr_result.csv",
+        allele_seq=OUT + "/serotype/{sample}/sistr_allele_sequences.json",
+        cgmlst_prof=OUT + "/serotype/{sample}/sistr_cgmlst_profile.csv",
+    message:
+        "Running additional Salmonella serotyper SISTR for {wildcards.sample} (nanopore)"
+    log:
+        OUT + "/log/serotype/{sample}_salmonella_sistr.log"
+    threads: config["threads"]["sistr"]
+    resources:
+        mem_gb=config["mem_gb"]["sistr"]
+    conda:
+        "../../envs/sistr.yaml"
+    shell:
+        """
+        sleep 30
+        sistr --qc -vvv -f csv \
+            -i {input.assembly} {wildcards.sample} \
+            -a {output.allele_seq} \
+            -p {output.cgmlst_prof} \
+            -o {output.sistr} \
+            -t {threads} &>{log}
+        sleep 10
+        sync
+        """
 
 rule convert_blastxml_to_csv:
     input:
