@@ -85,3 +85,4 @@ rule all:
         expand(OUT + "/16s/{sample}/16S_seq.fasta", sample=SAMPLES),
         OUT + "/serotype/serotyper_multireport.csv",
         OUT + "/mlst7/mlst7_multireport.csv",
+        # expand(OUT + "/mlst7/{sample}/mlst_report.tsv", sample=nanopore_samples),

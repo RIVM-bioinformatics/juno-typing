@@ -2,7 +2,6 @@
 #####                               MLST7                               #####
 #############################################################################
 
-
 rule mlst7:
     input:
         r1=lambda wildcards: SAMPLES[wildcards.sample]["R1"],
@@ -45,7 +44,8 @@ rule mlst7:
 
 rule mlst7_nanopore:
     input:
-        fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+        # fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+        assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
         db=config["mlst7_db"] + "/senterica/senterica.length.b",
     output:
         json=temp(OUT + "/mlst7/{sample}/data.json"),
@@ -53,6 +53,7 @@ rule mlst7_nanopore:
         fasta=(OUT + "/mlst7/{sample}/MLST_allele_seq.fsa"),
         hits=temp(OUT + "/mlst7/{sample}/Hit_in_genome_seq.fsa"),
         tab=temp(OUT + "/mlst7/{sample}/results_tab.tsv"),
+        tmp_mlst=directory(OUT + "/mlst7/{sample}/temp")
     message:
         "Calculating the 7 locus-MLST for {wildcards.sample}"
     conda:
@@ -73,12 +74,72 @@ rule mlst7_nanopore:
             touch {output.json}
             cp files/no_mlst7.json {output.json}
         else
-            python bin/cge-mlst/mlst.py -i {input.fastq} \
+            python bin/cge-mlst/mlst.py -i {input.assembly} \
             -o $(dirname {output.json}) \
             -s {params.species} \
             --database {params.mlst7_db} \
-            -mp kma \
+            -mp blastn \
+            -t {output.tmp_mlst}\
             -x &>> {log}
         fi
         """
 
+# rule mlst7_nanopore:
+#     input:
+#         # fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+#         assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
+#     output:
+#         mlst=OUT + "/mlst7/{sample}/mlst_tseemann.tsv",
+        
+#     message:
+#         "Calculating the 7 locus-MLST for {wildcards.sample}"
+#     conda:
+#         "../../envs/tseemann_mlst.yaml"
+#     log:
+#         OUT + "/log/mlst7/{sample}.log",
+#     threads: config["threads"]["tseemann_mlst"]
+#     resources:
+#         mem_gb=config["mem_gb"]["tseemann_mlst"],
+#     params:
+#         species=lambda wildcards: SAMPLES[wildcards.sample]["species-mlst7"],
+#         # mlst7_db=config["mlst7_db"],
+#     shell:
+#         """
+#         mlst {input.assembly}  > {output.mlst} 2>> {log}
+#         """
+
+# rule parse_mlst7_tseemann:
+#     input:
+#         OUT + "/mlst7/{sample}/mlst_tseemann.tsv",
+#     output:
+#         OUT + "/mlst7/{sample}/mlst_report.tsv",
+#     threads: config["threads"]["tseemann_mlst"]
+#     resources:
+#         mem_gb=config["mem_gb"]["tseemann_mlst"],
+#     run:
+#         import pandas as pd
+#         import re
+        
+#         rows = []
+#         genes = set()
+
+#         with open(input[0]) as f:
+#             for line in f:
+#                 fields = line.strip().split("\t")
+
+#                 row = {
+#                     "sample": fields[0].split("/")[-1].split(".")[0],
+#                     "scheme": fields[1],
+#                     "ST": fields[2],
+#                 }
+
+#                 for allele in fields[3:]:
+#                     m = re.match(r"(.+)\((.+)\)", allele)
+#                     if m:
+#                         gene, allele_number = m.groups()
+#                         row[gene] = allele_number
+#                         genes.add(gene)
+#                 rows.append(row)
+        
+#         cols = ["sample", "scheme", "ST"] + sorted(genes)
+#         pd.DataFrame(rows).reindex(columns=cols).to_csv(output[0], sep="\t", index=False)

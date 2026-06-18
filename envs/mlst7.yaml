@@ -11,5 +11,6 @@ dependencies:
   - git
   - pip
   - pandas
+  - blast=2.12.0
   - pip:
     - PyYAML==5.3.1

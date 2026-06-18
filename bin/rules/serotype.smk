@@ -90,8 +90,8 @@ rule salmonella_serotyper:
 
 rule salmonella_serotyper_nanopore:
     input:
-        fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
-        # assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
+        # fastq=lambda wildcards: SAMPLES[wildcards.sample]["nanopore_input"],
+        assembly=lambda wildcards: SAMPLES[wildcards.sample]["assembly"],
     output:
         seqsero=OUT + "/serotype/{sample}/SeqSero_result.tsv",
         seqsero_tmp1=temp(OUT + "/serotype/{sample}/SeqSero_result.txt"),
@@ -112,7 +112,7 @@ rule salmonella_serotyper_nanopore:
         # Run seqsero2 
         # -m 'k' means raw reads and genome assembly k-mer mode and -t '5' refers to nanopore input
 
-        SeqSero2_package.py -m 'k' -t '5' -i {input.fastq} -d {params.output_dir} -p {threads} &> {log}
+        SeqSero2_package.py -m 'k' -t '5' -i {input.assembly} -d {params.output_dir} -p {threads} &> {log}
         """
 
 rule add_context_salmonella_serotyper:
