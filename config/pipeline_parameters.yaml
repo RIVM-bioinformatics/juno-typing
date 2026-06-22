@@ -11,6 +11,7 @@ threads:
   tseemann_mlst: 1
   barrnap: 6
   sistr: 6
+  pacini: 1
 mem_gb:
   other: 8
   cgemlst: 16
@@ -24,4 +25,4 @@ mem_gb:
   tseemann_mlst: 4
   barrnap: 8
   sistr: 10
-
+  pacini: 8

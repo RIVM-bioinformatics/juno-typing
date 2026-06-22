@@ -23,14 +23,15 @@ rule serotype_multireports:
             sample_subfolder="{params.output_dir}/${{subfolder}}"
             result_sample=$(find "${{sample_subfolder}}" \
                     -type f \
-                    -name "SeqSero_result_with_context.tsv" \
+                    \( -name "SeqSero_result_with_context.tsv" \
                     -o -name "result_serotype.csv" \
                     -o -name "sistr_result.csv" \
                     -o -name "command.txt" \
                     -o -name "shigatyper.csv" \
                     -o -name "neisseriatyper.tab" \
-                    -o -name "pred.tsv")
-            echo $result_sample &> {log}
+                    -o -name "pred.tsv" \
+                    -o \( -path "*/pacini/*" -a -name "*_report.csv" \) \))
+                echo $result_sample &>> {log}
             input_serotype="${{input_serotype}} ${{result_sample}}"
         done
 
