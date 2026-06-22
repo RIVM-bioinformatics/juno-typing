@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.9.0...v0.10.0) (2026-06-22)
+
+
+### Features
+
+* added pacini for ParaB typing ([f08bc4c](https://github.com/RIVM-bioinformatics/juno-typing/commit/f08bc4cbbaceb3e22e3b68fc4002c11357fb3f4b))
+
 ## [0.9.0](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.8.7...v0.9.0) (2025-09-30)
 
 
