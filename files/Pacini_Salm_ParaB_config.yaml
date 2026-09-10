@@ -3,10 +3,10 @@
 metadata:
   filename: "Salm_ParaB_STM3357-gene_silenced.fasta"
   id: "Salm_ParaB_STM3357-gene_silenced"
-  type: "Salmonella Paratyphi B vs Java serovar: STM3357 gene silenced pattern"
+  type: "STM3357 gene expressed: Salmonella Paratyphi B var Java"
   description:
     "Genetic pattern run config file for Salmonella Paratyphi B vs Java
-    serovar: STM3357 gene silenced pattern"
+    serovar: STM3357 gene expressed"
   date_created: "2026-04-20"
   pointfinder_script_path: <PLACEHOLDER_04>
 
