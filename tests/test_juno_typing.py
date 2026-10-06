@@ -1,5 +1,7 @@
 import csv
 import os
+import shutil
+import tempfile
 from pathlib import Path
 from sys import path
 import unittest
@@ -58,6 +60,65 @@ class TestDownloadDbs(unittest.TestCase):
         self.assertTrue(
             path_to_db.joinpath("seroba_db", "database", "cdhit_cluster").exists()
         )
+
+
+class TestCopyNeisseriaDb(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.tmp = Path(tempfile.mkdtemp())
+        self.fake_source = self.tmp / "neisseria_capsule_DB"
+        self.fake_source.mkdir()
+        (self.fake_source / "marker.txt").write_text("hello")
+        self.fake_bin = self.tmp / "bin"
+        (self.fake_bin / "characterize_neisseria_capsule").mkdir(parents=True)
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.tmp)
+
+    def _make_instance(self, source: Path) -> DownloadsJunoTyping:
+        instance = DownloadsJunoTyping.__new__(DownloadsJunoTyping)
+        instance.bin_dir = self.fake_bin
+        instance.neisseria_db_source = source
+        return instance
+
+    def test_copies_from_overridden_source(self) -> None:
+        instance = self._make_instance(self.fake_source)
+        instance.copy_neisseria_db()
+        copied_marker = (
+            self.fake_bin
+            / "characterize_neisseria_capsule"
+            / "neisseria_capsule_DB"
+            / "marker.txt"
+        )
+        self.assertTrue(copied_marker.exists())
+        self.assertEqual(copied_marker.read_text(), "hello")
+
+    def test_copies_from_arbitrarily_named_source(self) -> None:
+        renamed = self.tmp / "my_custom_db"
+        renamed.mkdir()
+        (renamed / "marker.txt").write_text("hello")
+        instance = self._make_instance(renamed)
+        instance.copy_neisseria_db()
+        copied_marker = (
+            self.fake_bin
+            / "characterize_neisseria_capsule"
+            / "neisseria_capsule_DB"
+            / "marker.txt"
+        )
+        self.assertTrue(copied_marker.exists())
+
+    def test_missing_source_raises_clear_error(self) -> None:
+        instance = self._make_instance(self.tmp / "does_not_exist")
+        with self.assertRaises(FileNotFoundError) as ctx:
+            instance.copy_neisseria_db()
+        self.assertIn("does_not_exist", str(ctx.exception))
+
+    def test_default_preserves_rivm_hpc_path(self) -> None:
+        import inspect
+        default = inspect.signature(
+            DownloadsJunoTyping.__init__
+        ).parameters["neisseria_db_source"].default
+        self.assertEqual(str(default), "/mnt/db/juno/neisseria_capsule_DB")
 
 
 class TestJunoTypingDryRun(unittest.TestCase):

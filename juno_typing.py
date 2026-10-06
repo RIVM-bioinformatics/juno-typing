@@ -115,6 +115,13 @@ class JunoTyping(Pipeline):
             help="Name for the directory containing the Bordetella vaccine antigen MLST scheme in --db_dir. Should contain a BLAST db with base name bordetella.fa",
         )
         self.add_argument(
+            "--neisseria_db_source",
+            type=Path,
+            metavar="DIR",
+            default=Path("/mnt/db/juno/neisseria_capsule_DB"),
+            help="Source path for the neisseria_capsule_DB.",
+        )
+        self.add_argument(
             "--update",
             action="store_true",
             help="Force database update even if they are present.",
@@ -147,6 +154,7 @@ class JunoTyping(Pipeline):
             args.bordetella_vaccine_antigen_scheme_name
         )
         self.update_dbs: bool = args.update
+        self.neisseria_db_source: Path = args.neisseria_db_source
         self.seqsero_context: Path = args.seqsero_context
         return args
 
@@ -244,6 +252,7 @@ class JunoTyping(Pipeline):
                 mlst7_db_asked_version="master",
                 serotypefinder_db_asked_version="master",
                 seroba_db_asked_version="master",
+                neisseria_db_source=self.neisseria_db_source,
             )
             self.downloads_versions = downloads_juno_typing.downloaded_versions
             with open(
