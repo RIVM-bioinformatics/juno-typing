@@ -10,7 +10,7 @@ dependencies:
   - pandas=1.5.3
   - pandas-stubs=1.5.3
   - drmaa==0.7.9
-  - snakemake=7.25.*
+  - snakemake=7.24.*
   - xlrd=2.0.*
   - pyyaml=6.0
   - types-PyYaml=6.*
@@ -29,4 +29,4 @@ dependencies:
   - pulp=2.7.0
   - pyopenssl>=24.0.0
   - pip:
-    - "--editable=git+https://github.com/RIVM-bioinformatics/juno-library.git@v2.2.2#egg=juno_library"
+      - "--editable=git+https://github.com/RIVM-bioinformatics/juno-library.git@v2.2.2#egg=juno_library"
