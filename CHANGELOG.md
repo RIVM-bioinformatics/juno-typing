@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.2](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.10.1...v0.10.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* old mamba version pinning led to failing builds, mamba should be provided by the host system ([b840d6b](https://github.com/RIVM-bioinformatics/juno-typing/commit/b840d6b21b56d8a1d1c188afb487de8fe753e67c))
+
 ## [0.10.1](https://github.com/RIVM-bioinformatics/juno-typing/compare/v0.10.0...v0.10.1) (2026-09-10)
 
 
